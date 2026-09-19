@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biguhuh — Projets</title>
+<meta name="description" content="Sommaire des projets web d'Édouard Beauvier">
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #5a5a5a;
+    --accent: #2f6f4f;
+    --border: #e3e2dd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --card-bg: #1d2025;
+      --text: #f0f0ee;
+      --muted: #a3a6ab;
+      --accent: #6fcf97;
+      --border: #2c2f35;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 64px 20px 80px;
+  }
+  header {
+    margin-bottom: 48px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+  }
+  header p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 15px;
+  }
+  .grid {
+    display: grid;
+    gap: 16px;
+  }
+  a.card {
+    display: block;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  a.card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .card h2 {
+    margin: 0 0 6px;
+    font-size: 17px;
+    color: var(--accent);
+  }
+  .card p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  footer {
+    margin-top: 56px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer a {
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Biguhuh</h1>
+    <p>Sommaire de mes pages web publiques sur GitHub.</p>
+  </header>
+
+  <div class="grid">
+    <a class="card" href="https://biguhuh.github.io/cancer/">
+      <h2>Cancer, pesticides et alimentation</h2>
+      <p>Étude sur les cancers, pesticides et alimentation — Santé des Territoires Aigondigné.</p>
+    </a>
+
+    <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/">
+      <h2>Carte des cantines EGALIM</h2>
+      <p>Carte interactive des cantines EGALIM (Charente-Maritime 17 &amp; Deux-Sèvres 79), mise à jour mensuelle depuis data.gouv.fr.</p>
+    </a>
+
+    <a class="card" href="https://biguhuh.github.io/votes_parlementaires/">
+      <h2>Votes parlementaires</h2>
+      <p>Suivi des votes parlementaires.</p>
+    </a>
+
+    <a class="card" href="https://biguhuh.github.io/taxi-fare-interface/">
+      <h2>Taxi Fare Interface</h2>
+      <p>Interface de prédiction du prix d'une course de taxi.</p>
+    </a>
+  </div>
+
+  <footer>
+    <a href="https://github.com/Biguhuh">github.com/Biguhuh</a>
+  </footer>
+</main>
+</body>
+</html>
