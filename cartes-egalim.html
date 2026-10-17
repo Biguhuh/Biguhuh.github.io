@@ -6,7 +6,10 @@
 <title>Cartes EGALIM 2025 par intercommunalité</title>
 <meta name="description" content="Cartes EGALIM 2025 figées, une par intercommunalité de Charente-Maritime et des Deux-Sèvres.">
 <!-- Page générée par map_cantines_egalim/src/static_map.py (--tous) : ne pas modifier à la main. -->
-<script>document.documentElement.classList.add("js");</script>
+<script>
+  document.documentElement.classList.add("js");
+  try { if (localStorage.getItem("egalim-palette") === "daltonien") document.documentElement.dataset.palette = "daltonien"; } catch (e) {}
+</script>
 <style>
   :root {
     --bg: #f7f7f5;
@@ -41,6 +44,12 @@
   header p { color: var(--muted); margin: 0 0 8px; font-size: 15px; line-height: 1.55;
              text-align: justify; hyphens: auto; }
   header a { color: var(--accent); }
+  .btn { font: inherit; font-size: 14px; font-weight: 600; padding: 9px 14px; border-radius: 8px; cursor: pointer;
+         border: 1px solid var(--border); background: var(--card-bg); color: var(--text); margin-top: 8px; }
+  .btn:hover { border-color: var(--accent); }
+  .palette-toggle { display: none; }
+  .js .palette-toggle { display: inline-block; }
+  .palette-toggle[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
   /* Onglets par département. Sans JavaScript, les onglets restent cachés et les départements
      s'affichent l'un sous l'autre, chacun avec son titre. */
   .tabs { display: none; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; flex-wrap: wrap; }
@@ -83,6 +92,7 @@
       et crèches, comparée aux objectifs EGALIM et aux communes voisines.</p>
     <p>Pour explorer cantine par cantine, voir la
       <a href="https://biguhuh.github.io/map_cantines_egalim/">carte interactive</a>.</p>
+    <button class="btn palette-toggle" type="button" aria-pressed="false">Couleurs adaptées aux daltoniens</button>
   </header>
   <div class="tabs" role="tablist" aria-label="Départements">
     <button role="tab" id="tab-17" aria-controls="dep-17" data-dep="17" aria-selected="true" tabindex="0">Charente-Maritime (17) <span>13</span></button>
@@ -92,67 +102,67 @@
     <h2 class="dep-title">Charente-Maritime (17)</h2>
     <div class="grid">
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-de-la-rochelle-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-de-la-rochelle-2025.svg" alt="Carte EGALIM 2025 de la CA de La Rochelle" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-de-la-rochelle-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-de-la-rochelle-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-de-la-rochelle-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CA de La Rochelle" loading="lazy">
         <h2>CA de La Rochelle</h2>
         <p>23 communes déclarées sur 24 avec cantine · 28 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-rochefort-ocean-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-rochefort-ocean-2025.svg" alt="Carte EGALIM 2025 de la CA Rochefort Océan" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-rochefort-ocean-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-rochefort-ocean-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-rochefort-ocean-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CA Rochefort Océan" loading="lazy">
         <h2>CA Rochefort Océan</h2>
         <p>16 communes déclarées sur 18 avec cantine · 25 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-royan-atlantique-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-royan-atlantique-2025.svg" alt="Carte EGALIM 2025 de la CA Royan Atlantique" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-royan-atlantique-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-royan-atlantique-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-royan-atlantique-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CA Royan Atlantique" loading="lazy">
         <h2>CA Royan Atlantique</h2>
         <p>6 communes déclarées sur 13 avec cantine · 33 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-saintes-grandes-rives-l-agglo-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-saintes-grandes-rives-l-agglo-2025.svg" alt="Carte EGALIM 2025 de la CA &quot;Saintes - Grandes Rives - L&#x27;Agglo&quot;" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-saintes-grandes-rives-l-agglo-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-saintes-grandes-rives-l-agglo-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-saintes-grandes-rives-l-agglo-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CA &quot;Saintes - Grandes Rives - L&#x27;Agglo&quot;" loading="lazy">
         <h2>CA &quot;Saintes - Grandes Rives - L&#x27;Agglo&quot;</h2>
         <p>27 communes déclarées sur 27 avec cantine · 36 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-atlantique-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-atlantique-2025.svg" alt="Carte EGALIM 2025 de la CC Aunis Atlantique" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-atlantique-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-atlantique-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-atlantique-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC Aunis Atlantique" loading="lazy">
         <h2>CC Aunis Atlantique</h2>
         <p>11 communes déclarées sur 14 avec cantine · 20 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-sud-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-sud-2025.svg" alt="Carte EGALIM 2025 de la CC Aunis Sud" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-sud-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-sud-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-aunis-sud-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC Aunis Sud" loading="lazy">
         <h2>CC Aunis Sud</h2>
         <p>13 communes déclarées sur 15 avec cantine · 24 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-coeur-de-saintonge-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-coeur-de-saintonge-2025.svg" alt="Carte EGALIM 2025 de la CC Coeur de Saintonge" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-coeur-de-saintonge-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-coeur-de-saintonge-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-coeur-de-saintonge-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC Coeur de Saintonge" loading="lazy">
         <h2>CC Coeur de Saintonge</h2>
         <p>12 communes déclarées sur 13 avec cantine · 18 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-gemozac-et-de-la-saintonge-viticole-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-gemozac-et-de-la-saintonge-viticole-2025.svg" alt="Carte EGALIM 2025 de la CC de Gémozac et de la Saintonge Viticole" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-gemozac-et-de-la-saintonge-viticole-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-gemozac-et-de-la-saintonge-viticole-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-gemozac-et-de-la-saintonge-viticole-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC de Gémozac et de la Saintonge Viticole" loading="lazy">
         <h2>CC de Gémozac et de la Saintonge Viticole</h2>
         <p>5 communes déclarées sur 10 avec cantine · 16 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-d-oleron-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-d-oleron-2025.svg" alt="Carte EGALIM 2025 de la CC de l&#x27;Ile d&#x27;Oléron" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-d-oleron-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-d-oleron-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-d-oleron-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC de l&#x27;Ile d&#x27;Oléron" loading="lazy">
         <h2>CC de l&#x27;Ile d&#x27;Oléron</h2>
         <p>7 communes déclarées sur 7 avec cantine · 8 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-de-re-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-de-re-2025.svg" alt="Carte EGALIM 2025 de la CC de l&#x27;Ile de Ré" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-de-re-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-de-re-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-l-ile-de-re-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC de l&#x27;Ile de Ré" loading="lazy">
         <h2>CC de l&#x27;Ile de Ré</h2>
         <p>5 communes déclarées sur 7 avec cantine · 10 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-la-haute-saintonge-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-la-haute-saintonge-2025.svg" alt="Carte EGALIM 2025 de la CC de la Haute Saintonge" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-la-haute-saintonge-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-la-haute-saintonge-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-la-haute-saintonge-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC de la Haute Saintonge" loading="lazy">
         <h2>CC de la Haute Saintonge</h2>
         <p>15 communes déclarées sur 35 avec cantine · 129 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-bassin-de-marennes-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-bassin-de-marennes-2025.svg" alt="Carte EGALIM 2025 de la CC du Bassin de Marennes" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-bassin-de-marennes-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-bassin-de-marennes-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-bassin-de-marennes-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC du Bassin de Marennes" loading="lazy">
         <h2>CC du Bassin de Marennes</h2>
         <p>2 communes déclarées sur 4 avec cantine · 6 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-vals-de-saintonge-communaute-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-vals-de-saintonge-communaute-2025.svg" alt="Carte EGALIM 2025 de la CC Vals de Saintonge Communauté" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-vals-de-saintonge-communaute-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-vals-de-saintonge-communaute-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-vals-de-saintonge-communaute-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC Vals de Saintonge Communauté" loading="lazy">
         <h2>CC Vals de Saintonge Communauté</h2>
         <p>16 communes déclarées sur 21 avec cantine · 109 communes</p>
       </a>
@@ -162,42 +172,42 @@
     <h2 class="dep-title">Deux-Sèvres (79)</h2>
     <div class="grid">
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-bocage-bressuirais-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-bocage-bressuirais-2025.svg" alt="Carte EGALIM 2025 de la CA du Bocage Bressuirais" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-bocage-bressuirais-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-bocage-bressuirais-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-bocage-bressuirais-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CA du Bocage Bressuirais" loading="lazy">
         <h2>CA du Bocage Bressuirais</h2>
         <p>13 communes déclarées sur 16 avec cantine · 33 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-niortais-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-niortais-2025.svg" alt="Carte EGALIM 2025 de la CA du Niortais" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-niortais-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-niortais-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/ca-du-niortais-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CA du Niortais" loading="lazy">
         <h2>CA du Niortais</h2>
         <p>21 communes déclarées sur 30 avec cantine · 40 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-airvaudais-val-du-thouet-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-airvaudais-val-du-thouet-2025.svg" alt="Carte EGALIM 2025 de la CC Airvaudais-Val du Thouet" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-airvaudais-val-du-thouet-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-airvaudais-val-du-thouet-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-airvaudais-val-du-thouet-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC Airvaudais-Val du Thouet" loading="lazy">
         <h2>CC Airvaudais-Val du Thouet</h2>
         <p>0 communes déclarées sur 2 avec cantine · 9 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-parthenay-gatine-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-parthenay-gatine-2025.svg" alt="Carte EGALIM 2025 de la CC de Parthenay-Gâtine" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-parthenay-gatine-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-parthenay-gatine-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-de-parthenay-gatine-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC de Parthenay-Gâtine" loading="lazy">
         <h2>CC de Parthenay-Gâtine</h2>
         <p>7 communes déclarées sur 15 avec cantine · 38 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-thouarsais-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-thouarsais-2025.svg" alt="Carte EGALIM 2025 de la CC du Thouarsais" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-thouarsais-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-thouarsais-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-du-thouarsais-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC du Thouarsais" loading="lazy">
         <h2>CC du Thouarsais</h2>
         <p>7 communes déclarées sur 9 avec cantine · 24 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-haut-val-de-sevre-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-haut-val-de-sevre-2025.svg" alt="Carte EGALIM 2025 de la CC Haut Val de Sèvre" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-haut-val-de-sevre-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-haut-val-de-sevre-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-haut-val-de-sevre-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC Haut Val de Sèvre" loading="lazy">
         <h2>CC Haut Val de Sèvre</h2>
         <p>9 communes déclarées sur 14 avec cantine · 19 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-mellois-en-poitou-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-mellois-en-poitou-2025.svg" alt="Carte EGALIM 2025 de la CC Mellois en Poitou" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-mellois-en-poitou-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-mellois-en-poitou-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-mellois-en-poitou-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC Mellois en Poitou" loading="lazy">
         <h2>CC Mellois en Poitou</h2>
         <p>26 communes déclarées sur 28 avec cantine · 58 communes</p>
       </a>
       <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-val-de-gatine-2025.html">
-        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-val-de-gatine-2025.svg" alt="Carte EGALIM 2025 de la CC Val de Gâtine" loading="lazy">
+        <img src="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-val-de-gatine-2025.svg" data-classique="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-val-de-gatine-2025.svg" data-daltonien="https://biguhuh.github.io/map_cantines_egalim/cartes/cc-val-de-gatine-2025-daltonien.svg" alt="Carte EGALIM 2025 de la CC Val de Gâtine" loading="lazy">
         <h2>CC Val de Gâtine</h2>
         <p>3 communes déclarées sur 10 avec cantine · 31 communes</p>
       </a>
@@ -229,6 +239,25 @@
   });
   addEventListener("hashchange", () => show(location.hash.slice(1)));
   show(location.hash.slice(1));
+</script>
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.querySelector(".palette-toggle");
+    function apply(p) {
+      if (p === "daltonien") root.dataset.palette = "daltonien"; else delete root.dataset.palette;
+      if (btn) btn.setAttribute("aria-pressed", p === "daltonien");
+      document.querySelectorAll("[data-classique][data-daltonien]").forEach(function (el) {
+        var v = el.getAttribute("data-" + p);
+        if (el.tagName === "IMG") el.src = v; else el.href = v;
+      });
+    }
+    apply(root.dataset.palette || "classique");
+    if (btn) btn.addEventListener("click", function () {
+      var p = root.dataset.palette === "daltonien" ? "classique" : "daltonien";
+      try { localStorage.setItem("egalim-palette", p); } catch (e) {}
+      apply(p);
+    });
+  })();
 </script>
 </body>
 </html>
