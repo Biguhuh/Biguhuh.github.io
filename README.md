@@ -2,7 +2,11 @@
 
 Page sommaire listant mes projets web publiés sur GitHub Pages : https://biguhuh.github.io/
 
-Pour ajouter un projet, éditer `index.html` et ajouter une carte dans la grille.
+La page est découpée en deux sections : **Environnement et santé** et **Autres**. Pour ajouter un
+projet, éditer `index.html` et ajouter une carte dans la grille de la bonne section.
+
+`cartes-egalim.html` ne fait plus que rediriger vers la galerie des cartes EGALIM, désormais
+publiée par le dépôt `map_cantines_egalim` (https://biguhuh.github.io/map_cantines_egalim/cartes/).
 
 ## Licence
 

@@ -67,7 +67,18 @@
     border-color: var(--accent);
     transform: translateY(-1px);
   }
-  .card h2 {
+  section + section {
+    margin-top: 44px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+  .card h3 {
     margin: 0 0 6px;
     font-size: 17px;
     color: var(--accent);
@@ -95,32 +106,40 @@
     <p>Sommaire de mes pages web publiques sur GitHub.</p>
   </header>
 
-  <div class="grid">
-    <a class="card" href="https://biguhuh.github.io/cancer/">
-      <h2>Cancers, pesticides et voies d'exposition</h2>
-      <p>Étude sur les cancers, pesticides et voies d'exposition — Santé des Territoires Aigondigné.</p>
-    </a>
+  <section aria-labelledby="sante">
+    <h2 class="section-title" id="sante">Environnement et santé</h2>
+    <div class="grid">
+      <a class="card" href="https://biguhuh.github.io/cancer/">
+        <h3>Cancers, pesticides et voies d'exposition</h3>
+        <p>Étude sur les cancers, pesticides et voies d'exposition — Santé des Territoires Aigondigné.</p>
+      </a>
 
-    <a class="card" href="https://biguhuh.github.io/restitutions-exposition-pesticides.html">
-      <h2>Restitutions Exposition aux Pesticides, Santé des Territoires</h2>
-      <p>Comptes rendus des restitutions du programme de recherche Santé des Territoires du CEBC de Chizé, au fil des résultats — Santé des Territoires Aigondigné.</p>
-    </a>
+      <a class="card" href="https://biguhuh.github.io/restitutions-exposition-pesticides.html">
+        <h3>Restitutions Exposition aux Pesticides, Santé des Territoires</h3>
+        <p>Comptes rendus des restitutions du programme de recherche Santé des Territoires du CEBC de Chizé, au fil des résultats — Santé des Territoires Aigondigné.</p>
+      </a>
 
-    <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/">
-      <h2>Carte des cantines EGALIM</h2>
-      <p>Carte interactive des cantines EGALIM (Charente-Maritime 17 &amp; Deux-Sèvres 79), mise à jour mensuelle depuis data.gouv.fr.</p>
-    </a>
+      <a class="card" href="https://biguhuh.github.io/map_cantines_egalim/">
+        <h3>Cantines EGALIM</h3>
+        <p>Bio et produits durables dans les cantines de Charente-Maritime (17) et des Deux-Sèvres (79) : cartes figées par intercommunalité et carte interactive mise à jour chaque mois.</p>
+      </a>
 
-    <a class="card" href="https://biguhuh.github.io/cartes-egalim.html">
-      <h2>Cartes EGALIM par intercommunalité</h2>
-      <p>Une carte figée par intercommunalité (17 &amp; 79) : bio et produits durables de chaque commune, comparés aux objectifs EGALIM et aux communes voisines.</p>
-    </a>
+      <a class="card" href="https://biguhuh.github.io/votes_parlementaires/">
+        <h3>Votes parlementaires</h3>
+        <p>Suivi des votes parlementaires.</p>
+      </a>
+    </div>
+  </section>
 
-    <a class="card" href="https://biguhuh.github.io/votes_parlementaires/">
-      <h2>Votes parlementaires</h2>
-      <p>Suivi des votes parlementaires.</p>
-    </a>
-  </div>
+  <section aria-labelledby="autres">
+    <h2 class="section-title" id="autres">Autres</h2>
+    <div class="grid">
+      <a class="card" href="https://biguhuh.github.io/poussieres/">
+        <h3>Poussières</h3>
+        <p>Animation de la chute de poussières de différentes tailles (0,01 µm à quelques mm) dans de l'air au repos, selon la mécanique des fluides.</p>
+      </a>
+    </div>
+  </section>
 
   <footer>
     <a href="https://github.com/Biguhuh">github.com/Biguhuh</a>
