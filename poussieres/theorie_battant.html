@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Théorie · Battant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Colonne de lecture unique, sur le même fond nuit que les animations */
+  :root {
+    --fond: #0b0d12; --surface: #141821; --trait: #262c3a; --texte: #e6e8ee; --doux: #8b93a7;
+    --poussiere: #ffc857; --lien: #6cb2ff;
+    --titre: "Instrument Serif", Georgia, serif;
+    --corps: "Source Sans 3", system-ui, sans-serif;
+    --donnees: "JetBrains Mono", ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--fond); }
+  body {
+    margin: 0; background: var(--fond); color: var(--texte);
+    font: 17px/1.62 var(--corps);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .page { max-width: 46rem; margin: 0 auto; padding-block: 8px 64px; }
+  .site-nav a { color: var(--lien); text-decoration: none; }
+  h1, h2 { font-family: var(--titre); font-weight: 400; text-wrap: balance; line-height: 1.15; }
+  h1 { font-size: clamp(2.1rem, 5vw, 2.9rem); margin: 28px 0 8px; }
+  h2 { font-size: 1.75rem; margin: 48px 0 10px; padding-top: 14px; border-top: 1px solid var(--trait); }
+  h3 { font-size: 1.08rem; margin: 30px 0 6px; font-weight: 600; }
+  p, li { color: var(--texte); }
+  a { color: var(--lien); }
+  strong { color: #fff; font-weight: 600; }
+  code { font-family: var(--donnees); font-size: 0.86em; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--surface); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+  hr { border: 0; height: 0; margin: 8px 0; }
+  blockquote { margin: 18px 0; padding: 4px 16px; border-left: 3px solid var(--poussiere); background: var(--surface); border-radius: 0 6px 6px 0; }
+  blockquote p { margin: 8px 0; }
+  .tableau { overflow-x: auto; margin: 16px 0; }
+  table { border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; min-width: 100%; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: top; }
+  th { color: var(--doux); font-weight: 600; background: var(--surface); }
+  mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 4px 0; }
+  .pied { margin-top: 48px; color: var(--doux); font-size: 0.85rem; }
+</style>
+<script>
+  window.MathJax = { tex: { inlineMath: [["$", "$"]], displayMath: [["$$", "$$"]] }, svg: { fontCache: "global" } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg-full.js" defer></script>
+</head>
+<body>
+<div class="page">
+  <nav class="site-nav" style="font-size:12.5px;color:#8b93a7;padding-top:12px"><a href="index.html" style="color:#ffc857;font-weight:600">Poussières</a> — <a href="index.html">Accueil</a> · <a href="colonnes.html">Colonnes</a> · <a href="piece.html">Pièce</a> · <a href="convection.html">Convection</a> · <a href="battant.html">Battant</a></nav>
+  <article id="texte">
+<h1>Le battant de la porte : vue de dessus</h1>
+<p>Quand on ouvre une porte, le battant balaie un quart de disque et pousse l'air
+devant lui. Ce mouvement est hors du plan de la coupe verticale utilisée
+jusqu'ici (<a href="theorie_convection.html">theorie_convection.html</a>,
+<a href="theorie_porte.html">theorie_porte.html</a>). On le calcule donc dans une <strong>vue de
+dessus</strong> : un plan horizontal à mi-hauteur de porte. L'écoulement y est pris
+isotherme, sans gravité dans le plan.</p>
+<p>Le but est de savoir <strong>combien d'air le battant fait passer d'une pièce à
+l'autre, à quelle vitesse et jusqu'où</strong>, pour ensuite caler une « bouffée »
+dans la coupe verticale (option A).</p>
+<hr />
+<h2>0. Géométrie</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pièce, vue de dessus</td>
+<td>5 m (x) × 2 m (y), la profondeur de la coupe</td>
+</tr>
+<tr>
+<td>Mur entre pièce et couloir</td>
+<td>x = 5 m, épaisseur 4 cm</td>
+</tr>
+<tr>
+<td>Embrasure</td>
+<td>0,8 m, de y = 0,1 m à y = 0,9 m</td>
+</tr>
+<tr>
+<td>Battant</td>
+<td>0,8 m × 6 cm pénalisés, avec une transition lissée sur une maille (4 cm) de chaque côté, soit une épaisseur équivalente d'environ 10 cm ; charnière en (5 m ; 0,1 m), s'ouvre vers la pièce</td>
+</tr>
+<tr>
+<td>Couloir</td>
+<td>1,5 m de large (x de 5 à 6,5 m), de y = −1 m à y = 3 m, fermé à ses extrémités</td>
+</tr>
+<tr>
+<td>Plan de calcul</td>
+<td>horizontal, à mi-hauteur de porte (≈ 1 m)</td>
+</tr>
+</tbody>
+</table>
+<p>Porte ouverte, le battant est perpendiculaire au mur et longe le mur du bas de la
+pièce, à 10 cm.</p>
+<hr />
+<h2>1. Cinématique du battant</h2>
+<p>On fait passer l'angle de 0 à 90° en un temps $T$, avec un profil sans à-coups :</p>
+<p>$$
+\theta(t)=\frac{\pi}{2}\cdot\frac{1-\cos(\pi t/T)}{2},\qquad
+\Omega(t)=\dot\theta=\frac{\pi^2}{4T}\sin\!\left(\frac{\pi t}{T}\right)
+$$</p>
+<ul>
+<li><strong>Vitesse du bord libre</strong> : $U_b=\Omega\,\ell$, avec $\ell=0{,}8$ m. Elle
+  culmine à mi-course à $\ell\pi^2/(4T)\approx2/T$ m/s, soit <strong>2 m/s pour une
+  ouverture en 1 s</strong> et 0,7 m/s en 3 s.</li>
+<li><strong>Vitesse d'un point du battant</strong> à la position $\mathbf r$ :
+  $\mathbf u_s=\Omega\,\mathbf e_z\times(\mathbf r-\mathbf r_h)$, où
+  $\mathbf r_h$ est la charnière.</li>
+<li><strong>Volume balayé</strong> : $\pi\ell^2/4\times H_p=0{,}50\ \text{m}^2\times2\ \text{m}\approx$
+  <strong>1,0 m³</strong> pour une porte de 2 m de haut.</li>
+</ul>
+<p>La fermeture suit le même profil, à l'envers.</p>
+<hr />
+<h2>2. Ce qu'on attend</h2>
+<ul>
+<li><strong>Effet piston.</strong> Le battant pousse vers l'intérieur de la pièce l'air qui est
+  devant lui. L'air de derrière, côté charnière, est remplacé par de l'air qui
+  passe l'embrasure, venu du couloir. Le débit net à travers la porte est nul :
+  l'air est incompressible et le volume du battant est négligeable. L'échange
+  <strong>brut</strong> (entrée + sortie), lui, ne l'est pas.</li>
+<li><strong>Tourbillon de démarrage au bord libre.</strong> Le bord du battant décolle l'air et
+  lâche un tourbillon. Avec $U_b\approx2$ m/s et une échelle de 0,1 à 0,3 m, ce
+  tourbillon tourne à environ 1 m/s puis dérive dans la pièce pendant plusieurs
+  secondes.</li>
+<li><strong>À la fermeture</strong>, le phénomène s'inverse : le battant chasse l'air de
+  l'embrasure, et un jet traverse la fente qui se referme.</li>
+<li><strong>Ordre de grandeur de l'échange.</strong> Les études sur les portes battantes des
+  chambres d'isolement (Tang et al. 2005, Eames et al. 2009, Kalliomäki et al.
+  2016) trouvent qu'un cycle ouverture-fermeture transfère un volume <strong>de l'ordre
+  du volume balayé</strong>, quelques dixièmes de m³ à environ 1 m³ selon la vitesse. Le
+  passage d'une personne s'y ajoute. Ce sera notre point de comparaison.</li>
+</ul>
+<p><strong>Nombre de Reynolds.</strong> $\mathrm{Re}=U_b\ell/\nu\approx10^5$ : le sillage réel est
+turbulent.</p>
+<hr />
+<h2>3. Modèle</h2>
+<h3>3.1 Équations</h3>
+<p>On prend l'air incompressible et isotherme, avec une viscosité effective
+$\nu_e=\nu+\nu_t$ :</p>
+<p>$$
+\frac{\partial\mathbf u}{\partial t}+(\mathbf u\cdot\nabla)\mathbf u=-\frac1\rho\nabla p+\nu_e\nabla^2\mathbf u-\frac{\chi}{\eta}\,(\mathbf u-\mathbf u_s),\qquad\nabla\cdot\mathbf u=0
+$$</p>
+<p><strong>Pénalisation de Brinkman</strong> (Angot, Bruneau &amp; Fabrie 1999). $\chi$ vaut 1 dans
+le battant et 0 ailleurs, avec un bord adouci sur une maille. Dans le battant, le
+dernier terme force l'air à suivre le mouvement du battant ($\mathbf u\to\mathbf
+u_s$) en un temps $\eta\ll\Delta t$. Le battant est donc un « solide » qui se
+déplace sur une grille <strong>fixe</strong> : pas de remaillage, et la matrice de pression
+reste la même tout le temps.</p>
+<p><strong>Viscosité effective.</strong> On prend $\nu_t=10^{-3}$ m²/s, réglable. Cela donne un
+Reynolds effectif d'environ 1 500 pour le battant : les tourbillons sont
+résolus, puis amortis en quelques secondes. C'est plus faible que dans la coupe
+verticale ($5\times10^{-3}$), car il s'agit ici de la turbulence engendrée par
+le battant lui-même, pas de celle d'une pièce chauffée établie. Ce choix reste
+le principal paramètre libre.</p>
+<h3>3.2 Limites de la vue de dessus</h3>
+<ul>
+<li><strong>On ignore le sol, le plafond et le jour sous la porte.</strong> L'écoulement est
+  supposé le même sur toute la hauteur de la porte. Le volume échangé est donc le
+  débit par mètre de hauteur, multiplié par 2 m.</li>
+<li><strong>Pas de flottabilité.</strong> Si le couloir est à une autre température, l'échange
+  thermique de <a href="theorie_porte.html">theorie_porte.html</a> s'ajoute après quelques
+  secondes et domine vite.</li>
+<li><strong>Pas de sédimentation.</strong> La gravité est perpendiculaire au plan. Les poussières
+  sont donc des <strong>traceurs</strong> de l'air. C'est valable pour celles qui ne tombent pas
+  en quelques secondes, c'est-à-dire de moins de 30 µm environ.</li>
+</ul>
+<hr />
+<h2>4. Méthode numérique</h2>
+<ul>
+<li><strong>Grille décalée</strong> (MAC) de 4 cm, sur le rectangle pièce + couloir de 6,5 m
+  × 4 m, soit 164 × 100 cellules. La pression est au centre des cellules, $u$ et
+  $v$ sur leurs faces.</li>
+<li><strong>Parois fixes</strong> (murs, mur d'embrasure, extérieur de la pièce) : ce sont des
+  cellules solides, aux faces fermées ($u_n=0$). La pression n'y est pas
+  calculée.</li>
+<li><strong>Pas de temps, en quatre étapes :</strong></li>
+<li><strong>Advection semi-lagrangienne de MacCormack</strong> (Selle et al. 2008), précise à
+     l'ordre 2, avec un limiteur. Elle est stable quel que soit le pas, et diffuse
+     bien moins que l'advection semi-lagrangienne simple, qui effacerait les
+     tourbillons.</li>
+<li><strong>Diffusion explicite</strong> $\nu_e\nabla^2\mathbf u$.</li>
+<li><strong>Pénalisation implicite</strong>, point par point :
+     $\mathbf u\leftarrow(\mathbf u+\tfrac{\Delta t}{\eta}\chi\mathbf u_s)/(1+\tfrac{\Delta t}{\eta}\chi)$.</li>
+<li><strong>Projection</strong> : on résout $\nabla^2p=\tfrac{\rho}{\Delta t}\nabla\cdot\mathbf u$,
+     puis on corrige $\mathbf u\leftarrow\mathbf u-\tfrac{\Delta t}{\rho}\nabla p$.
+     Le Poisson est résolu par une factorisation de Cholesky en bande, faite une
+     seule fois (largeur de bande 100). Une cellule est fixée à $p=0$ pour lever
+     l'indétermination.</li>
+<li><strong>Pas de temps</strong> :
+  $\Delta t=\min\big(0{,}5\,\Delta/u_{\max},\;0{,}2\,\Delta^2/\nu_e,\;0{,}04\ \text{s}\big)$,
+  soit environ 8 ms pendant le mouvement du battant. On saute les pas quand l'air
+  est au repos et le battant immobile.</li>
+<li><strong>Échange mesuré</strong> : on intègre en temps le débit à travers l'embrasure,
+  séparément dans chaque sens.</li>
+</ul>
+<p>$$
+  V_{\rm entrant}(t)=H_p\int_0^t\!\!\int_{\rm embrasure}\max(-u,0)\,dy\,dt'
+  $$</p>
+<p>Le volume sortant se calcule de même avec $\max(u,0)$.</p>
+<h3>4.1 Contrôles</h3>
+<ul>
+<li><strong>Divergence</strong> résiduelle de $10^{-13}$ à $10^{-12}$ s⁻¹ après projection.</li>
+<li><strong>Débit net nul.</strong> Le volume entré dans la pièce est égal au volume sorti, à la
+  précision de l'affichage, à chaque instant.</li>
+<li><strong>Sensibilité à la maille.</strong> Le tableau donne le volume d'air du couloir passé
+  dans la pièce, mesuré par les traceurs, pour une ouverture en 1 s :</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Maille</th>
+<th>2 s</th>
+<th>5 s</th>
+<th>10 s</th>
+<th>20 s</th>
+<th>Échange brut à 20 s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3 cm</td>
+<td>0,14 m³</td>
+<td>0,22 m³</td>
+<td>0,41 m³</td>
+<td>0,61 m³</td>
+<td>1,22 m³</td>
+</tr>
+<tr>
+<td><strong>4 cm</strong> (retenue)</td>
+<td>0,24 m³</td>
+<td>0,22 m³</td>
+<td>0,36 m³</td>
+<td>0,59 m³</td>
+<td>1,21 m³</td>
+</tr>
+<tr>
+<td>5 cm</td>
+<td>0,20 m³</td>
+<td>0,27 m³</td>
+<td>0,31 m³</td>
+<td>0,37 m³</td>
+<td>0,75 m³</td>
+</tr>
+</tbody>
+</table>
+<p>À 3 et 4 cm, le tourbillon de démarrage est résolu et les résultats concordent.
+À 5 cm, il est trop amorti et l'échange tardif est sous-estimé. Le bruit des
+traceurs est d'environ ±0,05 m³.</p>
+<h3>4.2 Premiers résultats (4 cm, $\nu_t=10^{-3}$)</h3>
+<table>
+<thead>
+<tr>
+<th>Cas</th>
+<th>Pic de vitesse de l'air</th>
+<th>Air du couloir dans la pièce à 20 s</th>
+<th>Échange brut à 20 s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ouverture en 1 s</td>
+<td>2,8 m/s</td>
+<td>0,6 m³</td>
+<td>1,2 m³</td>
+</tr>
+<tr>
+<td>Ouverture en 3 s</td>
+<td>0,95 m/s</td>
+<td>0,3 m³</td>
+<td>0,7 m³</td>
+</tr>
+<tr>
+<td>Ouverture en 1 s, 3 s d'attente, fermeture en 1 s</td>
+<td>4,6 m/s, dans la fente à la fermeture</td>
+<td>0,35 m³</td>
+<td>0,8 m³</td>
+</tr>
+<tr>
+<td>Ouverture en 1 s, $\nu_t=5\times10^{-3}$</td>
+<td>2,3 m/s</td>
+<td>0,6 m³</td>
+<td>0,7 m³</td>
+</tr>
+</tbody>
+</table>
+<p>On retrouve bien l'ordre de grandeur attendu : <strong>un battant transfère quelques
+dixièmes de m³ à environ 1 m³</strong>, comparable à son volume balayé (1,0 m³).</p>
+<ul>
+<li><strong>Ouvrir vite</strong> double l'échange. Le tourbillon de démarrage emporte l'air du
+  couloir loin dans la pièce : on le voit encore à 2 m de la porte après 5 s.</li>
+<li><strong>Refermer</strong> chasse une partie de cet air vers le couloir, mais crée un jet
+  bref et violent dans la fente.</li>
+</ul>
+<p>À comparer avec l'échange thermique de <a href="theorie_porte.html">theorie_porte.html</a> : avec
+5 K d'écart, 0,19 m³/s passent la porte. <strong>Le battant équivaut donc à 2 à 3 s de
+porte ouverte</strong>. Il domine quand le couloir est à la même température, ou quand
+la porte n'est ouverte que le temps de passer.</p>
+<p><strong>Coût</strong> : environ 18 ms par pas, soit environ 1 s de calcul par seconde simulée
+pendant le mouvement, moins ensuite. La page affiche par défaut au ralenti × 0,5,
+avec un calcul dans un Web Worker.</p>
+<hr />
+<h2>5. Poussières</h2>
+<p>Comme dans la coupe verticale, la <strong>poussière de la pièce</strong> est dessinée en
+couleur et <strong>celle du couloir en blanc</strong>. Ce sont des traceurs passifs (§3.2)
+qui suivent l'air, avec une diffusion $\nu_t$. On compte en permanence :</p>
+<ul>
+<li>la part de la poussière du couloir entrée dans la pièce ;</li>
+<li>la part de la poussière de la pièce partie dans le couloir.</li>
+</ul>
+<p>Multipliées par les volumes, ces parts donnent une seconde estimation du volume
+d'air échangé, indépendante de la première.</p>
+<hr />
+<h2>6. Report dans la coupe verticale (option A)</h2>
+<p>Le volume transféré mesuré ici est reporté dans la page de convection : 0,6 m³
+pour une ouverture en 1 s, 0,3 m³ en 3 s. Il y devient une bouffée paramétrée à
+l'ouverture de la porte, qui échange de l'air (température et poussières) sur
+1,5 m de part et d'autre de la porte. On y ajoute une remise en suspension de la
+poussière au sol près de la porte. Voir <a href="theorie_porte.html">theorie_porte.html</a> §7.</p>
+<hr />
+<h2>Références</h2>
+<ul>
+<li>P. Angot, C.-H. Bruneau &amp; P. Fabrie (1999), <em>A penalization method to take into
+  account obstacles in incompressible viscous flows</em>, Numer. Math. 81.</li>
+<li>A. Selle, R. Fedkiw, B. Kim, Y. Liu &amp; J. Rossignac (2008), <em>An unconditionally
+  stable MacCormack method</em>, J. Sci. Comput. 35.</li>
+<li>J. Stam (1999), <em>Stable fluids</em>, SIGGRAPH.</li>
+<li>J. W. Tang, I. Eames, Y. Li et al. (2005), <em>Door-opening motion can potentially
+  lead to a transient breakdown in negative-pressure isolation conditions</em>,
+  J. Hosp. Infect. 61.</li>
+<li>I. Eames, D. Shoaib, C. A. Klettner &amp; V. Taban (2009), <em>Movement of airborne
+  contaminants in a hospital isolation room</em>, J. R. Soc. Interface 6.</li>
+<li>P. Kalliomäki, P. Saarinen, J. W. Tang &amp; H. Koskela (2016), <em>Airflow patterns
+  through single hinged and sliding doors in hospital isolation rooms</em>, Build.
+  Environ. 107.</li>
+</ul>
+  </article>
+  <p class="pied">Page générée depuis la théorie du projet. Les formules sont mises en forme par MathJax.</p>
+</div>
+<script>
+  // Les tableaux larges défilent dans leur propre conteneur
+  for (const t of document.querySelectorAll("#texte table")) {
+    const d = document.createElement("div");
+    d.className = "tableau";
+    t.replaceWith(d);
+    d.appendChild(t);
+  }
+</script>
+</body>
+</html>

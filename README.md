@@ -8,6 +8,16 @@ projet, éditer `index.html` et ajouter une carte dans la grille de la bonne sec
 `cartes-egalim.html` ne fait plus que rediriger vers la galerie des cartes EGALIM, désormais
 publiée par le dépôt `map_cantines_egalim` (https://biguhuh.github.io/map_cantines_egalim/cartes/).
 
+## Poussières
+
+`poussieres/` est une copie du site construit depuis le dépôt privé `poussieres` (le code reste
+privé, seul le site est publié). Pour le mettre à jour :
+
+```bash
+cd ~/code/Biguhuh/poussieres && python outils/construire_site.py
+rm -rf ../Biguhuh.github.io/poussieres && cp -r _site ../Biguhuh.github.io/poussieres
+```
+
 ## Licence
 
 Ce site est sous licence MIT (voir [LICENSE](LICENSE)) : tu peux le réutiliser librement, en gardant la mention de copyright.

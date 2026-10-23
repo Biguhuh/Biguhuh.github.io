@@ -1,0 +1,1559 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convection dans la pièce</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --fond: #0b0d12;
+    --panneau: #141821;
+    --bord: #262c3a;
+    --texte: #e6e8ee;
+    --doux: #8b93a7;
+    --accent: #4fd6a5;
+    --lien: #6cb2ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--fond);
+    color: var(--texte);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header, .commandes, main, footer { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+  header { padding-top: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
+  header p { margin: 0; color: var(--doux); max-width: 88ch; }
+
+  .commandes {
+    display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center;
+    margin-top: 16px; padding-top: 12px; padding-bottom: 12px;
+    border-top: 1px solid var(--bord); border-bottom: 1px solid var(--bord);
+  }
+  .commandes label { display: flex; align-items: center; gap: 8px; color: var(--doux); }
+  .commandes output { color: var(--texte); font-variant-numeric: tabular-nums; min-width: 4.5ch; }
+  select, button, input[type=number] {
+    background: var(--panneau); color: var(--texte); border: 1px solid var(--bord);
+    border-radius: 6px; padding: 5px 9px; font: inherit;
+  }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--doux); }
+  input[type=range] { width: 120px; accent-color: var(--accent); }
+  input[type=checkbox] { accent-color: var(--accent); }
+  .bascule { display: inline-flex; border: 1px solid var(--bord); border-radius: 6px; overflow: hidden; }
+  .bascule button { border: 0; border-radius: 0; }
+  .bascule button[aria-pressed=true] { background: #2a3245; }
+  [hidden] { display: none !important; }
+
+  main { margin-top: 14px; }
+  canvas#piece {
+    display: block; width: 100%; aspect-ratio: 5.44 / 2.94;
+    border: 1px solid var(--bord); border-radius: 8px; background: #07080c;
+    touch-action: none;
+  }
+  .sous-scene {
+    display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+    gap: 10px 24px; margin-top: 10px;
+  }
+  .statut { font-variant-numeric: tabular-nums; }
+  .statut strong { font-weight: 600; }
+  .statut .doux { color: var(--doux); }
+  .echelle { min-width: 260px; flex: 0 1 380px; }
+  .echelle canvas { display: block; width: 100%; height: 12px; border-radius: 3px; }
+  .graduations { position: relative; height: 16px; font-size: 11.5px; color: var(--doux); font-variant-numeric: tabular-nums; }
+  .graduations span { position: absolute; transform: translateX(-50%); top: 2px; white-space: nowrap; }
+  .echelle .titre { font-size: 12px; color: var(--doux); margin-bottom: 4px; }
+
+  .tuiles {
+    display: grid; gap: 10px; margin-top: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
+  .tuile { background: var(--panneau); border: 1px solid var(--bord); border-radius: 8px; padding: 10px 12px; }
+  .tuile .etiquette { color: var(--doux); font-size: 12.5px; }
+  .tuile .valeur { font-size: 20px; font-weight: 620; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .tuile .detail { color: var(--doux); font-size: 12px; margin-top: 2px; }
+
+  .horloge {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px;
+    margin-top: 12px; font-variant-numeric: tabular-nums;
+  }
+  .horloge strong { font-size: 16px; }
+  .horloge .doux { color: var(--doux); }
+  .progres { flex: 1 1 200px; height: 6px; background: var(--panneau); border-radius: 99px; overflow: hidden; }
+  .progres div { height: 100%; width: 0; background: var(--accent); }
+  .legende { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; color: var(--doux); font-size: 12.5px; }
+  .pastille::before {
+    content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    margin-right: 6px; background: var(--c);
+  }
+  section.resultats { margin-top: 20px; }
+  section.resultats h2 { font-size: 16px; margin: 0; font-weight: 620; }
+  .entete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .defile { overflow-x: auto; border: 1px solid var(--bord); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 13px; }
+  th, td { padding: 6px 10px; text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { color: var(--doux); font-weight: 550; background: var(--panneau); border-bottom: 1px solid var(--bord); }
+  tbody tr + tr td { border-top: 1px solid #1a1f2a; }
+  tr.principal td { font-weight: 600; }
+  tr.secondaire td { color: var(--doux); }
+  tr.separation td { border-top: 1px solid var(--bord) !important; }
+  .note { color: var(--doux); font-size: 12.5px; margin: 6px 0 0; }
+  .vide { color: var(--doux); padding: 10px; }
+
+  footer { color: var(--doux); font-size: 12.5px; padding-bottom: 28px; margin-top: 22px; }
+  footer p { margin: 4px 0; max-width: 100ch; }
+  footer a { color: var(--lien); }
+</style>
+</head>
+<body>
+<header>
+  <nav class="site-nav" style="font-size:12.5px;color:#8b93a7;padding-top:12px"><a href="index.html" style="color:#ffc857;font-weight:600">Poussières</a> — <a href="index.html">Accueil</a> · <a href="colonnes.html">Colonnes</a> · <a href="piece.html">Pièce</a> · <a href="convection.html">Convection</a> · <a href="battant.html">Battant</a></nav>
+  <h1>Convection dans la pièce : radiateur et fenêtre</h1>
+  <p>On regarde la même pièce de 5 m × 2,5 m en coupe, cette fois chauffée par un radiateur. On calcule l'<strong>écoulement moyen établi</strong> :
+     convection naturelle de Boussinesq, avec la turbulence représentée par une viscosité effective.
+     <strong>Fais glisser</strong> le radiateur, la fenêtre, la porte et les meubles : l'écoulement se recalcule en partant de l'état actuel.
+     Ouvre ou ferme la <strong>porte</strong> pour suivre en temps réel l'échange d'air avec le couloir.
+     Les couleurs donnent la température, les lignes blanches sont les lignes de courant et les traînées suivent l'air en temps réel.
+     La vue <strong>Poussières</strong> lâche des particules de 10 nm à 1 mm dans cet écoulement et mesure où elles se déposent.</p>
+</header>
+
+<div class="commandes">
+  <div class="bascule" role="group" aria-label="Vue">
+    <button id="vueEcoul" aria-pressed="true">Écoulement</button>
+    <button id="vuePous" aria-pressed="false">Poussières</button>
+  </div>
+  <div class="bascule" role="group" aria-label="Scénario">
+    <button id="scA" aria-pressed="true" title="Radiateur contre un mur, fenêtre froide sur un mur">A · Radiateur + fenêtre</button>
+    <button id="scB" aria-pressed="false" title="Radiateur déplaçable, toutes les parois plus froides, pas de fenêtre">B · Radiateur seul, parois froides</button>
+  </div>
+  <div class="bascule" role="group" aria-label="Autres parois" id="blocParois">
+    <button id="parIsolees" aria-pressed="false" title="Murs, sol et plafond parfaitement isolés : toute la chaleur sort par la fenêtre">Autres parois isolées</button>
+    <button id="parFroides" aria-pressed="true" title="Murs, sol et plafond à la température T parois">Autres parois à T parois</button>
+  </div>
+  <label>Radiateur <input id="Tr" type="range" min="30" max="80" step="1" value="60"><output id="TrVal"></output></label>
+  <button id="radOnOff" title="Éteint, le radiateur prend la température des parois (ou devient adiabatique si elles sont isolées)">Éteindre le radiateur</button>
+  <label id="blocTf">Fenêtre <input id="Tf" type="range" min="0" max="18" step="1" value="8"><output id="TfVal"></output></label>
+  <label id="blocTp">Parois <input id="Tp" type="range" min="10" max="20" step="0.5" value="17"><output id="TpVal"></output></label>
+  <label><input id="porteActive" type="checkbox"> Porte</label>
+  <button id="ouvrir" hidden>Ouvrir la porte</button>
+  <label id="blocTc" hidden title="Température du couloir derrière la porte">Couloir <input id="Tc" type="range" min="0" max="30" step="1" value="15"><output id="TcVal"></output></label>
+  <label id="blocBattant" hidden title="Bouffée du battant à l'ouverture, calée sur la vue de dessus (battant.html)">Battant
+    <select id="battant">
+      <option value="0">ignoré</option>
+      <option value="1" selected>ouvert en 1 s</option>
+      <option value="2">ouvert en 2 s</option>
+      <option value="3">ouvert en 3 s</option>
+    </select>
+  </label>
+  <label id="blocResusp" hidden title="Part de la poussière déposée au sol près de la porte qui repart à l'ouverture (paramètre libre)">Remise en suspension
+    <select id="resusp">
+      <option value="aucune">aucune</option>
+      <option value="faible">faible</option>
+      <option value="moyenne" selected>moyenne</option>
+      <option value="forte">forte</option>
+    </select>
+  </label>
+  <label><input id="meubles" type="checkbox" checked> Meubles</label>
+  <label title="Viscosité turbulente : le seul paramètre de réglage du modèle (théorie §4.2)">ν<sub>t</sub>
+    <select id="nut">
+      <option value="0.002">2·10⁻³ m²/s</option>
+      <option value="0.005" selected>5·10⁻³ m²/s</option>
+      <option value="0.01">10⁻² m²/s</option>
+    </select>
+  </label>
+  <label><input id="cTemp" type="checkbox" checked> Température</label>
+  <label><input id="cLignes" type="checkbox" checked> Lignes de courant</label>
+  <label><input id="cTraceurs" type="checkbox" checked> Traceurs</label>
+  <label title="Vitesse d'affichage des traceurs et, si l'écoulement oscille, de son évolution">Défilement
+    <select id="accel">
+      <option value="1" selected>temps réel</option>
+      <option value="3">× 3</option>
+      <option value="10">× 10</option>
+      <option value="30">× 30</option>
+    </select>
+  </label>
+  <button id="repos" title="Repart d'un air immobile à température uniforme">Recalculer depuis le repos</button>
+</div>
+
+<div class="commandes" id="panneauPous" hidden>
+  <label>Mesurer au bout de
+    <select id="pDuree">
+      <option value="60">1 min</option>
+      <option value="600">10 min</option>
+      <option value="3600" selected>1 h (≈ 30 s de calcul)</option>
+      <option value="10800">3 h (≈ 1 min 30)</option>
+      <option value="21600">6 h (≈ 3 min)</option>
+    </select>
+  </label>
+  <label>Durée à l'écran
+    <select id="pEcran">
+      <option value="15">15 s</option>
+      <option value="30" selected>30 s</option>
+      <option value="60">1 min</option>
+    </select>
+  </label>
+  <label>Matière
+    <select id="pMatiere">
+      <option value="1000" data-nom="Eau">Eau, ρ = 1000 kg/m³</option>
+      <option value="1500" data-nom="Organique" selected>Organique, ρ = 1500 kg/m³</option>
+      <option value="2650" data-nom="Quartz">Quartz, ρ = 2650 kg/m³</option>
+      <option value="7870" data-nom="Fer">Fer, ρ = 7870 kg/m³</option>
+    </select>
+  </label>
+  <label>Particules
+    <select id="pNombre">
+      <option value="2000">2 000</option>
+      <option value="5000" selected>5 000</option>
+      <option value="10000">10 000</option>
+    </select>
+  </label>
+  <label title="Concentration initiale de chaque classe de taille, en particules par litre d'air">C₀ par classe
+    <input id="pC0" type="number" min="0" step="any" value="1" style="width:5.5em"> /L</label>
+  <label id="blocCc" hidden title="Concentration de chaque classe dans le couloir, en particules par litre ; le couloir est un réservoir">C couloir
+    <input id="pCc" type="number" min="0" step="any" value="1" style="width:5.5em"> /L</label>
+  <button id="pPause">Pause</button>
+  <button id="pRelever" title="Ajoute l'état actuel au tableau des relevés">Relever maintenant</button>
+  <button id="pRelancer">Relancer</button>
+</div>
+
+<main>
+  <canvas id="piece" aria-label="Coupe de la pièce : température, lignes de courant et traceurs. Radiateur, fenêtre et meubles déplaçables à la souris."></canvas>
+  <div class="sous-scene">
+    <div class="statut" id="statut" aria-live="polite"></div>
+    <div class="echelle">
+      <div class="titre">Température de l'air, neutre à 20 °C</div>
+      <canvas id="barre" aria-hidden="true"></canvas>
+      <div class="graduations" id="graduations"></div>
+    </div>
+  </div>
+  <div id="blocPous" hidden>
+    <div class="horloge">
+      <strong id="pTemps">t = 0 s</strong>
+      <span class="doux" id="pCible"></span>
+      <div class="progres" aria-hidden="true"><div id="pBarre"></div></div>
+      <span class="doux" id="pRythme"></span>
+    </div>
+    <div class="legende" id="pLegende"></div>
+    <section class="resultats">
+      <div class="entete">
+        <h2 id="pTitreComp">Sol et dessus des meubles</h2>
+        <span class="note">particules par m², pour C₀ = <span id="pC0txt">1</span> particule/L par classe</span>
+      </div>
+      <div class="defile"><table id="pComparaison"></table></div>
+      <p class="note" id="pNoteCouloir" hidden></p>
+      <p class="note">On compare la simulation à deux modèles qui ignorent la diffusion. <strong>Air immobile</strong> : chaque m² reçoit ce que contient la colonne d'air au-dessus de lui (rapport 5 : 3 : 1, voir piece.html).
+         <strong>Pièce bien mélangée</strong> : la concentration est uniforme et chaque surface horizontale reçoit le même flux C·v<sub>s</sub> (rapport 1 : 1 : 1).</p>
+    </section>
+    <section class="resultats">
+      <div class="entete">
+        <h2 id="pTitreBilan">Dépôt surfacique par classe de taille</h2>
+        <span class="note">particules par m²</span>
+      </div>
+      <div class="defile"><table id="pBilan"></table></div>
+    </section>
+    <section class="resultats">
+      <div class="entete">
+        <h2>Relevés</h2>
+        <button id="pEffacer">Effacer</button>
+      </div>
+      <div class="defile" id="pReleves"></div>
+      <p class="note">Un relevé est ajouté automatiquement à la fin de chaque mesure. Déplace le radiateur ou les meubles, change de scénario, puis compare.</p>
+    </section>
+  </div>
+  <div class="tuiles">
+    <div class="tuile"><div class="etiquette">Panache du radiateur</div><div class="valeur" id="vPanache">—</div><div class="detail">vitesse ascendante max</div></div>
+    <div class="tuile"><div class="etiquette">Courant d'air au sol</div><div class="valeur" id="vSol">—</div><div class="detail">vitesse max entre 5 et 15 cm</div></div>
+    <div class="tuile"><div class="etiquette">Recirculation</div><div class="valeur" id="vDebit">—</div><div class="detail">débit de la boucle principale</div></div>
+    <div class="tuile"><div class="etiquette">Air de la pièce</div><div class="valeur" id="vTair">—</div><div class="detail" id="vTairDetail">température moyenne</div></div>
+    <div class="tuile"><div class="etiquette">Stratification</div><div class="valeur" id="vStrat">—</div><div class="detail">T à 2,1 m moins T à 0,3 m (médiane)</div></div>
+    <div class="tuile" id="tuilePorte" hidden><div class="etiquette">Échange par la porte</div><div class="valeur" id="vPorte">—</div><div class="detail" id="vPorteDetail"></div></div>
+    <div class="tuile"><div class="etiquette">Puissance du radiateur</div><div class="valeur" id="vPuiss">—</div><div class="detail">convection seule, corrélation de Churchill-Chu</div></div>
+  </div>
+</main>
+
+<footer>
+  <p><strong>Modèle.</strong> On résout les équations de Boussinesq 2D en fonction de courant et tourbillon, sur une grille de 5 cm (101 × 51 nœuds).
+     La turbulence est remplacée par une viscosité effective constante, ν + ν<sub>t</sub>, et une diffusivité thermique κ + ν<sub>t</sub>/0,9.
+     Le régime stationnaire est obtenu par faux transitoire. Les températures du radiateur, de la fenêtre et des parois sont imposées. Les meubles sont adiabatiques.
+     Le solveur a été validé sur la cavité de référence de de Vahl Davis : vitesses à 2,5 % près, Nu à 2 % près à Ra = 10⁵ et à 5 % près à Ra = 10⁶ sur 80 × 80 mailles.
+     Certaines configurations n'ont pas d'état stationnaire, par exemple un radiateur contre un mur froid. Le panache y pulse : la page montre alors le cycle en temps réel et moyenne les mesures.</p>
+  <p><strong>Ce qu'il faut en retenir.</strong> La forme de l'écoulement (boucles, panache, courant froid, zones mortes) et l'ordre de grandeur des vitesses sont fiables.
+     Les couches limites sont en revanche trop épaisses. La puissance est donc estimée par corrélation, et non à partir du calcul.
+     Le vrai écoulement est turbulent : on n'en voit ici que la moyenne.
+     Le solveur est validé à Pr = 0,71 alors que la pièce utilise un Prandtl effectif d'environ 0,9. Les grains de 0,3 mm et plus sont portés à leur vitesse limite sans transitoire, ce que la page des colonnes calcule, elle, avec son temps de réponse.</p>
+  <p><strong>Parois isolées.</strong> Le radiateur est maintenu à sa température, sans thermostat. Si les murs sont isolés, seule la fenêtre évacue la chaleur,
+     et l'air monte jusqu'à l'équilibre entre les deux : environ 40 °C avec 60 °C au radiateur et 8 °C à la fenêtre. C'est le régime établi d'une pièce idéalement isolée chauffée en continu.</p>
+  <p><strong>Porte.</strong> La porte fait 2 m de haut. Derrière elle, 1,5 m de couloir sont calculés, et leur air est ramené à la température du couloir au-delà de 50 cm :
+     c'est un réservoir. L'échange obtenu correspond à un coefficient de décharge C<sub>d</sub> ≈ 0,7, proche des mesures (0,6–0,7).
+     En 2D, la porte occupe toute la profondeur de la pièce. Les débits affichés sont ramenés à une porte de 0,8 m, mais les durées vues à l'écran restent environ 2,5 fois trop courtes.</p>
+  <p><strong>Battant.</strong> À l'ouverture, une bouffée reproduit l'effet mécanique du battant, calculé en vue de dessus (<a href="battant.html">battant.html</a>).
+     Une zone de 1,5 m devant la porte échange avec le couloir 0,3 à 0,6 m³ d'air (température et poussières) selon la vitesse d'ouverture.
+     La poussière déposée au sol à moins de 1 m de la porte peut être remise en suspension : c'est un paramètre libre.</p>
+  <p><strong>Poussières.</strong> Chaque particule suit l'air moyen, tombe à sa vitesse limite (physique.js) et diffuse. La diffusion est brownienne, plus une diffusion turbulente ν<sub>t</sub>.
+     Contre les parois, la turbulence s'éteint en n³ sur 10 cm (profil de Lai &amp; Nazaroff). Cette couche est traitée analytiquement : chaque surface absorbe partiellement,
+     avec la vitesse de dépôt qu'elle impose (verticale, tournée vers le haut ou vers le bas), selon la méthode d'Erban &amp; Chapman.
+     Si l'écoulement oscille, les poussières suivent sa moyenne sur le cycle. Thermophorèse, inertie des grains et remise en suspension sont ignorées.</p>
+  <p>Théorie : <a href="theorie_convection.html">theorie_convection.html</a> · Dépôt dans l'air immobile : <a href="piece.html">piece.html</a>
+     · Battant de la porte vu de dessus : <a href="battant.html">battant.html</a></p>
+</footer>
+
+<script src="physique.js"></script>
+<script src="convection.js"></script>
+<script src="transport.js"></script>
+<script>
+(() => {
+  // ---------- Géométrie (m) ----------
+  const L = 5, H = 2.5, PROF = 2, DX = 0.05;
+  // La grille couvre aussi 1,5 m de couloir de chaque côté : solide, sauf derrière une porte ouverte
+  const LC = 1.5, X0 = -LC;
+  const NX = Math.round((L + 2 * LC) / DX), NY = Math.round(H / DX), NI = NX + 1, N = NI * (NY + 1);
+  const I0 = Math.round(-X0 / DX), I1 = Math.round((L - X0) / DX);   // colonnes des murs de la pièce
+  const MARGE = 0.22;
+  const LM = 0.5;                      // largeur d'un meuble
+  const RAD_L = 0.1, RAD_H = 0.6;      // radiateur
+  const FEN_H = 1.2;                   // hauteur de la fenêtre
+  const PORTE_H = 2.0, PORTE_L = 0.8;  // hauteur, et largeur réelle utilisée pour les débits (§4 de theorie_porte.html)
+  const CD = 0.6;                      // coefficient de décharge de la formule de Brown & Solvason
+  const RAPPEL = 0.2, RAPPEL_DIST = 0.5; // s⁻¹ ; le couloir est ramené à Tc au-delà de 50 cm de la porte
+  const T_REF = 20;                    // °C, neutre de l'échelle de couleur
+  const NU_AIR = 1.51e-5, KAPPA_AIR = 2.12e-5, PR_T = 0.9;
+  const TOL = 1e-3;                    // variation relative des grandeurs globales sur 20 s de pseudo-temps
+
+  const etat = {
+    scenario: "A", paroisFroides: true, Tr: 60, Tf: 8, Tp: 17, avecMeubles: true, nut: 5e-3,
+    couches: { temp: true, lignes: true, traceurs: true }, accel: 1,
+    Tc: 15, evenement: null, radAllume: true,
+  };
+  const porte = { active: false, cote: "droite", ouverte: false };
+  const radiateur = { x: 0 };
+  const fenetre = { cote: "droite", y: 0.9 };
+  const meubles = [{ h: 1, x: 1.0 }, { h: 2, x: 3.5 }];
+
+  // ---------- Formatage ----------
+  const fr = (x, d = 1) => x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const vit = (v) => (v < 0.1 ? fr(v * 100, 1) + " cm/s" : fr(v, 2) + " m/s");
+
+  // ---------- Couleurs de température : divergente bleu ↔ rouge, neutre à 20 °C ----------
+  const NEUTRE = [56, 56, 53], FROID = [[57, 135, 229], [169, 205, 250]], CHAUD = [[230, 103, 103], [255, 196, 184]];
+  const melange = (a, b, t) => a.map((x, i) => Math.round(x + (b[i] - x) * t));
+  let Tmin = 8, Tmax = 60;
+  function couleurT(T) {
+    // Même pente en K des deux côtés du neutre : un écart de 3 K a la même intensité en chaud et en froid
+    const chaud = T >= T_REF;
+    let f = Math.abs(T - T_REF) / Math.max(Tmax - T_REF, T_REF - Tmin);
+    f = Math.sqrt(Math.min(1, Math.max(0, f)));   // racine : les petits écarts de l'air restent visibles
+    const [pole, bout] = chaud ? CHAUD : FROID;
+    return f < 0.6 ? melange(NEUTRE, pole, f / 0.6) : melange(pole, bout, (f - 0.6) / 0.4);
+  }
+  const css = (c) => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+  // ---------- Placement des objets ----------
+  const cale = (x) => Math.round(x / DX) * DX;
+  const occupants = (sauf) => {
+    const liste = [{ ref: radiateur, x: radiateur.x, w: RAD_L }];
+    if (etat.avecMeubles) for (const m of meubles) liste.push({ ref: m, x: m.x, w: LM });
+    // Dégagement de 10 cm devant la porte
+    if (porte.active) liste.push({ ref: porte, x: porte.cote === "gauche" ? -1 : L - 0.1, w: 1.1 });
+    return liste.filter((o) => o.ref !== sauf);
+  };
+  const oppose = (c) => (c === "gauche" ? "droite" : "gauche");
+  // Pose un objet de largeur w au sol au plus près de x, sans chevaucher les autres
+  function poserAuSol(obj, w, x) {
+    const autres = occupants(obj);
+    const libre = (c) => c >= -1e-9 && c <= L - w + 1e-9 && autres.every((o) => c >= o.x + o.w - 1e-9 || c + w <= o.x + 1e-9);
+    const voulu = Math.min(Math.max(cale(x), 0), L - w);
+    const candidats = [voulu, ...autres.flatMap((o) => [cale(o.x - w), cale(o.x + o.w)])].filter(libre);
+    if (!candidats.length) return;
+    obj.x = candidats.reduce((a, b) => (Math.abs(b - voulu) < Math.abs(a - voulu) ? b : a));
+  }
+  const coteRadiateur = () => (radiateur.x < L / 2 ? "gauche" : "droite");
+  function placerFenetre(cote, y) {
+    if (porte.active && cote === porte.cote) cote = oppose(cote);   // la porte prend tout son mur
+    fenetre.cote = cote;
+    const bas = etat.scenario === "A" && cote === coteRadiateur() ? RAD_H + 0.1 : 0.1;
+    fenetre.y = Math.min(Math.max(cale(y), bas), H - FEN_H - 0.1);
+  }
+  function placerRadiateur(x) {
+    if (etat.scenario === "A") {
+      // Contre le mur le plus proche (celui sans porte) ; les meubles qui gênent sont poussés
+      let cote = x + RAD_L / 2 < L / 2 ? "gauche" : "droite";
+      if (porte.active && cote === porte.cote) cote = oppose(cote);
+      radiateur.x = cote === "gauche" ? 0 : L - RAD_L;
+      if (etat.avecMeubles) for (const m of meubles) poserAuSol(m, LM, m.x);
+      placerFenetre(fenetre.cote, fenetre.y);
+    } else {
+      poserAuSol(radiateur, RAD_L, x);
+    }
+  }
+
+  // Respecte les contraintes de placement après un changement de porte ou de scénario
+  function appliquerContraintes() {
+    placerRadiateur(radiateur.x);
+    if (etat.scenario === "A") placerFenetre(fenetre.cote, fenetre.y);
+    if (etat.avecMeubles) for (const m of meubles) poserAuSol(m, LM, m.x);
+  }
+
+  // ---------- Conditions aux limites envoyées au solveur ----------
+  const iDe = (x) => Math.round((x - X0) / DX);
+  const jDe = (y) => Math.round(y / DX);
+  const xDe = (i) => X0 + i * DX;
+  const porteOuverte = () => porte.active && porte.ouverte;
+  const iPorte = () => (porte.cote === "gauche" ? I0 : I1);
+  // Température du radiateur : la sienne s'il est allumé ; éteint, celle des parois,
+  // ou NaN (adiabatique) si les parois sont isolées
+  const paroisFroides = () => etat.scenario === "B" || etat.paroisFroides;
+  const Trad = () => (etat.radAllume ? etat.Tr : paroisFroides() ? etat.Tp : NaN);
+  let masque = new Uint8Array(N);
+  function geometrie() {
+    const solide = new Uint8Array(N), tfix = new Float64Array(N).fill(NaN);
+    const tinit = new Float64Array(N).fill(NaN), rappel = new Float64Array(N);
+    const bloc = (x0, x1, h, T) => {
+      for (let j = 0; j <= jDe(h); j++) {
+        for (let i = iDe(x0); i <= iDe(x1); i++) { solide[j * NI + i] = 1; tfix[j * NI + i] = T; }
+      }
+    };
+    // Couloirs : solides, sauf derrière une porte ouverte, où l'air est ramené à Tc loin de la porte
+    for (let j = 0; j <= NY; j++) {
+      for (let i = 0; i <= NX; i++) {
+        if (i >= I0 && i <= I1) continue;
+        const k = j * NI + i;
+        if (porteOuverte() && (i < I0) === (porte.cote === "gauche")) {
+          tinit[k] = etat.Tc;
+          if (Math.abs(i - iPorte()) * DX > RAPPEL_DIST) rappel[k] = RAPPEL;
+        } else solide[k] = 1;
+      }
+    }
+    // Murs latéraux de la pièce, percés par la porte ouverte
+    for (let j = 0; j <= NY; j++) {
+      for (const i of [I0, I1]) {
+        if (porteOuverte() && i === iPorte() && j >= 1 && j < jDe(PORTE_H)) continue;
+        solide[j * NI + i] = 1;
+      }
+    }
+    const parois = etat.scenario === "B" || etat.paroisFroides;
+    for (let i = I0; i <= I1; i++) for (const j of [0, NY]) tfix[j * NI + i] = parois ? etat.Tp : NaN;
+    for (let j = 0; j <= NY; j++) for (const i of [I0, I1]) tfix[j * NI + i] = parois ? etat.Tp : NaN;
+    if (etat.scenario === "A") {
+      const i = fenetre.cote === "gauche" ? I0 : I1;
+      for (let j = jDe(fenetre.y); j <= jDe(fenetre.y + FEN_H); j++) tfix[j * NI + i] = etat.Tf;
+    }
+    if (etat.avecMeubles) for (const m of meubles) bloc(m.x, m.x + LM, m.h, NaN);
+    bloc(radiateur.x, radiateur.x + RAD_L, RAD_H, Trad());
+
+    // Température de départ et écart de référence
+    const froides = [];
+    if (etat.scenario === "A") froides.push([etat.Tf, FEN_H]);
+    if (parois) froides.push([etat.Tp, 2 * (L + H)]);
+    const Tr = Trad();
+    const longueurRad = Number.isNaN(Tr) ? 0 : RAD_H + RAD_L + (etat.scenario === "B" && radiateur.x > 0 && radiateur.x < L - RAD_L ? RAD_H : 0);
+    const somme = froides.reduce((a, [T, l]) => a + T * l, longueurRad ? Tr * longueurRad : 0);
+    const poids = froides.reduce((a, [, l]) => a + l, longueurRad);
+    if (porte.active) froides.push([etat.Tc, 0]);
+    const Tfroide = Math.min(...froides.map(([T]) => T));
+    Tmin = Math.min(Tfroide, T_REF - 1);
+    const Tchaude = Math.max(Number.isNaN(Tr) ? -Infinity : Tr, porte.active ? etat.Tc : -Infinity, ...froides.map(([T]) => T));
+    Tmax = Math.max(Tchaude, T_REF + 1);
+    masque = solide.slice();
+    for (let i = 0; i <= NX; i++) for (const j of [0, NY]) masque[j * NI + i] = 1;
+    for (let j = 0; j <= NY; j++) for (const i of [0, NX]) masque[j * NI + i] = 1;
+    return { solide, tfix, tinit, rappel, Text: etat.Tc, Tinit: somme / poids, ecartT: Math.max(1, Tchaude - Tfroide) };
+  }
+
+  // ---------- Moteur de calcul : Web Worker, ou fil principal en repli ----------
+  let instantane = null, debutCalcul = performance.now(), dureeCalcul = 0;
+  let envoyerAuSolveur;
+  function recevoir(m) {
+    instantane = m;
+    if (m.regime !== "calcul" && !dureeCalcul) dureeCalcul = (performance.now() - debutCalcul) / 1000;
+    suivreChampMoyen(m);
+    suivreLive(m);
+    majCarte();
+    majLignes();
+    majMesures();
+    if (vue === "poussieres" && pous.etat === "attente" && champPret()) lancerPoussieres();
+  }
+  function demarrerMoteur() {
+    const repli = () => {
+      const pilote = Convection.pilote(recevoir, 12);
+      envoyerAuSolveur = (m) => pilote(m);
+    };
+    try {
+      const w = new Worker("convection-worker.js");
+      let ok = false;
+      w.onmessage = (e) => { ok = true; recevoir(e.data); };
+      w.onerror = (e) => { e.preventDefault(); if (!ok) { repli(); envoyer(true); } };
+      envoyerAuSolveur = (m) => w.postMessage(m);
+    } catch {
+      repli();
+    }
+  }
+  function envoyer(reinit = false, rythme = "max") {
+    const g = geometrie();
+    debutCalcul = performance.now();
+    dureeCalcul = 0;
+    lissage = null;
+    champMoyen = null;
+    // Un évènement (porte, radiateur) en vue Poussières : les particules suivent le transitoire.
+    // Tout autre changement relance la mesure.
+    if (rythme === "reel" && vue === "poussieres" && particules.length && pous.etat !== "attente") debutLive();
+    else attendrePoussieres();
+    envoyerAuSolveur({
+      type: "config", grille: { nx: NX, ny: NY, dx: DX }, nu: NU_AIR + etat.nut, kappa: KAPPA_AIR + etat.nut / PR_T,
+      tol: TOL, reinit, rythme, ...g,
+    });
+    majEchelle();
+  }
+  let envoiPrevu = null, rythmePrevu = "max";
+  function envoyerBientot(rythme = "max") {
+    rythmePrevu = rythme;
+    if (envoiPrevu) return;
+    envoiPrevu = setTimeout(() => { envoiPrevu = null; envoyer(false, rythmePrevu); }, 120);
+  }
+
+  // ---------- Rendu ----------
+  const canvas = document.getElementById("piece");
+  const ctx = canvas.getContext("2d");
+  const carte = document.createElement("canvas");
+  carte.width = NI; carte.height = NY + 1;
+  const carteCtx = carte.getContext("2d");
+  const image = carteCtx.createImageData(NI, NY + 1);
+  const trainees = document.createElement("canvas");
+  const traineesCtx = trainees.getContext("2d");
+  let echelle = 1, dpr = 1, lignes = new Path2D();
+
+  function dimensionner() {
+    const r = canvas.getBoundingClientRect();
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    trainees.width = canvas.width;
+    trainees.height = canvas.height;
+    echelle = canvas.width / (L + 2 * MARGE);
+    majLignes();
+    majEchelle();
+  }
+  const ex = (x) => (x + MARGE) * echelle;
+  const ey = (y) => (H + MARGE - y) * echelle;
+
+  function majCarte() {
+    if (!instantane) return;
+    const T = instantane.T, d = image.data;
+    for (let j = 0; j <= NY; j++) {
+      for (let i = 0; i <= NX; i++) {
+        const c = couleurT(T[j * NI + i]);
+        const o = ((NY - j) * NI + i) * 4;
+        d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
+      }
+    }
+    carteCtx.putImageData(image, 0, 0);
+  }
+
+  // Lignes de courant : isolignes de ψ par « marching squares »
+  function majLignes() {
+    lignes = new Path2D();
+    if (!instantane) return;
+    const psi = instantane.psi;
+    let pMin = 0, pMax = 0;
+    for (let k = 0; k < N; k++) { if (psi[k] < pMin) pMin = psi[k]; if (psi[k] > pMax) pMax = psi[k]; }
+    const etendue = Math.max(pMax, -pMin);
+    if (etendue < 1e-6) return;
+    const niveaux = [];
+    const pas = etendue / 9;
+    for (let v = pas; v < pMax; v += pas) niveaux.push(v);
+    for (let v = -pas; v > pMin; v -= pas) niveaux.push(v);
+    const point = (i, j, a, b, va, vb, niv) => {
+      const t = (niv - va) / (vb - va);
+      return [ex(X0 + (i + (a[0] + (b[0] - a[0]) * t)) * DX), ey((j + (a[1] + (b[1] - a[1]) * t)) * DX)];
+    };
+    const coins = [[0, 0], [1, 0], [1, 1], [0, 1]];
+    for (let j = 0; j < NY; j++) {
+      for (let i = 0; i < NX; i++) {
+        const k = j * NI + i;
+        const v = [psi[k], psi[k + 1], psi[k + NI + 1], psi[k + NI]];
+        for (const niv of niveaux) {
+          const pts = [];
+          for (let e = 0; e < 4; e++) {
+            const a = v[e], b = v[(e + 1) % 4];
+            if ((a < niv) !== (b < niv)) pts.push(point(i, j, coins[e], coins[(e + 1) % 4], a, b, niv));
+          }
+          for (let p = 0; p + 1 < pts.length; p += 2) {
+            lignes.moveTo(pts[p][0], pts[p][1]);
+            lignes.lineTo(pts[p + 1][0], pts[p + 1][1]);
+          }
+        }
+      }
+    }
+  }
+
+  function majEchelle() {
+    const barre = document.getElementById("barre");
+    const r = barre.getBoundingClientRect();
+    barre.width = Math.max(1, Math.round(r.width * dpr));
+    barre.height = Math.max(1, Math.round(r.height * dpr));
+    const c = barre.getContext("2d");
+    for (let x = 0; x < barre.width; x++) {
+      c.fillStyle = css(couleurT(Tmin + ((Tmax - Tmin) * x) / (barre.width - 1)));
+      c.fillRect(x, 0, 1, barre.height);
+    }
+    const grad = document.getElementById("graduations");
+    const pas = Tmax - Tmin > 40 ? 10 : 5;
+    let html = "";
+    for (let t = Math.ceil(Tmin / pas) * pas; t <= Tmax; t += pas) {
+      html += `<span style="left:${(100 * (t - Tmin)) / (Tmax - Tmin)}%">${t} °C</span>`;
+    }
+    grad.innerHTML = html;
+  }
+
+  // ---------- Traceurs ----------
+  const NB_TRACEURS = 900;
+  let traceurs = [];
+  const interp = (f, x, y) => {
+    const gx = Math.min(NX - 1e-6, Math.max(0, (x - X0) / DX)), gy = Math.min(NY - 1e-6, Math.max(0, y / DX));
+    const i = Math.floor(gx), j = Math.floor(gy), fx = gx - i, fy = gy - j, k = j * NI + i;
+    return (f[k] * (1 - fx) + f[k + 1] * fx) * (1 - fy) + (f[k + NI] * (1 - fx) + f[k + NI + 1] * fx) * fy;
+  };
+  const dansSolide = (x, y) => masque[jDe(y) * NI + iDe(x)] === 1;
+  function nouveauTraceur(t = {}) {
+    let x, y, n = 0;
+    do { x = Math.random() * L; y = Math.random() * H; } while (dansSolide(x, y) && ++n < 50);
+    return Object.assign(t, { x, y, age: 0, vie: 6 + Math.random() * 14 });
+  }
+  function avancerTraceurs(dt) {
+    if (!instantane) return;
+    const { u, v } = instantane;
+    traineesCtx.globalCompositeOperation = "destination-out";
+    traineesCtx.fillStyle = "rgba(0,0,0,0.07)";
+    traineesCtx.fillRect(0, 0, trainees.width, trainees.height);
+    traineesCtx.globalCompositeOperation = "source-over";
+    traineesCtx.strokeStyle = "rgba(240,239,236,0.75)";
+    traineesCtx.lineWidth = 1.2 * dpr;
+    traineesCtx.beginPath();
+    for (const t of traceurs) {
+      // Point milieu (RK2)
+      const u1 = interp(u, t.x, t.y), v1 = interp(v, t.x, t.y);
+      const xm = t.x + 0.5 * dt * u1, ym = t.y + 0.5 * dt * v1;
+      const nx = t.x + dt * interp(u, xm, ym), ny = t.y + dt * interp(v, xm, ym);
+      t.age += dt / etat.accel;
+      if (t.age > t.vie || nx <= 0 || nx >= L || ny <= 0 || ny >= H || dansSolide(nx, ny)) { nouveauTraceur(t); continue; }
+      traineesCtx.moveTo(ex(t.x), ey(t.y));
+      traineesCtx.lineTo(ex(nx), ey(ny));
+      t.x = nx; t.y = ny;
+    }
+    traineesCtx.stroke();
+  }
+
+  // ---------- Dessin ----------
+  let survol = null, sonde = null;
+  function dessiner() {
+    const W = canvas.width, Hc = canvas.height;
+    ctx.fillStyle = "#07080c";
+    ctx.fillRect(0, 0, W, Hc);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(ex(0), ey(H), L * echelle, H * echelle);
+    // Bande de couloir visible derrière une porte ouverte
+    if (porteOuverte()) ctx.rect(porte.cote === "gauche" ? ex(-MARGE) : ex(L), ey(H), MARGE * echelle, H * echelle);
+    ctx.clip();
+    if (etat.couches.temp && instantane) {
+      ctx.fillStyle = "#0d1017";
+      ctx.fillRect(ex(0), ey(H), L * echelle, H * echelle);
+      ctx.imageSmoothingEnabled = true;
+      ctx.globalAlpha = vue === "poussieres" ? 0.4 : 1;   // en vue poussières, la température reste en fond
+      ctx.drawImage(carte, ex(X0 - DX / 2), ey(H + DX / 2), (NX + 1) * DX * echelle, (H + DX) * echelle);
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.fillStyle = "#0d1017";
+      ctx.fillRect(ex(0), ey(H), L * echelle, H * echelle);
+    }
+    if (etat.couches.lignes) {
+      ctx.strokeStyle = "rgba(240,239,236,0.35)";
+      ctx.lineWidth = 1 * dpr;
+      ctx.stroke(lignes);
+    }
+    if (vue === "poussieres") dessinerPoussieres(false);
+    else if (etat.couches.traceurs) ctx.drawImage(trainees, 0, 0);
+    ctx.restore();
+
+    // Graduations
+    ctx.fillStyle = "rgba(139,147,167,0.85)";
+    ctx.font = `${11 * dpr}px system-ui, sans-serif`;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (let y = 0; y <= H + 1e-9; y += 0.5) ctx.fillText(fr(y, y % 1 ? 1 : 0), ex(0) - 6 * dpr, ey(y));
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (let x = 0; x <= L; x++) ctx.fillText(x + (x === L ? " m" : ""), ex(x), ey(0) + 6 * dpr);
+
+    // Parois : trait plein coloré si température imposée, pointillé si isolée
+    const parois = etat.scenario === "B" || etat.paroisFroides;
+    ctx.lineWidth = 3 * dpr;
+    if (parois) { ctx.strokeStyle = css(couleurT(etat.Tp)); ctx.setLineDash([]); }
+    else { ctx.strokeStyle = "#4a5470"; ctx.setLineDash([6 * dpr, 5 * dpr]); }
+    ctx.strokeRect(ex(0), ey(H), L * echelle, H * echelle);
+    ctx.setLineDash([]);
+
+    // Porte : battant fermé, ou ouverture sur le couloir
+    if (porte.active) {
+      const xp = porte.cote === "gauche" ? ex(0) : ex(L);
+      ctx.save();
+      if (porte.ouverte) {
+        ctx.fillStyle = "#07080c";
+        ctx.fillRect(xp - 2 * dpr, ey(PORTE_H), 4 * dpr, PORTE_H * echelle);
+        ctx.strokeStyle = css(couleurT(etat.Tc));
+        ctx.lineWidth = 1.5 * dpr;
+        ctx.setLineDash([4 * dpr, 4 * dpr]);
+        ctx.beginPath(); ctx.moveTo(xp, ey(0)); ctx.lineTo(xp, ey(PORTE_H)); ctx.stroke();
+      } else {
+        ctx.strokeStyle = survol === "porte" ? "#e6e8ee" : "#a07a52";
+        ctx.lineWidth = 6 * dpr;
+        ctx.beginPath(); ctx.moveTo(xp, ey(0.02)); ctx.lineTo(xp, ey(PORTE_H)); ctx.stroke();
+      }
+      ctx.restore();
+      ctx.fillStyle = "#e6e8ee";
+      ctx.font = `600 ${11.5 * dpr}px system-ui, sans-serif`;
+      ctx.textAlign = porte.cote === "gauche" ? "left" : "right";
+      ctx.textBaseline = "bottom";
+      const dxTexte = (porte.cote === "gauche" ? 10 : -10) * dpr;
+      ctx.fillText(porte.ouverte ? `porte ouverte · couloir ${etat.Tc} °C` : "porte fermée", xp + dxTexte, ey(PORTE_H) - 4 * dpr);
+    }
+
+    // Fenêtre
+    if (etat.scenario === "A") {
+      const xf = fenetre.cote === "gauche" ? ex(0) : ex(L);
+      ctx.strokeStyle = css(couleurT(etat.Tf));
+      ctx.lineWidth = (survol === "fenetre" ? 9 : 7) * dpr;
+      ctx.beginPath(); ctx.moveTo(xf, ey(fenetre.y)); ctx.lineTo(xf, ey(fenetre.y + FEN_H)); ctx.stroke();
+      ctx.fillStyle = "#e6e8ee";
+      ctx.font = `600 ${11.5 * dpr}px system-ui, sans-serif`;
+      ctx.textAlign = fenetre.cote === "gauche" ? "left" : "right";
+      ctx.textBaseline = "middle";
+      const dxTexte = (fenetre.cote === "gauche" ? 10 : -10) * dpr;
+      ctx.fillText("fenêtre " + etat.Tf + " °C", xf + dxTexte, ey(fenetre.y + FEN_H / 2));
+    }
+
+    // Meubles
+    if (etat.avecMeubles) {
+      meubles.forEach((m, i) => {
+        const x = ex(m.x), y = ey(m.h), w = LM * echelle, h = m.h * echelle;
+        ctx.fillStyle = "#1a2030";
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = survol === i ? "#e6e8ee" : "#4a5470";
+        ctx.lineWidth = 1.5 * dpr;
+        ctx.strokeRect(x, y, w, h);
+        ctx.fillStyle = "#e6e8ee";
+        ctx.textAlign = "center"; ctx.textBaseline = "top";
+        ctx.font = `600 ${12 * dpr}px system-ui, sans-serif`;
+        ctx.fillText(m.h + " m", x + w / 2, y + 8 * dpr);
+      });
+    }
+
+    // Radiateur
+    {
+      const x = ex(radiateur.x), y = ey(RAD_H), w = RAD_L * echelle, h = RAD_H * echelle;
+      ctx.fillStyle = Number.isNaN(Trad()) ? "#4a5470" : css(couleurT(Trad()));
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = "rgba(11,13,18,0.55)";
+      ctx.lineWidth = 1 * dpr;
+      for (let k = 1; k < 6; k++) {
+        ctx.beginPath(); ctx.moveTo(x + 2 * dpr, y + (k * h) / 6); ctx.lineTo(x + w - 2 * dpr, y + (k * h) / 6); ctx.stroke();
+      }
+      ctx.strokeStyle = survol === "radiateur" ? "#e6e8ee" : "rgba(11,13,18,0.8)";
+      ctx.lineWidth = 1.5 * dpr;
+      ctx.strokeRect(x, y, w, h);
+      ctx.fillStyle = "#e6e8ee";
+      ctx.font = `600 ${11.5 * dpr}px system-ui, sans-serif`;
+      ctx.textBaseline = "bottom";
+      ctx.textAlign = radiateur.x < 0.3 ? "left" : radiateur.x > L - 0.4 ? "right" : "center";
+      const xt = radiateur.x < 0.3 ? x : radiateur.x > L - 0.4 ? x + w : x + w / 2;
+      ctx.fillText(etat.radAllume ? "radiateur " + etat.Tr + " °C" : "radiateur éteint", xt, y - 4 * dpr);
+    }
+
+    if (vue === "poussieres") dessinerPoussieres(true);
+
+    // Sonde au survol
+    if (sonde && instantane && !dansSolide(sonde.x, sonde.y)) {
+      const T = interp(instantane.T, sonde.x, sonde.y);
+      const u = interp(instantane.u, sonde.x, sonde.y), v = interp(instantane.v, sonde.x, sonde.y);
+      const texte = `${fr(T)} °C · ${vit(Math.hypot(u, v))}`;
+      ctx.font = `${12 * dpr}px system-ui, sans-serif`;
+      const w = ctx.measureText(texte).width + 12 * dpr, h = 20 * dpr;
+      let x = ex(sonde.x) + 12 * dpr, y = ey(sonde.y) - h - 8 * dpr;
+      if (x + w > W) x = ex(sonde.x) - w - 12 * dpr;
+      if (y < 0) y = ey(sonde.y) + 12 * dpr;
+      ctx.fillStyle = "rgba(20,24,33,0.92)";
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = "#262c3a";
+      ctx.strokeRect(x, y, w, h);
+      ctx.fillStyle = "#e6e8ee";
+      ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      ctx.fillText(texte, x + 6 * dpr, y + h / 2);
+    }
+  }
+
+  // ---------- Mesures ----------
+  // En régime oscillant, les valeurs affichées sont lissées sur environ une période
+  let lissage = null;
+  function lisser(valeurs, m) {
+    if (m.regime !== "oscillant" || !lissage) { lissage = { ...valeurs, t: m.temps }; return lissage; }
+    const tau = Math.max(30, m.periode || 60);
+    const a = 1 - Math.exp(-Math.max(0, m.temps - lissage.t) / tau);
+    for (const c in valeurs) lissage[c] += (valeurs[c] - lissage[c]) * a;
+    lissage.t = m.temps;
+    return lissage;
+  }
+  const $ = (id) => document.getElementById(id);
+  function majMesures() {
+    const m = instantane;
+    if (!m) return;
+    const { u, v, T, psi } = m;
+    let vPanache = 0, vSol = 0, sT = 0, nT = 0, psiMax = 0;
+    const r0 = radiateur.x - 0.3, r1 = radiateur.x + RAD_L + 0.3;
+    for (let j = 1; j < NY; j++) {
+      for (let i = I0 + 1; i < I1; i++) {
+        const k = j * NI + i;
+        if (masque[k]) continue;
+        const x = xDe(i), y = j * DX;
+        if (x >= r0 && x <= r1 && y > RAD_H && v[k] > vPanache) vPanache = v[k];
+        if (y >= 0.05 && y <= 0.15) vSol = Math.max(vSol, Math.abs(u[k]));
+        sT += T[k]; nT++;
+        psiMax = Math.max(psiMax, Math.abs(psi[k]));
+      }
+    }
+    // Médiane sur la ligne, loin des murs : insensible au panache et aux couches limites
+    const medianeLigne = (y) => {
+      const j = Math.round(y / DX), val = [];
+      for (let i = iDe(0.5); i <= iDe(L - 0.5); i++) {
+        const k = j * NI + i;
+        if (!masque[k]) val.push(T[k]);
+      }
+      val.sort((a, b) => a - b);
+      return val.length ? val[val.length >> 1] : NaN;
+    };
+    const l = lisser({ vPanache, vSol, psiMax, Tair: sT / nT, strat: medianeLigne(2.1) - medianeLigne(0.3) }, m);
+    const { Tair, strat } = l;
+    $("vPanache").textContent = vit(l.vPanache);
+    $("vSol").textContent = vit(l.vSol);
+    $("vDebit").textContent = fr(l.psiMax * PROF * 3600, 0) + " m³/h";
+    $("vTair").textContent = fr(Tair) + " °C";
+    $("vStrat").textContent = (strat >= 0 ? "+" : "−") + fr(Math.abs(strat)) + " K";
+
+    // Churchill & Chu sur les faces verticales exposées du radiateur (théorie §6.1)
+    const dT = etat.radAllume ? etat.Tr - Tair : 0;
+    let P = 0;
+    if (dT > 0) {
+      const ra = (0.0335 * dT * RAD_H ** 3) / (NU_AIR * KAPPA_AIR);
+      const nu = (0.825 + (0.387 * ra ** (1 / 6)) / (1 + (0.492 / 0.71) ** (9 / 16)) ** (8 / 27)) ** 2;
+      const h = (nu * 0.0257) / RAD_H;
+      const faces = radiateur.x <= 0 || radiateur.x >= L - RAD_L ? 1 : 2;
+      P = h * faces * RAD_H * PROF * dT;
+    }
+    $("vPuiss").textContent = etat.radAllume ? "≈ " + fr(Math.round(P / 10) * 10, 0) + " W" : "éteint";
+
+    // Débit entrant par la porte, ramené à une porte de 0,8 m, et formule de Brown & Solvason (theorie_porte.html §1.2)
+    $("tuilePorte").hidden = !porteOuverte();
+    if (porteOuverte()) {
+      const sens = porte.cote === "gauche" ? 1 : -1;
+      let q = 0;
+      for (let j = 1; j < jDe(PORTE_H); j++) q += Math.max(0, u[j * NI + iPorte()] * sens) * DX;
+      const dT = Math.abs(Tair - etat.Tc);
+      const theorie = (CD / 3) * PORTE_L * Math.sqrt(((9.81 * dT) / 293) * PORTE_H ** 3);
+      $("vPorte").textContent = fr(q * PORTE_L * 3600, 0) + " m³/h";
+      $("vPorteDetail").textContent = `entrant · théorie (C_d = 0,6, ΔT = ${fr(dT)} K) : ${fr(theorie * 3600, 0)} m³/h`;
+    }
+
+    const s = $("statut");
+    if (m.regime === "stationnaire") {
+      s.innerHTML = `<strong>Régime stationnaire atteint</strong> <span class="doux">· ${fr(dureeCalcul)} s de calcul, ${fr(m.temps, 0)} s de pseudo-temps</span>`;
+    } else if (m.regime === "oscillant") {
+      const per = m.periode ? `période ≈ ${fr(m.periode, 0)} s` : "période en cours d'estimation";
+      s.innerHTML = `<strong>Régime établi oscillant</strong> <span class="doux">· pas d'état stationnaire : le panache pulse (${per}). Affiché en temps réel${etat.accel > 1 ? " × " + etat.accel : ""}, mesures moyennées sur le cycle.</span>`;
+    } else if (m.rythme === "reel") {
+      s.innerHTML = `<strong>${etat.evenement || "Transitoire"} depuis ${duree(m.temps)}</strong> <span class="doux">· temps réel${etat.accel > 1 ? " × " + etat.accel : ""} jusqu'au nouveau régime établi</span>`;
+    } else {
+      const evol = Number.isFinite(m.evolution) ? ` · évolution ${fr(100 * m.evolution, 2)} % en 20 s (cible ${fr(100 * TOL, 1)} %)` : "";
+      s.innerHTML = `<strong>Calcul de l'écoulement…</strong> <span class="doux">· pseudo-temps ${fr(m.temps, 0)} s${evol}</span>`;
+    }
+  }
+
+  // ---------- Glisser-déposer ----------
+  let glisse = null;
+  function versMonde(e) {
+    const r = canvas.getBoundingClientRect();
+    const k = (L + 2 * MARGE) / r.width;
+    return [(e.clientX - r.left) * k - MARGE, H + MARGE - (e.clientY - r.top) * k];
+  }
+  function objetSous(x, y) {
+    const tol = 0.06;
+    if (porte.active) {
+      const xp = porte.cote === "gauche" ? 0 : L;
+      if (Math.abs(x - xp) < 0.15 && y >= -tol && y <= PORTE_H + tol) return "porte";
+    }
+    if (etat.scenario === "A") {
+      const xf = fenetre.cote === "gauche" ? 0 : L;
+      if (Math.abs(x - xf) < 0.15 && y >= fenetre.y - tol && y <= fenetre.y + FEN_H + tol) return "fenetre";
+    }
+    if (x >= radiateur.x - tol && x <= radiateur.x + RAD_L + tol && y >= -tol && y <= RAD_H + tol) return "radiateur";
+    if (etat.avecMeubles) {
+      const i = meubles.findIndex((m) => x >= m.x - tol && x <= m.x + LM + tol && y >= -tol && y <= m.h + tol);
+      if (i >= 0) return i;
+    }
+    return null;
+  }
+  canvas.addEventListener("pointerdown", (e) => {
+    const [x, y] = versMonde(e);
+    const o = objetSous(x, y);
+    if (o === null) return;
+    const ref = o === "fenetre" ? { x: 0, y: fenetre.y } : o === "radiateur" ? { x: radiateur.x, y: 0 } : o === "porte" ? { x: 0, y: 0 } : { x: meubles[o].x, y: 0 };
+    glisse = { o, dx: x - ref.x, dy: y - ref.y };
+    canvas.setPointerCapture(e.pointerId);
+    canvas.style.cursor = "grabbing";
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    const [x, y] = versMonde(e);
+    sonde = { x, y };
+    if (!glisse) {
+      survol = objetSous(x, y);
+      canvas.style.cursor = survol !== null ? "grab" : "crosshair";
+      return;
+    }
+    const avant = JSON.stringify([radiateur, fenetre, meubles, porte]);
+    if (glisse.o === "porte") {
+      const cote = x < L / 2 ? "gauche" : "droite";
+      if (cote !== porte.cote) { porte.cote = cote; appliquerContraintes(); }
+    } else if (glisse.o === "fenetre") placerFenetre(x < L / 2 ? "gauche" : "droite", y - glisse.dy);
+    else if (glisse.o === "radiateur") placerRadiateur(x - glisse.dx);
+    else poserAuSol(meubles[glisse.o], LM, x - glisse.dx);
+    if (JSON.stringify([radiateur, fenetre, meubles, porte]) !== avant) envoyerBientot();
+  });
+  const lacher = () => {
+    if (!glisse) return;
+    glisse = null;
+    canvas.style.cursor = "grab";
+    envoyer();
+  };
+  canvas.addEventListener("pointerup", lacher);
+  canvas.addEventListener("pointercancel", lacher);
+  canvas.addEventListener("pointerleave", () => { sonde = null; if (!glisse) survol = null; });
+
+  // ---------- Commandes ----------
+  function majCommandes() {
+    $("scA").setAttribute("aria-pressed", etat.scenario === "A");
+    $("scB").setAttribute("aria-pressed", etat.scenario === "B");
+    $("parIsolees").setAttribute("aria-pressed", !etat.paroisFroides);
+    $("parFroides").setAttribute("aria-pressed", etat.paroisFroides);
+    $("blocParois").hidden = etat.scenario !== "A";
+    $("blocTf").hidden = etat.scenario !== "A";
+    $("blocTp").hidden = !(etat.scenario === "B" || etat.paroisFroides);
+    $("TrVal").textContent = etat.Tr + " °C";
+    $("radOnOff").textContent = etat.radAllume ? "Éteindre le radiateur" : "Allumer le radiateur";
+    $("TfVal").textContent = etat.Tf + " °C";
+    $("TpVal").textContent = fr(etat.Tp) + " °C";
+    $("ouvrir").hidden = !porte.active;
+    $("blocTc").hidden = !porte.active;
+    $("blocCc").hidden = !porte.active;
+    $("blocBattant").hidden = !porte.active;
+    $("blocResusp").hidden = !porte.active;
+    $("ouvrir").textContent = porte.ouverte ? "Fermer la porte" : "Ouvrir la porte";
+    $("TcVal").textContent = etat.Tc + " °C";
+  }
+  function choisirScenario(sc) {
+    etat.scenario = sc;
+    if (sc === "B" && (radiateur.x <= 0 || radiateur.x >= L - RAD_L)) poserAuSol(radiateur, RAD_L, 2.45);
+    appliquerContraintes();
+    majCommandes();
+    envoyer(true);
+  }
+  $("scA").onclick = () => choisirScenario("A");
+  $("scB").onclick = () => choisirScenario("B");
+  $("parIsolees").onclick = () => { etat.paroisFroides = false; majCommandes(); envoyer(); };
+  $("parFroides").onclick = () => { etat.paroisFroides = true; majCommandes(); envoyer(); };
+  for (const [id, cle] of [["Tr", "Tr"], ["Tf", "Tf"], ["Tp", "Tp"]]) {
+    $(id).oninput = (e) => {
+      etat[cle] = +e.target.value;
+      majCommandes();
+      if (cle !== "Tr" || etat.radAllume) envoyerBientot();
+    };
+  }
+  $("radOnOff").onclick = () => {
+    etat.radAllume = !etat.radAllume;
+    etat.evenement = etat.radAllume ? "Radiateur allumé" : "Radiateur éteint";
+    majCommandes();
+    envoyer(false, "reel");
+  };
+  $("porteActive").onchange = (e) => {
+    porte.active = e.target.checked;
+    if (!porte.active) porte.ouverte = false;
+    appliquerContraintes();
+    majCommandes();
+    envoyer();
+  };
+  $("ouvrir").onclick = () => {
+    porte.ouverte = !porte.ouverte;
+    etat.evenement = porte.ouverte ? "Porte ouverte" : "Porte fermée";
+    majCommandes();
+    envoyer(false, "reel");
+    if (porte.ouverte && +$("battant").value > 0) bouffee(+$("battant").value);
+  };
+  $("Tc").oninput = (e) => {
+    etat.Tc = +e.target.value;
+    majCommandes();
+    if (porteOuverte()) { etat.evenement = "Couloir à " + etat.Tc + " °C"; envoyerBientot("reel"); }
+    else majEchelle();
+  };
+  $("meubles").onchange = (e) => {
+    etat.avecMeubles = e.target.checked;
+    if (etat.avecMeubles) for (const m of meubles) poserAuSol(m, LM, m.x);
+    envoyer();
+  };
+  $("nut").onchange = (e) => { etat.nut = +e.target.value; envoyer(); };
+  $("cTemp").onchange = (e) => { etat.couches.temp = e.target.checked; };
+  $("cLignes").onchange = (e) => { etat.couches.lignes = e.target.checked; };
+  $("cTraceurs").onchange = (e) => { etat.couches.traceurs = e.target.checked; };
+  $("accel").onchange = (e) => { etat.accel = +e.target.value; envoyerAuSolveur({ type: "accel", valeur: etat.accel }); };
+  $("repos").onclick = () => envoyer(true);
+  window.addEventListener("resize", dimensionner);
+
+  // ---------- Poussières ----------
+  const CLASSES = [
+    { nom: "10–100 nm", couleur: "#b39cff" },
+    { nom: "0,1–1 µm", couleur: "#6cb2ff" },
+    { nom: "1–10 µm", couleur: "#4fd6a5" },
+    { nom: "10–100 µm", couleur: "#ffc857" },
+    { nom: "0,1–1 mm", couleur: "#ff7a6b" },
+  ];
+  const PAR_DECADE = 50, DECADES = 5, D_MIN = 1e-8;   // diamètres log-uniformes de 10 nm à 1 mm
+  const DELTA_PAROI = 0.1;     // m, épaisseur sur laquelle la diffusion turbulente s'éteint contre une paroi (§8.3)
+  const SC_T = 1;              // nombre de Schmidt turbulent : D_t = ν_t / Sc_t
+  const T0_LOG = 0.5;          // s, échelle de départ du temps logarithmique
+  const MISE_EN_MOYENNE = 180; // s de pseudo-temps de moyenne avant de lâcher les poussières si l'écoulement oscille
+  const { AIR, SOL, DESSUS_M1, DESSUS_M2, COTES, RADIATEUR, FENETRE, MURS, PLAFOND, SORTIE, COULOIR } = Transport;
+  const COULEUR_COULOIR = "#ffffff";   // poussière venue du couloir, toutes tailles
+  const SURFACES = [
+    { s: SOL, nom: "Sol", principal: true },
+    { s: DESSUS_M1, nom: "Dessus du meuble 1 m", principal: true },
+    { s: DESSUS_M2, nom: "Dessus du meuble 2 m", principal: true },
+    { s: COTES, nom: "Côtés des meubles" },
+    { s: RADIATEUR, nom: "Radiateur" },
+    { s: FENETRE, nom: "Fenêtre" },
+    { s: MURS, nom: "Murs" },
+    { s: PLAFOND, nom: "Plafond" },
+  ];
+
+  let vue = "ecoulement";
+  const pous = { T: 3600, Tanim: 30, rhoP: 1500, nombre: 5000, c0: 1, cc: 1, t: 0, tau: 0, etat: "attente", pause: false, idx: 0, cible: 0, horloge: 0,
+    live: false, fluxDernier: 0 };
+  let grilleP = [], reactP = [], particules = [], parClasse = [], relevesP = [], scene = null, champMoyen = null;
+
+  // Champ vu par les poussières : le champ stationnaire, ou la moyenne glissante d'un écoulement oscillant
+  function suivreChampMoyen(m) {
+    if (m.regime !== "oscillant") { champMoyen = { u: m.u, v: m.v, regime: m.regime }; return; }
+    if (!champMoyen || champMoyen.regime !== "oscillant") {
+      champMoyen = { u: Float32Array.from(m.u), v: Float32Array.from(m.v), regime: "oscillant", t: m.temps, debut: m.temps };
+      return;
+    }
+    const a = 1 - Math.exp(-Math.max(0, m.temps - champMoyen.t) / Math.max(60, m.periode || 60));
+    for (let k = 0; k < N; k++) {
+      champMoyen.u[k] += (m.u[k] - champMoyen.u[k]) * a;
+      champMoyen.v[k] += (m.v[k] - champMoyen.v[k]) * a;
+    }
+    champMoyen.t = m.temps;
+  }
+  const champPret = () => champMoyen && (champMoyen.regime === "stationnaire" ||
+    (champMoyen.regime === "oscillant" && champMoyen.t - champMoyen.debut >= MISE_EN_MOYENNE));
+
+  // ----- Formatage -----
+  const EXPOSANTS = { "-": "⁻", 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" };
+  function nombre(x, chiffres = 2) {
+    if (x === 0) return "0";
+    const e = Math.floor(Math.log10(Math.abs(x)));
+    if (e >= -2 && e < 5) return Number(x.toPrecision(chiffres)).toLocaleString("fr-FR", { maximumFractionDigits: 6 });
+    const m = Number((x / 10 ** e).toPrecision(chiffres)).toLocaleString("fr-FR");
+    return (m === "1" ? "" : m + "·") + "10" + String(e).split("").map((c) => EXPOSANTS[c]).join("");
+  }
+  function duree(s) {
+    for (const [u, nom] of [[86400, "j"], [3600, "h"], [60, "min"], [1, "s"]]) if (s >= u) return nombre(s / u) + " " + nom;
+    return nombre(s * 1e3) + " ms";
+  }
+  function horloge(s) {
+    if (s < 60) return s.toFixed(1).replace(".", ",") + " s";
+    if (s < 3600) return Math.floor(s / 60) + " min " + String(Math.floor(s % 60)).padStart(2, "0") + " s";
+    if (s < 86400) return Math.floor(s / 3600) + " h " + String(Math.floor((s % 3600) / 60)).padStart(2, "0") + " min";
+    return nombre(s / 86400, 3) + " j";
+  }
+  function masse(kg) {
+    if (kg === 0) return "0";
+    const g = kg * 1e3;
+    for (const [u, nom] of [[1, "g"], [1e-3, "mg"], [1e-6, "µg"], [1e-9, "ng"]]) if (g >= u) return nombre(g / u) + " " + nom;
+    return nombre(g / 1e-12) + " pg";
+  }
+
+  // ----- Préparation -----
+  function caracteriserP() {
+    grilleP = [];
+    for (let i = 0; i < PAR_DECADE * DECADES; i++) {
+      grilleP.push(Physique.caracteriser(D_MIN * 10 ** ((i + 0.5) / PAR_DECADE), pous.rhoP));
+    }
+    $("pLegende").innerHTML = CLASSES.map((k, i) => {
+      const c = grilleP[i * PAR_DECADE + PAR_DECADE / 2];
+      return `<span class="pastille" style="--c:${k.couleur}">${k.nom} : chute ${nombre(c.vt)} m/s</span>`;
+    }).join("") + `<span class="pastille" style="--c:${COULEUR_COULOIR}">poussière venue du couloir (toutes tailles)</span>`;
+  }
+  function obstaclesScene() {
+    const liste = [];
+    if (etat.avecMeubles) {
+      for (const m of meubles) liste.push({ x0: m.x, x1: m.x + LM, h: m.h, dessus: m.h === 1 ? DESSUS_M1 : DESSUS_M2, cote: COTES });
+    }
+    liste.push({ x0: radiateur.x, x1: radiateur.x + RAD_L, h: RAD_H, dessus: RADIATEUR, cote: RADIATEUR });
+    return liste;
+  }
+  // Géométrie vue par les poussières : pièce, et couloir derrière la porte
+  function geometrieP() {
+    const gauche = porte.cote === "gauche";
+    return {
+      obstacles: obstaclesScene(),
+      fenetre: etat.scenario === "A" ? { x: fenetre.cote === "gauche" ? 0 : L, y0: fenetre.y, y1: fenetre.y + FEN_H } : null,
+      couloir: porte.active ? { xa: gauche ? -LC : L + LC, xb: gauche ? 0 : L, cloison: gauche ? 0 : L, yPorte: porte.ouverte ? PORTE_H : 0 } : null,
+    };
+  }
+  const VOL_COULOIR = LC * H * PROF;
+  const dansCouloirP = (x) => scene.couloir && x > Math.min(scene.couloir.xa, scene.couloir.xb) && x < Math.max(scene.couloir.xa, scene.couloir.xb);
+  const auFond = (x) => dansCouloirP(x) && Math.abs(x - scene.couloir.cloison) > RAPPEL_DIST;
+  function auFondAuHasard(p) {
+    const c = scene.couloir, sens = Math.sign(c.xa - c.cloison);
+    p.x = c.cloison + sens * (RAPPEL_DIST + Math.random() * (LC - RAPPEL_DIST));
+    p.y = Math.random() * H;
+    p.s = AIR;
+  }
+  const contreMur = (o) => (o.x0 <= 1e-9 ? 1 : 0) + (o.x1 >= L - 1e-9 ? 1 : 0);
+  function aires() {
+    const obs = scene.obstacles, A = {};
+    A[SOL] = (L - obs.reduce((a, o) => a + o.x1 - o.x0, 0)) * PROF;
+    A[DESSUS_M1] = obs.some((o) => o.dessus === DESSUS_M1) ? LM * PROF : 0;
+    A[DESSUS_M2] = obs.some((o) => o.dessus === DESSUS_M2) ? LM * PROF : 0;
+    A[COTES] = obs.filter((o) => o.cote === COTES).reduce((a, o) => a + (2 - contreMur(o)) * o.h * PROF, 0);
+    const r = obs.find((o) => o.dessus === RADIATEUR);
+    A[RADIATEUR] = (RAD_L + (2 - contreMur(r)) * RAD_H) * PROF;
+    A[FENETRE] = scene.fenetre ? FEN_H * PROF : 0;
+    A[MURS] = 2 * H * PROF - A[FENETRE] - obs.reduce((a, o) => a + contreMur(o) * o.h * PROF, 0)
+      - (scene.couloir && scene.couloir.yPorte > 0 ? PORTE_H * PROF : 0);
+    A[PLAFOND] = L * PROF;
+    return A;
+  }
+  const volumeAir = () => (L * H - scene.obstacles.reduce((a, o) => a + (o.x1 - o.x0) * o.h, 0)) * PROF;
+
+  function attendrePoussieres() {
+    pous.live = false;
+    if (pous.etat === "attente" && !particules.length) return;
+    pous.etat = "attente";
+    particules = [];
+    parClasse = CLASSES.map(() => []);
+  }
+  function lancerPoussieres() {
+    scene = {
+      L, H, dx: DX, nx: NX, ny: NY, x0: X0,
+      u: Float32Array.from(champMoyen.u), v: Float32Array.from(champMoyen.v),
+      Dt: etat.nut / SC_T,
+      ...geometrieP(),
+    };
+    reactP = grilleP.map((c) => Transport.reactivites(c, scene.Dt, DELTA_PAROI));
+    const dedans = (x, y) => scene.obstacles.some((o) => x > o.x0 && x < o.x1 && y < o.h);
+    particules = [];
+    parClasse = CLASSES.map(() => []);
+    const nouvelle = (o) => {
+      const g = Math.floor(Math.random() * grilleP.length);
+      const p = { x: 0, y: 0, g, k: Math.floor(g / PAR_DECADE), s: AIR, o, w: 0 };
+      particules.push(p);
+      parClasse[p.k].push(p);
+      return p;
+    };
+    reserveCouloir = CLASSES.map(() => 0);
+    for (let n = 0; n < pous.nombre; n++) {
+      const p = nouvelle(0);
+      do { p.x = Math.random() * L; p.y = Math.random() * H; } while (dedans(p.x, p.y));
+    }
+    // Couloir : même densité de particules simulées que la pièce, modulée par C couloir / C₀ (au plus × 3)
+    if (scene.couloir) {
+      const V = volumeAir(), ratio = pous.c0 > 0 ? Math.min(3, pous.cc / pous.c0) : pous.cc > 0 ? 1 : 0;
+      const nc = Math.round(pous.nombre * (VOL_COULOIR / V) * ratio);
+      for (let n = 0; n < nc; n++) {
+        const p = nouvelle(1);
+        const c = scene.couloir;
+        p.x = c.cloison + Math.sign(c.xa - c.cloison) * Math.random() * LC;
+        p.y = Math.random() * H;
+      }
+    }
+    // Poids : nombre de particules réelles que représente chaque particule simulée
+    const V = volumeAir();
+    for (const o of [0, 1]) {
+      const vol = o ? VOL_COULOIR : V, c = o ? pous.cc : pous.c0;
+      const compte = CLASSES.map((_, k) => parClasse[k].filter((p) => p.o === o).length);
+      for (const p of particules) if (p.o === o) p.w = (c * 1000 * vol) / compte[p.k];
+    }
+    // Population de référence du fond du couloir, que le renouvellement maintient
+    if (scene.couloir) for (const p of particules) if (p.o === 1 && auFond(p.x)) reserveCouloir[p.k]++;
+    Object.assign(pous, { t: 0, tau: 0, idx: 0, cible: 0, etat: "marche", horloge: performance.now(), live: false });
+    majBoutonsP();
+    majBilanP();
+  }
+
+  // ----- Temps : logarithmique, et jamais plus vite que le calcul ne le permet -----
+  const tempsSim = (tau) => T0_LOG * ((1 + pous.T / T0_LOG) ** Math.min(1, tau / pous.Tanim) - 1);
+  const tauDe = (t) => Math.min(1, Math.log1p(t / T0_LOG) / Math.log1p(pous.T / T0_LOG)) * pous.Tanim;
+  function avancerPoussieres(budget) {
+    if (pous.etat !== "marche" || pous.pause) { pous.horloge = performance.now(); return; }
+    const t0 = performance.now();
+    while (performance.now() - t0 < budget) {
+      if (pous.idx === 0) {
+        // Début d'une passe : on fixe la prochaine cible de temps
+        const maintenant = performance.now();
+        if (pous.live) {
+          // Transitoire : on suit le temps de l'écoulement, image par image
+          const tf = instantane ? instantane.temps : pous.fluxDernier;
+          pous.cible = pous.t + Math.max(0, tf - pous.fluxDernier);
+          pous.fluxDernier = tf;
+        } else {
+          pous.tau = Math.min(pous.Tanim, pous.tau + Math.min(0.05, (maintenant - pous.horloge) / 1000));
+          pous.cible = tempsSim(pous.tau);
+        }
+        pous.horloge = maintenant;
+      }
+      const dt = pous.cible - pous.t;
+      const fin = Math.min(particules.length, pous.idx + 100);
+      for (; pous.idx < fin; pous.idx++) {
+        const p = particules[pous.idx];
+        if (p.s === AIR && dt > 0) Transport.avancer(scene, p, grilleP[p.g], reactP[p.g], dt);
+      }
+      if (pous.idx >= particules.length) {
+        pous.idx = 0;
+        renouvelerCouloir(pous.cible - pous.t);
+        if (pous.live) echangerPoussieres(pous.cible - pous.t);
+        pous.t = pous.cible;
+        if (!pous.live && pous.tau >= pous.Tanim) {
+          pous.etat = "fini";
+          majBilanP();
+          releverP();
+          majBoutonsP();
+        }
+        break;   // au plus une passe par image
+      }
+    }
+  }
+
+  // Le fond du couloir est un réservoir à concentration constante : son air est renouvelé au taux
+  // RAPPEL. Une poussière de la pièce qui y parvient est emportée (SORTIE). Le nombre de particules
+  // du couloir y est maintenu classe par classe : on recycle d'abord celles qui se sont déposées
+  // dans le couloir, puis on en crée, pour remplacer celles qui sont entrées dans la pièce.
+  let reserveCouloir = [];
+  function renouvelerCouloir(dt) {
+    if (!scene.couloir || dt <= 0) return;
+    const prob = -Math.expm1(-RAPPEL * dt);
+    const auFondNb = CLASSES.map(() => 0), recyclables = CLASSES.map(() => []);
+    for (const p of particules) {
+      if (p.s === AIR && auFond(p.x)) {
+        if (p.o === 0) { if (Math.random() < prob) p.s = SORTIE; }
+        else auFondNb[p.k]++;
+      } else if (p.o === 1 && p.s === COULOIR) recyclables[p.k].push(p);
+    }
+    CLASSES.forEach((_, k) => {
+      let manque = reserveCouloir[k] - auFondNb[k];
+      while (manque > 0 && recyclables[k].length) { auFondAuHasard(recyclables[k].pop()); manque--; }
+      const modele = parClasse[k].find((p) => p.o === 1);
+      for (; manque > 0 && modele; manque--) {
+        const g = k * PAR_DECADE + Math.floor(Math.random() * PAR_DECADE);
+        const p = { x: 0, y: 0, g, k, s: AIR, o: 1, w: modele.w };
+        auFondAuHasard(p);
+        particules.push(p);
+        parClasse[k].push(p);
+      }
+    });
+  }
+
+  // ----- Bouffée du battant (theorie_porte.html §7) -----
+  // Volume transféré par le battant selon la durée d'ouverture, mesuré dans battant.html
+  // (air du couloir passé dans la pièce 20 s après l'ouverture, theorie_battant.html §4.2)
+  const V_BATTANT = { 1: 0.6, 2: 0.45, 3: 0.3 };      // m³
+  const ZONE_BATTANT = 1.5;                           // m de part et d'autre de la porte
+  const RESUSP = { aucune: 0, faible: 0.01, moyenne: 0.05, forte: 0.2 };   // fraction maximale remise en suspension
+  const D50_RESUSP = 20e-6, R_RESUSP = 1.0;           // m : taille de demi-efficacité, rayon autour de la porte
+  let derniereBouffee = null;
+  function bouffee(duree) {
+    // Zone de la pièce devant la porte (1,5 m × 2 m) et son symétrique dans le couloir :
+    // chaque paire de nœuds échange la fraction phi de sa température
+    const V = V_BATTANT[duree], phi = V / (ZONE_BATTANT * PORTE_H * PROF);
+    const n = Math.round(ZONE_BATTANT / DX) - 1, ip = iPorte(), sens = porte.cote === "gauche" ? 1 : -1, paires = [];
+    for (let j = 1; j < jDe(PORTE_H); j++) for (let d = 1; d <= n; d++) paires.push(j * NI + ip + sens * d, j * NI + ip - sens * d);
+    envoyerAuSolveur({ type: "melange", paires: Int32Array.from(paires), phi });
+    derniereBouffee = { V, phi, resusp: 0 };
+    if (vue === "poussieres" && pous.live && scene && scene.couloir) {
+      pous.bouffee = { phi, duree, fait: 0 };
+      derniereBouffee.resusp = remettreEnSuspension();
+    }
+  }
+  // Échange progressif des poussières pendant le mouvement du battant (appelé à chaque passe)
+  function echangerPoussieres(dt) {
+    const b = pous.bouffee;
+    if (!b || b.fait >= 1 || !scene.couloir) return;
+    const frac = Math.min(1 - b.fait, dt / b.duree), proba = b.phi * frac;
+    b.fait += frac;
+    const xc = scene.couloir.cloison;
+    const dedans = (x, y) => scene.obstacles.some((o) => x > o.x0 && x < o.x1 && y < o.h);
+    for (const p of particules) {
+      if (p.s !== AIR || p.y > PORTE_H || Math.abs(p.x - xc) > ZONE_BATTANT || Math.random() >= proba) continue;
+      const x = 2 * xc - p.x;
+      if (!dedans(x, p.y)) p.x = x;
+    }
+  }
+  // Rafale au ras du sol : la poussière déposée près de la porte repart, d'autant plus qu'elle est grosse
+  function remettreEnSuspension() {
+    const F = RESUSP[$("resusp").value];
+    if (!F) return 0;
+    let reel = 0;
+    for (const p of particules) {
+      if (p.s !== SOL || Math.abs(p.x - scene.couloir.cloison) > R_RESUSP) continue;
+      const d = grilleP[p.g].d;
+      if (Math.random() < (F * d) / (d + D50_RESUSP)) {
+        p.s = AIR;
+        p.y = 0.02 + Math.random() * 0.18;
+        reel += p.w;
+      }
+    }
+    return reel;
+  }
+
+  // ----- Transitoire : les particules suivent l'écoulement instantané -----
+  function debutLive() {
+    pous.live = true;
+    pous.bouffee = null;
+    pous.fluxDernier = 0;
+    if (pous.etat === "fini") pous.etat = "marche";
+    Object.assign(scene, geometrieP());
+    majBoutonsP();
+  }
+  function suivreLive(m) {
+    if (!pous.live || !scene) return;
+    scene.u = m.u;
+    scene.v = m.v;
+    if (m.regime !== "calcul") {
+      // Nouveau régime établi : retour au temps logarithmique, à partir du temps atteint
+      pous.live = false;
+      scene.u = Float32Array.from(m.u);
+      scene.v = Float32Array.from(m.v);
+      pous.tau = tauDe(pous.t);
+      pous.horloge = performance.now();
+      if (pous.t >= pous.T) { pous.etat = "fini"; majBilanP(); releverP(); }
+      majBoutonsP();
+    }
+  }
+
+  // ----- Bilan -----
+  function compterP() {
+    // Sommes pondérées : chaque particule simulée compte pour p.w particules réelles
+    const dep = Array.from({ length: 11 }, () => new Array(DECADES).fill(0));
+    const depC = Array.from({ length: 11 }, () => 0);
+    const ms = Array.from({ length: 11 }, () => 0);
+    const piece = new Array(DECADES).fill(0), pieceAir = new Array(DECADES).fill(0), pieceSortie = new Array(DECADES).fill(0);
+    const couloirDansAir = new Array(DECADES).fill(0);
+    let entrees = 0;
+    for (const p of particules) {
+      dep[p.s][p.k] += p.w;
+      ms[p.s] += p.w * grilleP[p.g].m;
+      if (p.o === 1) {
+        depC[p.s] += p.w;
+        const dansPiece = p.s === AIR ? p.x > 0 && p.x < L : p.s !== COULOIR && p.s !== SORTIE;
+        if (dansPiece) entrees += p.w;
+        if (p.s === AIR && p.x > 0 && p.x < L) couloirDansAir[p.k] += p.w;
+      } else {
+        piece[p.k] += p.w;
+        if (p.s === AIR) pieceAir[p.k] += p.w;
+        if (p.s === SORTIE) pieceSortie[p.k] += p.w;
+      }
+    }
+    const V = volumeAir(), A = aires();
+    const surf = {};
+    for (const { s } of SURFACES) {
+      const n = dep[s].map((x) => (A[s] ? x / A[s] : NaN));
+      surf[s] = { n, total: A[s] ? n.reduce((a, b) => a + b, 0) : NaN, m: A[s] ? ms[s] / A[s] : NaN, couloir: A[s] ? depC[s] / A[s] : NaN };
+    }
+    const part = (a) => a.map((x, k) => (piece[k] ? x / piece[k] : 0));
+    const somme = (a) => a.reduce((x, y) => x + y, 0);
+    // Modèles simples, évalués sur la poussière initiale de la pièce (§8.4) : par m²
+    const Ah = L * PROF, t = pous.t;
+    const immobile = { [SOL]: 0, [DESSUS_M1]: 0, [DESSUS_M2]: 0 }, melange = { total: 0 };
+    const hauteur = { [SOL]: H, [DESSUS_M1]: H - 1, [DESSUS_M2]: H - 2 };
+    for (const p of particules) {
+      if (p.o === 1) continue;
+      const c = grilleP[p.g], w = p.w / V;
+      for (const s of [SOL, DESSUS_M1, DESSUS_M2]) immobile[s] += w * Math.min(c.vt * t, hauteur[s]);
+      melange.total += w * (V / Ah) * -Math.expm1((-c.vt * Ah * t) / V);
+    }
+    return {
+      surf, A, V, immobile, melange,
+      enAir: part(pieceAir), sortis: part(pieceSortie),
+      fracAir: somme(pieceAir) / somme(piece), fracSortie: somme(pieceSortie) / somme(piece),
+      couloirDansAir: couloirDansAir.map((x) => x / V / 1000), entrees,
+    };
+  }
+  const n2 = (x) => (Number.isFinite(x) ? nombre(x) : "—");
+  const rapport = (vals) => {
+    const ref = vals[2] || vals[1] || vals[0];
+    return vals.every(Number.isFinite) && ref ? vals.map((x) => nombre(x / ref)).join(" : ") : "—";
+  };
+  function majBilanP() {
+    if (!particules.length) return;
+    const b = compterP();
+    $("pC0txt").textContent = nombre(pous.c0);
+    $("pTitreComp").textContent = "Sol et dessus des meubles à t = " + horloge(pous.t);
+    const sim = [SOL, DESSUS_M1, DESSUS_M2].map((s) => b.surf[s].total);
+    const imm = [SOL, DESSUS_M1, DESSUS_M2].map((s) => (b.A[s] ? b.immobile[s] : NaN));
+    const mel = [SOL, DESSUS_M1, DESSUS_M2].map((s) => (b.A[s] ? b.melange.total : NaN));
+    const ligne = (nom, v, cls = "") => `<tr class="${cls}"><td>${nom}</td>${v.map((x) => `<td>${n2(x)}</td>`).join("")}<td>${rapport(v)}</td></tr>`;
+    $("pComparaison").innerHTML = `<thead><tr><th>Modèle</th><th>Sol</th><th>Meuble 1 m</th><th>Meuble 2 m</th><th>Rapport sol : 1 m : 2 m</th></tr></thead><tbody>` +
+      ligne("Convection (simulation)", sim, "principal") + ligne("Air immobile (théorie)", imm, "secondaire") +
+      ligne("Pièce bien mélangée (théorie)", mel, "secondaire") + "</tbody>";
+
+    let html = "<thead><tr><th>Surface</th><th>Aire</th>";
+    for (const k of CLASSES) html += `<th><span class="pastille" style="--c:${k.couleur}">${k.nom}</span></th>`;
+    const avecCouloir = !!scene.couloir;
+    html += `<th>Total /m²</th>${avecCouloir ? "<th>dont couloir</th>" : ""}<th>Masse /m²</th><th>÷ sol</th></tr></thead><tbody>`;
+    const sol = b.surf[SOL].total;
+    SURFACES.forEach(({ s, nom, principal }, i) => {
+      if (!b.A[s]) return;
+      const r = b.surf[s];
+      html += `<tr class="${principal ? "principal" : "secondaire"}${i === 3 ? " separation" : ""}"><td>${nom}</td><td>${nombre(b.A[s])} m²</td>`;
+      for (const x of r.n) html += `<td>${n2(x)}</td>`;
+      html += `<td>${n2(r.total)}</td>${avecCouloir ? `<td>${n2(r.couloir)}</td>` : ""}<td>${masse(r.m)}</td><td>${sol ? nombre(r.total / sol) : "—"}</td></tr>`;
+    });
+    const vide = avecCouloir ? "<td></td>" : "";
+    html += `<tr class="secondaire separation"><td>Poussière de la pièce encore en l'air</td><td>${nombre(b.V)} m³</td>`;
+    for (const f of b.enAir) html += `<td>${nombre(100 * f)} %</td>`;
+    html += `<td>${nombre(100 * b.fracAir)} %</td>${vide}<td></td><td></td></tr>`;
+    if (avecCouloir) {
+      html += `<tr class="secondaire"><td>Poussière de la pièce partie dans le couloir</td><td></td>`;
+      for (const f of b.sortis) html += `<td>${nombre(100 * f)} %</td>`;
+      html += `<td>${nombre(100 * b.fracSortie)} %</td>${vide}<td></td><td></td></tr>`;
+      html += `<tr class="secondaire"><td>Poussière du couloir en l'air dans la pièce</td><td>/L</td>`;
+      for (const c of b.couloirDansAir) html += `<td>${n2(c)}</td>`;
+      html += `<td>${n2(b.couloirDansAir.reduce((a, x) => a + x, 0))}</td>${vide}<td></td><td></td></tr>`;
+    }
+    html += "</tbody>";
+    $("pBilan").innerHTML = html;
+    $("pNoteCouloir").hidden = !avecCouloir;
+    if (avecCouloir) {
+      $("pNoteCouloir").textContent = `Poussière venue du couloir et présente dans la pièce (en l'air ou déposée) : ${nombre(b.entrees)} particules réelles, `
+        + `soit ${nombre((100 * b.entrees) / (pous.c0 * 1000 * b.V * DECADES || 1))} % de la poussière initiale de la pièce. Elle est comptée dans les dépôts ci-dessus.`
+        + (derniereBouffee ? ` Dernier battant : ${fr(derniereBouffee.V, 2)} m³ échangés, ${nombre(derniereBouffee.resusp)} particules du sol remises en suspension.` : "");
+    }
+  }
+  function configuration() {
+    const pos = (x) => fr(x, 2) + " m";
+    const meublesTxt = etat.avecMeubles ? ` · meubles ${meubles.map((m) => pos(m.x)).join(" / ")}` : " · sans meubles";
+    const porteTxt = (porteOuverte() ? ` · porte ${porte.cote} ouverte (couloir ${etat.Tc} °C)` : "") + (etat.radAllume ? "" : " · radiateur éteint");
+    if (etat.scenario === "A") return `A · radiateur ${coteRadiateur()}, fenêtre ${fenetre.cote}${meublesTxt}${porteTxt}`;
+    return `B · radiateur à ${pos(radiateur.x)}${meublesTxt}${porteTxt}`;
+  }
+  function releverP() {
+    if (!particules.length) return;
+    const b = compterP();
+    const sel = $("pMatiere");
+    relevesP.push({ t: pous.t, config: configuration(), matiere: sel.options[sel.selectedIndex].dataset.nom,
+      vals: [SOL, DESSUS_M1, DESSUS_M2].map((s) => b.surf[s].total) });
+    majRelevesP();
+  }
+  function majRelevesP() {
+    const el = $("pReleves");
+    if (!relevesP.length) { el.innerHTML = '<div class="vide">Aucun relevé pour l\'instant.</div>'; return; }
+    el.innerHTML = `<table><thead><tr><th>#</th><th>t</th><th>Configuration</th><th>Matière</th><th>Sol /m²</th><th>Meuble 1 m /m²</th><th>Meuble 2 m /m²</th><th>Rapport sol : 1 m : 2 m</th></tr></thead><tbody>` +
+      relevesP.map((r, i) => `<tr><td>${i + 1}</td><td>${horloge(r.t)}</td><td>${r.config}</td><td>${r.matiere}</td>${r.vals.map((x) => `<td>${n2(x)}</td>`).join("")}<td>${rapport(r.vals)}</td></tr>`).join("") +
+      "</tbody></table>";
+  }
+  function majHorlogeP() {
+    $("pTemps").textContent = "t = " + horloge(pous.t);
+    $("pCible").textContent = "/ " + duree(pous.T);
+    $("pBarre").style.width = (100 * pous.tau) / pous.Tanim + "%";
+    $("pRythme").textContent = pous.etat === "attente" ? "En attente de l'écoulement établi…"
+      : pous.live ? "Transitoire : les particules suivent l'écoulement instantané, en temps réel"
+      : pous.etat === "fini" ? "Mesure terminée" : pous.pause ? "En pause" : "Temps logarithmique, limité par le calcul";
+  }
+  function majBoutonsP() {
+    $("pPause").textContent = pous.etat === "fini" ? "Terminé" : pous.pause ? "Reprendre" : "Pause";
+    $("pPause").disabled = pous.etat !== "marche";
+  }
+
+  // ----- Dessin -----
+  function dessinerPoussieres(deposees) {
+    ctx.globalAlpha = deposees ? 0.95 : 0.85;
+    for (const o of [0, 1]) {
+      parClasse.forEach((liste, k) => {
+        ctx.fillStyle = o ? COULEUR_COULOIR : CLASSES[k].couleur;
+        const t = ((deposees ? 1.4 : 1.1) + 0.45 * k) * dpr;
+        for (const p of liste) {
+          if (p.o === o && p.s !== SORTIE && (p.s !== AIR) === deposees) ctx.fillRect(ex(p.x) - t / 2, ey(p.y) - t / 2, t, t);
+        }
+      });
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ----- Commandes -----
+  function choisirVue(v) {
+    vue = v;
+    $("vueEcoul").setAttribute("aria-pressed", v === "ecoulement");
+    $("vuePous").setAttribute("aria-pressed", v === "poussieres");
+    $("panneauPous").hidden = v !== "poussieres";
+    $("blocPous").hidden = v !== "poussieres";
+    if (v === "poussieres" && pous.etat === "attente" && champPret()) lancerPoussieres();
+    majHorlogeP();
+  }
+  function recalerP() {
+    pous.tau = tauDe(pous.t);
+    if (pous.etat !== "attente") pous.etat = pous.t >= pous.T ? "fini" : "marche";
+    majBoutonsP();
+  }
+  function relancerP() {
+    pous.pause = false;
+    pous.etat = "attente";
+    particules = [];
+    parClasse = CLASSES.map(() => []);
+    if (champPret()) lancerPoussieres();
+    majBoutonsP();
+  }
+  $("vueEcoul").onclick = () => choisirVue("ecoulement");
+  $("vuePous").onclick = () => choisirVue("poussieres");
+  $("pDuree").onchange = (e) => { pous.T = +e.target.value; recalerP(); };
+  $("pEcran").onchange = (e) => { pous.Tanim = +e.target.value; recalerP(); };
+  $("pMatiere").onchange = (e) => { pous.rhoP = +e.target.value; caracteriserP(); relancerP(); };
+  $("pNombre").onchange = (e) => { pous.nombre = +e.target.value; relancerP(); };
+  $("pC0").onchange = (e) => { pous.c0 = Math.max(0, +e.target.value || 0); relancerP(); };
+  $("pCc").onchange = (e) => { pous.cc = Math.max(0, +e.target.value || 0); relancerP(); };
+  $("pPause").onclick = () => { pous.pause = !pous.pause; majBoutonsP(); };
+  $("pRelever").onclick = releverP;
+  $("pRelancer").onclick = relancerP;
+  $("pEffacer").onclick = () => { relevesP = []; majRelevesP(); };
+
+  // ---------- Boucle ----------
+  let precedent = performance.now(), dernierBilanP = 0;
+  function boucle(t) {
+    const dt = Math.min(0.05, (t - precedent) / 1000);
+    precedent = t;
+    if (vue === "poussieres") {
+      avancerPoussieres(12);
+      if (t - dernierBilanP > 300) { dernierBilanP = t; majHorlogeP(); if (pous.etat === "marche") majBilanP(); }
+    } else if (etat.couches.traceurs) avancerTraceurs(dt * etat.accel);
+    dessiner();
+    requestAnimationFrame(boucle);
+  }
+
+  majCommandes();
+  caracteriserP();
+  majRelevesP();
+  dimensionner();
+  demarrerMoteur();
+  envoyer(true);
+  traceurs = Array.from({ length: NB_TRACEURS }, () => nouveauTraceur());
+  requestAnimationFrame(boucle);
+})();
+</script>
+</body>
+</html>

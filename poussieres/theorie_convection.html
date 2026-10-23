@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Théorie · Convection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Colonne de lecture unique, sur le même fond nuit que les animations */
+  :root {
+    --fond: #0b0d12; --surface: #141821; --trait: #262c3a; --texte: #e6e8ee; --doux: #8b93a7;
+    --poussiere: #ffc857; --lien: #6cb2ff;
+    --titre: "Instrument Serif", Georgia, serif;
+    --corps: "Source Sans 3", system-ui, sans-serif;
+    --donnees: "JetBrains Mono", ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--fond); }
+  body {
+    margin: 0; background: var(--fond); color: var(--texte);
+    font: 17px/1.62 var(--corps);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .page { max-width: 46rem; margin: 0 auto; padding-block: 8px 64px; }
+  .site-nav a { color: var(--lien); text-decoration: none; }
+  h1, h2 { font-family: var(--titre); font-weight: 400; text-wrap: balance; line-height: 1.15; }
+  h1 { font-size: clamp(2.1rem, 5vw, 2.9rem); margin: 28px 0 8px; }
+  h2 { font-size: 1.75rem; margin: 48px 0 10px; padding-top: 14px; border-top: 1px solid var(--trait); }
+  h3 { font-size: 1.08rem; margin: 30px 0 6px; font-weight: 600; }
+  p, li { color: var(--texte); }
+  a { color: var(--lien); }
+  strong { color: #fff; font-weight: 600; }
+  code { font-family: var(--donnees); font-size: 0.86em; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--surface); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+  hr { border: 0; height: 0; margin: 8px 0; }
+  blockquote { margin: 18px 0; padding: 4px 16px; border-left: 3px solid var(--poussiere); background: var(--surface); border-radius: 0 6px 6px 0; }
+  blockquote p { margin: 8px 0; }
+  .tableau { overflow-x: auto; margin: 16px 0; }
+  table { border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; min-width: 100%; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: top; }
+  th { color: var(--doux); font-weight: 600; background: var(--surface); }
+  mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 4px 0; }
+  .pied { margin-top: 48px; color: var(--doux); font-size: 0.85rem; }
+</style>
+<script>
+  window.MathJax = { tex: { inlineMath: [["$", "$"]], displayMath: [["$$", "$$"]] }, svg: { fontCache: "global" } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg-full.js" defer></script>
+</head>
+<body>
+<div class="page">
+  <nav class="site-nav" style="font-size:12.5px;color:#8b93a7;padding-top:12px"><a href="index.html" style="color:#ffc857;font-weight:600">Poussières</a> — <a href="index.html">Accueil</a> · <a href="colonnes.html">Colonnes</a> · <a href="piece.html">Pièce</a> · <a href="convection.html">Convection</a> · <a href="battant.html">Battant</a></nav>
+  <article id="texte">
+<h1>Convection naturelle dans la pièce : radiateur, fenêtre et poussières</h1>
+<p>Un radiateur chauffe l'air à son contact. Cet air, plus léger, monte en panache,
+longe le plafond, se refroidit sur les parois froides puis redescend. On cherche
+<strong>l'écoulement moyen établi</strong> (régime stationnaire) dans la coupe 2D de la pièce
+déjà utilisée pour la sédimentation (5 m × 2,5 m, 2 m de profondeur). On veut
+ensuite savoir comment cet écoulement transporte les poussières.</p>
+<p>Ce document prépare l'animation <code>src/animation/convection.html</code>. La chute des
+particules dans l'air immobile est traitée dans
+<a href="theorie_sedimentation.html">theorie_sedimentation.html</a>, et on en réutilise les
+résultats.</p>
+<hr />
+<h2>0. Les deux scénarios</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Scénario A : radiateur + fenêtre</th>
+<th>Scénario B : radiateur seul</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Radiateur</td>
+<td>Bloc posé au sol contre le mur de gauche ou de droite, à $T_r$</td>
+<td>Bloc posé au sol, <strong>déplaçable</strong> n'importe où</td>
+</tr>
+<tr>
+<td>Fenêtre</td>
+<td>Portion d'un mur (gauche ou droite) à $T_f$, sans recouvrir le radiateur</td>
+<td>Aucune</td>
+</tr>
+<tr>
+<td>Autres parois</td>
+<td>Adiabatiques (parfaitement isolées)</td>
+<td>Toutes à $T_p&lt;T_r$ : murs, sol, plafond</td>
+</tr>
+<tr>
+<td>Meubles</td>
+<td>Obstacles adiabatiques (optionnels)</td>
+<td>Idem</td>
+</tr>
+</tbody>
+</table>
+<p>Le scénario A représente la situation classique d'hiver. Le scénario B isole le
+panache du radiateur pour bien voir l'écoulement qu'il crée.</p>
+<p><strong>Géométrie du radiateur.</strong> C'est un bloc de 0,10 m d'épaisseur et 0,60 m de
+haut, sur toute la profondeur de la pièce (2 m). La coupe 2D est donc une bonne
+approximation : un radiateur aussi long que la pièce est profonde crée un
+écoulement quasi plan.</p>
+<hr />
+<h2>1. Hypothèses et données</h2>
+<p><strong>Hypothèses</strong></p>
+<ul>
+<li><strong>Régime stationnaire établi.</strong> Le radiateur chauffe depuis longtemps, et les
+  murs et la fenêtre ont atteint leur température. Les transitoires (mise en
+  route, thermostat) sont laissés pour plus tard.</li>
+<li><strong>Températures imposées</strong> sur le radiateur et les parois. Le §2 explique
+  pourquoi c'est le choix le plus simple.</li>
+<li><strong>Approximation de Boussinesq</strong> : la masse volumique de l'air ne varie que
+  dans le terme de poussée.</li>
+<li><strong>Écoulement 2D</strong> dans le plan de la coupe. On néglige les effets de bord sur
+  les murs avant et arrière.</li>
+<li><strong>Turbulence modélisée par une viscosité effective constante</strong> (§4.2).</li>
+<li><strong>Le rayonnement n'entre pas dans le calcul de l'écoulement</strong>, car il chauffe
+  les parois et non l'air. Comme les températures des parois sont imposées, il
+  ne change rien à l'écoulement. Il compte seulement dans la puissance du
+  radiateur (§6.1).</li>
+</ul>
+<p><strong>Air à 20 °C et 1 atm</strong></p>
+<table>
+<thead>
+<tr>
+<th>Grandeur</th>
+<th>Symbole</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Viscosité cinématique</td>
+<td>$\nu$</td>
+<td>$1{,}51\times10^{-5}$ m²/s</td>
+</tr>
+<tr>
+<td>Diffusivité thermique</td>
+<td>$\kappa$</td>
+<td>$2{,}12\times10^{-5}$ m²/s</td>
+</tr>
+<tr>
+<td>Nombre de Prandtl</td>
+<td>$\mathrm{Pr}=\nu/\kappa$</td>
+<td>0,71</td>
+</tr>
+<tr>
+<td>Conductivité thermique</td>
+<td>$k$</td>
+<td>0,0257 W/(m·K)</td>
+</tr>
+<tr>
+<td>Coefficient de dilatation (gaz parfait)</td>
+<td>$\beta=1/T_0$</td>
+<td>$3{,}41\times10^{-3}$ K⁻¹</td>
+</tr>
+<tr>
+<td>Paramètre de flottabilité</td>
+<td>$g\beta$</td>
+<td>0,0335 m/(s²·K)</td>
+</tr>
+<tr>
+<td>Capacité thermique volumique</td>
+<td>$\rho_a c_p$</td>
+<td>1211 J/(m³·K)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Températures par défaut</strong></p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Défaut</th>
+<th>Plage proposée</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Radiateur $T_r$</td>
+<td>60 °C</td>
+<td>30 – 80 °C</td>
+</tr>
+<tr>
+<td>Fenêtre $T_f$ (face intérieure, en hiver)</td>
+<td>8 °C</td>
+<td>0 – 18 °C</td>
+</tr>
+<tr>
+<td>Parois $T_p$ (scénario B)</td>
+<td>17 °C</td>
+<td>10 – 20 °C</td>
+</tr>
+<tr>
+<td>Référence $T_0$</td>
+<td>20 °C</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. Températures imposées ou puissance imposée ?</h2>
+<p>Il y a deux façons de décrire le radiateur.</p>
+<p><strong>Puissance imposée</strong> (flux de chaleur, condition de Neumann) : c'est la réalité
+d'un radiateur électrique de 1 kW. Mais pour obtenir un état stationnaire, il
+faut que toute cette chaleur ressorte par les parois. Il faut donc modéliser
+aussi les pertes : coefficients d'échange, conduction dans les murs et
+température extérieure. Si les pertes sont mal réglées, la pièce chauffe sans
+fin et aucun régime stationnaire n'existe.</p>
+<p><strong>Températures imposées</strong> (condition de Dirichlet) : on fixe $T_r$, $T_f$ et
+$T_p$. L'équilibre s'établit tout seul : la chaleur cédée par le radiateur est
+exactement celle reprise par les parois froides. Il n'y a ni bilan à équilibrer
+ni paramètre de paroi à inventer. La puissance devient un <strong>résultat</strong> du
+calcul, qu'on peut afficher.</p>
+<p><strong>Radiateur éteint.</strong> Il prend alors la température des parois, $T_p$, ou devient
+adiabatique si les parois sont isolées. On suit en temps réel le refroidissement
+de la pièce et l'effondrement du panache, comme pour une porte (voir
+<a href="theorie_porte.html">theorie_porte.html</a>, §3).</p>
+<blockquote>
+<p><strong>Conclusion : imposer les températures est plus simple et suffit.</strong> C'est
+d'ailleurs ce qui se passe en régime établi : le thermostat a ajusté la
+puissance pour que l'ensemble soit à l'équilibre, et seules les températures
+de surface comptent pour l'écoulement.</p>
+</blockquote>
+<hr />
+<h2>3. Les équations de Boussinesq</h2>
+<p>Pour l'air de vitesse $\mathbf u=(u,v)$ et de température $T$ :</p>
+<p>$$
+\frac{\partial\mathbf u}{\partial t}+(\mathbf u\cdot\nabla)\mathbf u
+=-\frac{1}{\rho_0}\nabla p'+\nu\nabla^2\mathbf u+g\beta\,(T-T_0)\,\mathbf e_y,
+\qquad\nabla\cdot\mathbf u=0
+$$</p>
+<p>$$
+\frac{\partial T}{\partial t}+\mathbf u\cdot\nabla T=\kappa\nabla^2T
+$$</p>
+<p><strong>D'où vient la poussée.</strong> On écrit $\rho=\rho_0\,[1-\beta(T-T_0)]$ et on retire la
+pression hydrostatique de référence. La seule trace de la variation de masse
+volumique est le terme $g\beta(T-T_0)$ : l'air plus chaud que $T_0$ est poussé
+vers le haut.</p>
+<p><strong>Validité.</strong> L'approximation demande $\beta\Delta T\ll1$. Entre 8 °C et 60 °C,
+$\beta\Delta T\approx0{,}18$. L'erreur sur la poussée est donc de l'ordre de
+10 %, ce qui est acceptable pour une animation. Le nombre de Mach reste
+négligeable (vitesses inférieures à 1 m/s).</p>
+<hr />
+<h2>4. Nombres sans dimension et turbulence</h2>
+<h3>4.1 Le nombre de Rayleigh</h3>
+<p>On compare la poussée au freinage visqueux et à la diffusion de la chaleur :</p>
+<p>$$
+\mathrm{Ra}=\frac{g\beta\,\Delta T\,\ell^3}{\nu\,\kappa}
+$$</p>
+<table>
+<thead>
+<tr>
+<th>Échelle</th>
+<th>$\ell$</th>
+<th>$\Delta T$</th>
+<th>Ra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Face du radiateur</td>
+<td>0,6 m</td>
+<td>40 K</td>
+<td>$9\times10^{8}$</td>
+</tr>
+<tr>
+<td>Fenêtre</td>
+<td>1,2 m</td>
+<td>12 K</td>
+<td>$2\times10^{9}$</td>
+</tr>
+<tr>
+<td>Pièce entière</td>
+<td>2,5 m</td>
+<td>52 K</td>
+<td>$8\times10^{10}$</td>
+</tr>
+</tbody>
+</table>
+<p>La couche limite le long d'une paroi verticale devient turbulente vers
+$\mathrm{Ra}\approx10^9$. Le radiateur est donc à la limite. À l'échelle de la
+pièce, l'écoulement est <strong>turbulent</strong> : il fluctue en permanence et n'a pas de
+vrai régime stationnaire.</p>
+<h3>4.2 Ce que veut dire « stationnaire » ici : l'écoulement moyen</h3>
+<p>On décompose chaque grandeur en moyenne et fluctuation,
+$\mathbf u=\overline{\mathbf u}+\mathbf u'$. En moyennant les équations (approche
+RANS), il apparaît des flux turbulents $\overline{u'_iu'_j}$ et
+$\overline{u'_iT'}$. On les modélise par le <strong>modèle le plus simple</strong>, une
+viscosité et une diffusivité effectives <strong>constantes</strong> :</p>
+<p>$$
+\nu\;\to\;\nu_e=\nu+\nu_t,\qquad \kappa\;\to\;\kappa_e=\kappa+\frac{\nu_t}{\mathrm{Pr}_t},\qquad\mathrm{Pr}_t\approx0{,}9
+$$</p>
+<p>On résout alors les équations du §3 avec $\nu_e$ et $\kappa_e$, et on cherche leur
+solution <strong>stationnaire</strong>. Cela revient à remplacer le Rayleigh physique par un
+Rayleigh effectif bien plus petit :</p>
+<p>$$
+\mathrm{Ra}_e=\frac{g\beta\,\Delta T\,H^3}{\nu_e\,\kappa_e}
+$$</p>
+<p><strong>Choix de $\nu_t$.</strong> Avec $\nu_t\approx5\times10^{-3}$ m²/s, environ 300 fois la
+viscosité moléculaire, on obtient $\mathrm{Ra}_e\approx10^6$ à l'échelle de la
+pièce. Pour une cavité 2D simple, l'écoulement est alors stationnaire. Ce n'est
+pas toujours le cas dans la pièce (§7.3). Les vitesses
+obtenues sont du bon ordre de grandeur (§6). La cavité de référence de
+de Vahl Davis donne à $\mathrm{Ra}=10^6$ une vitesse maximale
+$v_{\max}\approx220\,\kappa/H$. Avec $\kappa_e=5{,}6\times10^{-3}$ m²/s et $H=2{,}5$ m,
+cela fait environ 0,5 m/s, à comparer aux 0,2 – 0,3 m/s mesurés dans une pièce :
+un facteur 2 au plus, donc le bon ordre de grandeur.</p>
+<blockquote>
+<p><strong>Ce que ce modèle sait faire et ne sait pas faire.</strong> Il donne la <strong>topologie</strong>
+de l'écoulement moyen (où l'air monte, où il redescend, les boucles, les zones
+mortes derrière les meubles) et des vitesses du bon ordre. Ses couches limites
+sont trop épaisses (quelques cm au lieu de quelques mm). Il ne donne donc pas
+correctement le flux de chaleur aux parois. $\nu_t$ est <strong>le seul paramètre de
+réglage</strong> : on le cale pour retrouver les vitesses du §6.</p>
+</blockquote>
+<hr />
+<h2>5. Formulation 2D : fonction de courant et tourbillon</h2>
+<h3>5.1 Équations</h3>
+<p>En 2D, on élimine la pression en introduisant la fonction de courant $\psi$ et le
+tourbillon $\omega$ :</p>
+<p>$$
+u=\frac{\partial\psi}{\partial y},\qquad v=-\frac{\partial\psi}{\partial x},\qquad
+\omega=\frac{\partial v}{\partial x}-\frac{\partial u}{\partial y}=-\nabla^2\psi
+$$</p>
+<p>La condition $\nabla\cdot\mathbf u=0$ est alors automatiquement satisfaite. En
+prenant le rotationnel de l'équation de quantité de mouvement, on obtient trois
+équations scalaires :</p>
+<p>$$
+\boxed{
+\begin{aligned}
+\mathbf u\cdot\nabla\omega&amp;=\nu_e\nabla^2\omega+g\beta\,\frac{\partial T}{\partial x}\\
+\nabla^2\psi&amp;=-\omega\\
+\mathbf u\cdot\nabla T&amp;=\kappa_e\nabla^2T
+\end{aligned}}
+$$</p>
+<p><strong>Le moteur de l'écoulement est $\partial T/\partial x$.</strong> Un gradient horizontal
+de température crée du tourbillon. Une stratification purement verticale, avec
+l'air chaud en haut, ne met rien en mouvement : elle est stable.</p>
+<p><strong>Sens de rotation.</strong> Prenons un radiateur à gauche : $T$ décroît vers la droite,
+donc $\partial T/\partial x&lt;0$ et $\omega&lt;0$. La boucle tourne dans le sens horaire :
+l'air monte à gauche, va vers la droite sous le plafond, redescend à droite et
+revient le long du sol.</p>
+<p>Les lignes $\psi=\text{cte}$ sont les <strong>lignes de courant</strong>. Entre deux lignes, le
+débit vaut $\Delta\psi$ en m²/s, c'est-à-dire en m³/s par mètre de profondeur.</p>
+<h3>5.2 Conditions aux limites</h3>
+<p><strong>Vitesse.</strong> L'air adhère à toutes les parois solides : $u=v=0$.</p>
+<ul>
+<li><strong>Pas de flux à travers les parois.</strong> $\psi$ est constant le long de chaque
+  paroi. Les meubles et le radiateur sont <strong>posés au sol</strong>, donc toutes les
+  surfaces solides forment une seule frontière connexe avec les murs. On peut
+  donc prendre $\psi=0$ partout, ce qui simplifie beaucoup le calcul. Un meuble
+  suspendu demanderait sa propre constante, à déterminer.</li>
+<li><strong>Adhérence.</strong> On impose $\partial\psi/\partial n=0$ par la formule de Thom sur le
+  tourbillon de paroi. Un développement de Taylor à la paroi, avec $\psi_w=0$ et
+  $\partial_n\psi=0$, donne
+  $\omega_w=-\dfrac{2\,\psi_1}{\Delta^2}$, où $\psi_1$ est la valeur à une maille de
+  la paroi.</li>
+</ul>
+<p><strong>Température.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Scénario A</th>
+<th>Scénario B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Radiateur</td>
+<td>$T=T_r$</td>
+<td>$T=T_r$</td>
+</tr>
+<tr>
+<td>Fenêtre</td>
+<td>$T=T_f$</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Murs, sol, plafond</td>
+<td>$\partial T/\partial n=0$ (adiabatique)</td>
+<td>$T=T_p$</td>
+</tr>
+<tr>
+<td>Meubles</td>
+<td>$\partial T/\partial n=0$</td>
+<td>$\partial T/\partial n=0$</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Existence de l'état stationnaire.</strong> Avec au moins une surface chaude et une
+surface froide à température fixée, l'énergie s'équilibre d'elle-même. Dans le
+scénario A, toute la chaleur du radiateur sort par la fenêtre. Dans le
+scénario B, elle sort par l'ensemble des parois.</p>
+<hr />
+<h2>6. Ordres de grandeur attendus</h2>
+<h3>6.1 Échange de chaleur au radiateur</h3>
+<p>On utilise la corrélation de Churchill &amp; Chu (1975) pour une plaque verticale de
+hauteur $\ell$, valable en laminaire comme en turbulent :</p>
+<p>$$
+\mathrm{Nu}=\left\{0{,}825+\frac{0{,}387\,\mathrm{Ra}^{1/6}}{\left[1+(0{,}492/\mathrm{Pr})^{9/16}\right]^{8/27}}\right\}^2,\qquad
+h=\frac{\mathrm{Nu}\,k}{\ell}
+$$</p>
+<p>Pour une face du radiateur ($\ell=0{,}6$ m, $\Delta T=40$ K), on trouve
+$\mathrm{Ra}=9\times10^8$, $\mathrm{Nu}\approx119$ et <strong>$h\approx5$ W/(m²·K)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Échange, par face de 1,2 m²</th>
+<th>Puissance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Convection, $h\,A\,\Delta T$</td>
+<td>≈ 240 W</td>
+</tr>
+<tr>
+<td>Rayonnement, $\varepsilon\sigma(T_r^4-T_p^4)A$ avec $\varepsilon=0{,}9$</td>
+<td>≈ 300 W</td>
+</tr>
+</tbody>
+</table>
+<p>Avec ses deux faces, ce radiateur lisse cède environ 1 kW, dont la moitié en
+convection. Un vrai radiateur atteint la même puissance avec une température
+plus basse grâce à ses ailettes.</p>
+<p><strong>On affichera la puissance déduite de cette corrélation</strong>, et non celle du
+calcul. Avec $\nu_t$ constant, le flux à la paroi n'est pas fiable (§4.2).</p>
+<h3>6.2 Panache du radiateur</h3>
+<p>Au-dessus d'une source linéaire, c'est-à-dire une source qui s'étend sur toute
+la profondeur, le panache 2D a une propriété remarquable : <strong>sa vitesse ne dépend
+pas de la hauteur</strong>. Elle ne dépend que du flux de flottabilité par mètre de
+longueur, $B=g\beta\,Q'/(\rho_ac_p)$ :</p>
+<p>$$
+w_{\rm axe}\approx1{,}7\;B^{1/3}
+$$</p>
+<p>Avec $Q'\approx250$ W/m de convection, on trouve $B\approx7\times10^{-3}$ m³/s³ et
+<strong>$w\approx0{,}3$ m/s</strong>.</p>
+<h3>6.3 Descente d'air froid le long de la fenêtre</h3>
+<p>La corrélation de Heiselberg (1994) donne la vitesse maximale au sol, près du
+mur sous une fenêtre froide de hauteur $\ell$ :</p>
+<p>$$
+u_{\max}\approx0{,}055\sqrt{\Delta T\,\ell}\quad\text{[m/s, K, m]}
+$$</p>
+<p>Pour $\Delta T=12$ K et $\ell=1{,}2$ m, on trouve <strong>$u\approx0{,}2$ m/s</strong>. C'est le
+courant d'air froid ressenti aux pieds.</p>
+<h3>6.4 Topologies attendues</h3>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Écoulement attendu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A, radiateur <strong>sous</strong> la fenêtre</td>
+<td>Le panache chaud contrarie la descente froide de la fenêtre. Le courant d'air au sol disparaît, et c'est pourquoi on place les radiateurs sous les fenêtres. Il reste une boucle faible dans le reste de la pièce.</td>
+</tr>
+<tr>
+<td>A, radiateur <strong>en face</strong> de la fenêtre</td>
+<td>Une seule grande boucle : l'air monte au radiateur, longe le plafond, descend à la fenêtre et revient au sol. Courant d'air froid au sol de 0,1 à 0,2 m/s.</td>
+</tr>
+<tr>
+<td>B, radiateur <strong>contre un mur</strong></td>
+<td>Une boucle principale. L'air chaud forme une couche sous le plafond, avec une stratification stable d'environ 1 à 2 K/m.</td>
+</tr>
+<tr>
+<td>B, radiateur <strong>au milieu</strong></td>
+<td>Deux boucles contrarotatives, une de chaque côté du panache.</td>
+</tr>
+<tr>
+<td>Meubles dans le retour au sol</td>
+<td>L'air froid les contourne par-dessus. Des zones de recirculation lente se forment derrière eux.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>7. Résolution numérique</h2>
+<p>Le code est dans <code>src/animation/convection.js</code>. Le
+calcul tourne dans un Web Worker (<code>convection-worker.js</code>)
+pour que l'animation reste fluide.</p>
+<h3>7.1 Schéma</h3>
+<ul>
+<li><strong>Grille</strong> uniforme de 5 cm, soit 101 × 51 nœuds. Les meubles, le radiateur et la
+  fenêtre sont calés sur la grille au moment du glisser-déposer.</li>
+<li><strong>Faux transitoire</strong> (Mallinson &amp; de Vahl Davis 1973). On avance $\omega$ et $T$
+  en temps par Euler explicite jusqu'à ce que tout se stabilise. Le transitoire
+  n'a pas de sens physique, seul l'état final compte.</li>
+<li><strong>Advection : schéma hybride.</strong> On utilise des différences centrées tant que le
+  Péclet de maille $|u|\,\Delta/\nu_e$ reste sous 2, ce qui est le cas presque
+  partout avec $\nu_t=5\times10^{-3}$, et un schéma amont d'ordre 1 au-delà. Un
+  schéma amont d'ordre 2 s'est révélé <strong>instable</strong> avec Euler explicite.</li>
+<li><strong>Poisson $\nabla^2\psi=-\omega$ : résolution directe.</strong> On factorise une fois
+  par géométrie, par Cholesky en bande. La numérotation par colonnes donne une
+  largeur de bande de 51. Chaque pas fait ensuite une descente-remontée exacte.</li>
+<li>Une sur-relaxation (SOR) avec quelques itérations par pas laisse $\psi$ en
+    retard sur $\omega$. Le tourbillon de paroi de Thom est alors faux, et le calcul
+    oscille ou diverge.</li>
+<li>Converger la SOR à chaque pas coûtait, lui, des centaines d'itérations.</li>
+<li><strong>Pas de temps.</strong> On prend
+  $\Delta t=0{,}8\,/\,\big(|u|_{\max}/\Delta+|v|_{\max}/\Delta+4\max(\nu_e,\kappa_e)/\Delta^2\big)$,
+  soit environ 0,04 s. Aux nœuds centrés, la condition $|\mathbf u|^2\Delta t\le2\nu_e$
+  de « centré + Euler » en découle automatiquement.</li>
+</ul>
+<h3>7.2 Validation</h3>
+<p>On compare à la cavité carrée chauffée latéralement de de Vahl Davis (1983), avec
+$\mathrm{Pr}=0{,}71$ :</p>
+<table>
+<thead>
+<tr>
+<th>Ra</th>
+<th>Grille</th>
+<th>Nu calculé</th>
+<th>Nu référence</th>
+<th>$v_{\max}L/\kappa$ calculé</th>
+<th>référence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$10^3$</td>
+<td>30 × 30</td>
+<td>1,125</td>
+<td>1,118</td>
+<td>3,7</td>
+<td>3,70</td>
+</tr>
+<tr>
+<td>$10^4$</td>
+<td>30 × 30</td>
+<td>2,318</td>
+<td>2,243</td>
+<td>19,3</td>
+<td>19,6</td>
+</tr>
+<tr>
+<td>$10^5$</td>
+<td>40 × 40</td>
+<td>4,787</td>
+<td>4,519</td>
+<td>66,9</td>
+<td>68,6</td>
+</tr>
+<tr>
+<td>$10^5$</td>
+<td>80 × 80</td>
+<td>4,593</td>
+<td>4,519</td>
+<td>68,2</td>
+<td>68,6</td>
+</tr>
+<tr>
+<td>$10^6$</td>
+<td>80 × 80</td>
+<td>9,240</td>
+<td>8,800</td>
+<td>218,6</td>
+<td>219,4</td>
+</tr>
+</tbody>
+</table>
+<p>Les vitesses sont justes à 2,5 % près. Le nombre de Nusselt est juste à 2 % près
+à $\mathrm{Ra}=10^5$ sur 80 × 80 mailles, et à 5 % près à $\mathrm{Ra}=10^6$. Il
+converge vers la référence quand on raffine le maillage : à $\mathrm{Ra}=10^5$,
+l'écart passe de 6 % sur 40 × 40 à 2 % sur 80 × 80.</p>
+<h3>7.3 Régime stationnaire… ou pas</h3>
+<p>On suit deux grandeurs globales tous les 20 s de pseudo-temps : la température
+moyenne de l'air et le débit de la boucle, $\max|\psi|$.</p>
+<ul>
+<li><strong>Régime stationnaire.</strong> Si elles varient de moins de 0,1 % deux fois de suite,
+  le calcul s'arrête. Un critère local, comme le maximum de $\partial\omega/\partial t$
+  sur la grille, resterait bloqué par de petites oscillations sans effet visible.</li>
+<li><strong>Régime oscillant.</strong> Il arrive que le modèle n'ait <strong>pas d'état stationnaire</strong>.
+  Avec un radiateur collé à un mur froid, plus une fenêtre froide, le panache
+  pulse avec une période de 1 à 2 minutes, et cela persiste avec
+  $\nu_t=10^{-2}$. On le détecte quand, après 300 s de pseudo-temps, la température
+  moyenne a changé au moins deux fois de sens de variation. Une dérive lente et
+  monotone n'est pas une oscillation : c'est le cas de la mise en température d'une
+  pièce isolée. La page continue alors le calcul <strong>en temps réel</strong>, estime la
+  période et lisse les mesures sur environ un cycle.</li>
+</ul>
+<p><strong>Durées de calcul</strong>, sur le fil principal d'un navigateur sans écran :</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Pseudo-temps</th>
+<th>Calcul</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B, radiateur au centre</td>
+<td>200 s, stationnaire</td>
+<td>≈ 10 s</td>
+</tr>
+<tr>
+<td>A, parois à 17 °C</td>
+<td>300 s, puis oscillant</td>
+<td>≈ 15 s</td>
+</tr>
+<tr>
+<td>A, parois isolées</td>
+<td>900 s, stationnaire (lente montée de l'air vers 40 °C)</td>
+<td>≈ 40 s</td>
+</tr>
+</tbody>
+</table>
+<p>L'écoulement s'affiche au fur et à mesure du calcul. Après un déplacement, le calcul
+repart de l'état courant.</p>
+<p><strong>Ce que la page montre</strong> : la carte de température, avec une échelle divergente
+neutre à 20 °C et la même pente en kelvins des deux côtés, les lignes de courant,
+des traceurs sans masse qui suivent l'air en temps réel, et une sonde au survol.
+Elle affiche aussi la vitesse du panache, le courant d'air au sol, le débit de
+recirculation, la température moyenne, la stratification et la puissance estimée
+(§6.1).</p>
+<hr />
+<h2>8. Transport des poussières dans l'écoulement</h2>
+<p>Implémenté dans <code>src/animation/transport.js</code>, vue « Poussières » de la page.</p>
+<h3>8.1 Équation d'une particule</h3>
+<p>On reprend le §7 de la théorie de la sédimentation. La traînée dépend maintenant
+de la vitesse <strong>relative</strong> à l'air :</p>
+<p>$$
+m_p\frac{d\mathbf v}{dt}=m_p\mathbf g'-\mathbf F\big(\mathbf v-\mathbf u(\mathbf x)\big)
+$$</p>
+<p>Le <strong>nombre de Stokes</strong> $\mathrm{St}=\tau\,U/\ell$ compare le temps de réponse de la
+particule à celui de l'écoulement. Avec $U\approx0{,}2$ m/s et $\ell\approx0{,}1$ m,
+on a $\mathrm{St}&lt;0{,}05$ jusqu'à 100 µm environ. La particule suit alors l'air,
+plus sa vitesse de chute :</p>
+<p>$$
+\mathbf v\simeq\mathbf u(\mathbf x)-v_s\,\mathbf e_y
+$$</p>
+<h3>8.2 Qui est emporté, qui tombe ?</h3>
+<table>
+<thead>
+<tr>
+<th>Critère</th>
+<th>Seuil (ρp = 1000)</th>
+<th>Conséquence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$v_s&lt;w_{\rm panache}\approx0{,}3$ m/s</td>
+<td>d ≲ 100 µm</td>
+<td>Le panache peut soulever la particule</td>
+</tr>
+<tr>
+<td>$v_s&lt;U_{\rm cœur}\approx0{,}05$ m/s</td>
+<td>d ≲ 40 µm</td>
+<td>La particule est brassée dans toute la pièce</td>
+</tr>
+<tr>
+<td>$v_s\gg U$</td>
+<td>d ≳ 200 µm</td>
+<td>Elle tombe comme dans l'air au repos (rapport 5 : 3 : 1)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Piège de Stommel (1949).</strong> Dans un écoulement en cellules stationnaire, une
+particule dont $v_s$ est inférieure à la vitesse ascendante peut tourner
+indéfiniment sur une orbite fermée sans jamais se déposer. C'est un artefact de
+l'écoulement moyen : dans la réalité, les fluctuations turbulentes l'en font
+sortir. Il faut donc ajouter une dispersion turbulente.</p>
+<h3>8.3 Dispersion turbulente et couche de paroi</h3>
+<p>On ajoute une marche aléatoire de diffusivité $D_t=\nu_t/\mathrm{Sc}_t$, avec
+$\mathrm{Sc}_t=1$, cohérente avec le $\nu_t$ de l'écoulement. Elle s'ajoute à la
+diffusion brownienne $D_B$ :</p>
+<p>$$
+d\mathbf x=\big(\mathbf u-v_s\mathbf e_y\big)\,dt+\sqrt{2\,(D_B+D_t)\,dt}\;\boldsymbol\xi
+$$</p>
+<p><strong>Près d'une paroi, la turbulence s'éteint.</strong> Suivant Lai &amp; Nazaroff (2000), on
+prend $D_t(n)\approx a\,n^3$ avec $a=D_t/\delta^3$ et $\delta=10$ cm. Ce choix
+reproduit leur profil pour une vitesse de frottement $u^*\approx1$ cm/s.</p>
+<p><strong>Pourquoi on ne résout pas cette couche dans la marche aléatoire.</strong> Ce fut le
+premier essai, avec une diffusivité amortie et une dérive d'Itô $\nabla D_t$. Une
+marche à pas raisonnables (Δt ≈ 0,1 – 0,5 s) <strong>saute par-dessus</strong> la couche : un
+saut de 0,3 à 0,45 fois la distance à la paroi la traverse avec une probabilité
+d'environ $10^{-3}$ par pas. Cela crée une vitesse de dépôt parasite d'environ
+$10^{-4}$ m/s, et toutes les particules fines se déposaient en une heure. Résoudre
+la couche demanderait des pas de quelques millisecondes, ce qui est inabordable.</p>
+<p><strong>Traitement analytique.</strong> La couche est une résistance au transport en série :</p>
+<p>$$
+I=\int_0^\infty\frac{dn}{D_B+a\,n^3}=\frac{2\pi}{3\sqrt3}\,D_B^{-2/3}\,a^{-1/3}
+$$</p>
+<p>On en déduit la vitesse de dépôt $K$ de chaque orientation de surface, gravité
+comprise dans la couche (Lai &amp; Nazaroff 2000) :</p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>$K$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Verticale (murs, fenêtre, côtés)</td>
+<td>$1/I$</td>
+</tr>
+<tr>
+<td>Tournée vers le haut (sol, dessus)</td>
+<td>$v_s\,/\,\big(1-e^{-v_sI}\big)$</td>
+</tr>
+<tr>
+<td>Tournée vers le bas (plafond)</td>
+<td>$v_s\,/\,\big(e^{v_sI}-1\big)$</td>
+</tr>
+</tbody>
+</table>
+<p>Pour une paroi verticale, on trouve $K\approx2\times10^{-5}$ m/s à 10 nm et
+$K\approx10^{-6}$ m/s à 0,1 µm. Dans la marche aléatoire, l'air garde donc
+$D=D_B+D_t$ <strong>constant</strong> jusqu'aux parois, et chaque surface devient
+<strong>partiellement absorbante</strong>. Une particule dont le pas traverse une surface s'y
+dépose avec la probabilité</p>
+<p>$$
+P=K\sqrt{\frac{\pi\,\Delta t}{D}}\qquad\text{(Erban \&amp; Chapman 2007)},
+$$</p>
+<p>et elle est réfléchie sinon. Pour les gros grains, $K\approx v_s$ et $P$ atteint 1 :
+tout grain qui touche le sol y reste.</p>
+<p><strong>Vitesse normale de l'air contre les parois.</strong> Par continuité,
+$\partial u_n/\partial n=0$ à la paroi, donc $u_n\propto n^2$. L'interpolation
+bilinéaire du champ nodal donnerait $u_n\propto n$, et l'air « pousserait » les
+particules dans les murs. On corrige donc la composante normale par le facteur
+$n/\Delta$ dans la première maille.</p>
+<p><strong>Pas de temps</strong> : dérive d'au plus une demi-maille, et $\Delta t\le0{,}5$ s, soit
+un saut turbulent d'au plus 7 cm.</p>
+<p><strong>Écoulement oscillant.</strong> Les poussières suivent la moyenne glissante du champ sur
+environ une période. On les lâche après 180 s de pseudo-temps de mise en moyenne.</p>
+<h3>8.4 Résultats et comparaison aux modèles simples</h3>
+<p>Si l'air est bien brassé, la concentration $C(t)$ est uniforme et chaque surface
+horizontale tournée vers le haut reçoit le même flux $C\,v_s$. Le dépôt <strong>par m²</strong>
+vaut alors $C_0\,\dfrac{V}{A_h}\big(1-e^{-v_sA_ht/V}\big)$, le même sur le sol et
+sur les meubles : <strong>rapport 1 : 1 : 1</strong>. En air immobile, au contraire, il vaut
+$C_0\min(v_st,\,h_{\rm dessus})$ : <strong>rapport 5 : 3 : 1</strong>.</p>
+<p>La page affiche ces deux modèles à côté de la simulation. Voici ce qu'elle donne au
+bout d'1 h, dans le scénario B (radiateur au centre, parois à 17 °C, ρ = 1500 kg/m³),
+en particules par m² pour $C_0=1$ /L par classe :</p>
+<table>
+<thead>
+<tr>
+<th>Classe</th>
+<th>Sol</th>
+<th>Meuble 1 m</th>
+<th>Meuble 2 m</th>
+<th>Lecture</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 – 10 µm</td>
+<td>1 300</td>
+<td>1 000</td>
+<td>1 100</td>
+<td>≈ 1 : 1 : 1, pièce bien mélangée</td>
+</tr>
+<tr>
+<td>10 – 100 µm</td>
+<td>2 400</td>
+<td>1 900</td>
+<td>820</td>
+<td>intermédiaire</td>
+</tr>
+<tr>
+<td>0,1 – 1 mm</td>
+<td>2 500</td>
+<td>1 600</td>
+<td>470</td>
+<td>≈ 5 : 3 : 1, comme en air immobile</td>
+</tr>
+<tr>
+<td>&lt; 1 µm</td>
+<td>quelques dizaines</td>
+<td></td>
+<td></td>
+<td>96 % encore en l'air</td>
+</tr>
+</tbody>
+</table>
+<p>C'est le résultat annoncé au §8.2. Le brassage égalise le dépôt des particules
+de quelques µm, et les gros grains l'ignorent. Le bruit statistique est d'environ
+10 % sur le dessus des meubles avec 5 000 particules.</p>
+<h3>8.5 Coût de calcul</h3>
+<p>Le transport fait environ 1,5 million de sous-pas par seconde. Une heure simulée
+pour 5 000 particules représente environ 30 millions de sous-pas, soit environ
+30 s dans la page. Les durées proposées vont jusqu'à 6 h, soit environ 3 min.</p>
+<p>Au-delà, les particules qui restent en l'air sont celles de moins de 1 µm,
+réparties de façon homogène. Leur devenir suit le modèle de la pièce bien
+mélangée, avec les vitesses de dépôt du §8.3.</p>
+<hr />
+<h2>9. Laissé de côté pour l'instant</h2>
+<ul>
+<li><strong>Les transitoires</strong> : mise en route du radiateur, cycles du thermostat,
+  refroidissement nocturne.</li>
+<li><strong>La thermophorèse.</strong> Un gradient de température pousse les particules vers le
+  froid à la vitesse $v_{th}\approx-0{,}55\,\nu\,\nabla T/T$ (Talbot 1980, pour les
+  submicroniques). Contre la fenêtre, où il y a environ 12 K sur 6 mm, on trouve
+  $v_{th}\approx6\times10^{-5}$ m/s, soit <strong>autant que la chute d'une particule
+  de 1 µm</strong>. C'est l'origine des traces grises sur les murs froids et au-dessus
+  des radiateurs. Ce serait un bon ajout par la suite, en le paramétrant, car la
+  grille ne résout pas cette couche.</li>
+<li><strong>Le rayonnement</strong> entre surfaces : sans effet sur l'écoulement tant que les
+  températures des parois sont imposées.</li>
+<li><strong>Les effets 3D</strong>, l'humidité, la remise en suspension et la ventilation.</li>
+</ul>
+<hr />
+<h2>Références</h2>
+<ul>
+<li>J. Boussinesq (1903), <em>Théorie analytique de la chaleur</em>, t. II.</li>
+<li>G. de Vahl Davis (1983), <em>Natural convection of air in a square cavity: a bench
+  mark numerical solution</em>, Int. J. Numer. Meth. Fluids 3.</li>
+<li>A. E. Mallinson &amp; G. de Vahl Davis (1973), <em>The method of the false transient
+  for the solution of coupled elliptic equations</em>, J. Comput. Phys. 12.</li>
+<li>S. W. Churchill &amp; H. H. S. Chu (1975), Int. J. Heat Mass Transfer 18.</li>
+<li>H. Rouse, C. S. Yih &amp; H. W. Humphreys (1952), <em>Gravitational convection from a
+  boundary source</em>, Tellus 4.</li>
+<li>P. Heiselberg (1994), <em>Draught risk from cold vertical surfaces</em>, Building and
+  Environment 29.</li>
+<li>H. Stommel (1949), <em>Trajectories of small bodies sinking slowly through
+  convection cells</em>, J. Mar. Res. 8.</li>
+<li>R. Erban &amp; S. J. Chapman (2007), <em>Reactive boundary conditions for stochastic
+  simulations of reaction–diffusion processes</em>, Phys. Biol. 4.</li>
+<li>A. C. K. Lai &amp; W. W. Nazaroff (2000), <em>Modeling indoor particle deposition from
+  turbulent flow onto smooth surfaces</em>, J. Aerosol Sci. 31.</li>
+<li>L. Talbot et al. (1980), <em>Thermophoresis of particles in a heated boundary
+  layer</em>, J. Fluid Mech. 101.</li>
+<li>W. W. Nazaroff (2004), <em>Indoor particle dynamics</em>, Indoor Air 14.</li>
+</ul>
+  </article>
+  <p class="pied">Page générée depuis la théorie du projet. Les formules sont mises en forme par MathJax.</p>
+</div>
+<script>
+  // Les tableaux larges défilent dans leur propre conteneur
+  for (const t of document.querySelectorAll("#texte table")) {
+    const d = document.createElement("div");
+    d.className = "tableau";
+    t.replaceWith(d);
+    d.appendChild(t);
+  }
+</script>
+</body>
+</html>

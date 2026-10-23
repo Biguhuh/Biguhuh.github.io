@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Théorie · Porte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Colonne de lecture unique, sur le même fond nuit que les animations */
+  :root {
+    --fond: #0b0d12; --surface: #141821; --trait: #262c3a; --texte: #e6e8ee; --doux: #8b93a7;
+    --poussiere: #ffc857; --lien: #6cb2ff;
+    --titre: "Instrument Serif", Georgia, serif;
+    --corps: "Source Sans 3", system-ui, sans-serif;
+    --donnees: "JetBrains Mono", ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--fond); }
+  body {
+    margin: 0; background: var(--fond); color: var(--texte);
+    font: 17px/1.62 var(--corps);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .page { max-width: 46rem; margin: 0 auto; padding-block: 8px 64px; }
+  .site-nav a { color: var(--lien); text-decoration: none; }
+  h1, h2 { font-family: var(--titre); font-weight: 400; text-wrap: balance; line-height: 1.15; }
+  h1 { font-size: clamp(2.1rem, 5vw, 2.9rem); margin: 28px 0 8px; }
+  h2 { font-size: 1.75rem; margin: 48px 0 10px; padding-top: 14px; border-top: 1px solid var(--trait); }
+  h3 { font-size: 1.08rem; margin: 30px 0 6px; font-weight: 600; }
+  p, li { color: var(--texte); }
+  a { color: var(--lien); }
+  strong { color: #fff; font-weight: 600; }
+  code { font-family: var(--donnees); font-size: 0.86em; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--surface); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+  hr { border: 0; height: 0; margin: 8px 0; }
+  blockquote { margin: 18px 0; padding: 4px 16px; border-left: 3px solid var(--poussiere); background: var(--surface); border-radius: 0 6px 6px 0; }
+  blockquote p { margin: 8px 0; }
+  .tableau { overflow-x: auto; margin: 16px 0; }
+  table { border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; min-width: 100%; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: top; }
+  th { color: var(--doux); font-weight: 600; background: var(--surface); }
+  mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 4px 0; }
+  .pied { margin-top: 48px; color: var(--doux); font-size: 0.85rem; }
+</style>
+<script>
+  window.MathJax = { tex: { inlineMath: [["$", "$"]], displayMath: [["$$", "$$"]] }, svg: { fontCache: "global" } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg-full.js" defer></script>
+</head>
+<body>
+<div class="page">
+  <nav class="site-nav" style="font-size:12.5px;color:#8b93a7;padding-top:12px"><a href="index.html" style="color:#ffc857;font-weight:600">Poussières</a> — <a href="index.html">Accueil</a> · <a href="colonnes.html">Colonnes</a> · <a href="piece.html">Pièce</a> · <a href="convection.html">Convection</a> · <a href="battant.html">Battant</a></nav>
+  <article id="texte">
+<h1>Ouverture d'une porte : échange d'air avec le couloir</h1>
+<p>On ouvre une porte entre la pièce chauffée et un couloir (ou l'extérieur) à une
+autre température. L'air froid entre par le bas, l'air chaud sort par le haut. On
+veut voir ce <strong>transitoire</strong> en temps réel, puis le nouveau régime établi, porte
+ouverte. Ce document prolonge <a href="theorie_convection.html">theorie_convection.html</a> : même
+pièce, même solveur, même modèle de turbulence.</p>
+<hr />
+<h2>0. Configuration</h2>
+<ul>
+<li><strong>Porte</strong> : haute de 2,0 m, posée au sol, sur le mur de gauche ou de droite.
+  Elle est fermée ou ouverte, et on la déplace en la faisant glisser.</li>
+<li><strong>Côté pièce</strong> : en scénario A, le radiateur et la fenêtre passent sur le mur
+  opposé à la porte (fenêtre au-dessus du radiateur). En scénario B, le radiateur
+  et les meubles restent à au moins 10 cm du mur de la porte.</li>
+<li><strong>Côté couloir</strong> : un grand volume d'air à la température <strong>T_c</strong>, réglable de
+  0 à 30 °C, uniforme et immobile au loin. C'est un réservoir : ce qui sort de la
+  pièce ne le réchauffe pas. On en calcule 1,5 m derrière la porte (§2).</li>
+<li><strong>Porte fermée</strong> : elle fait partie du mur, avec la même condition de
+  température que lui (isolée ou à T parois).</li>
+</ul>
+<hr />
+<h2>1. L'échange par une ouverture verticale</h2>
+<h3>1.1 Origine : deux colonnes d'air de densités différentes</h3>
+<p>De part et d'autre de la porte, la pression décroît avec l'altitude, plus vite
+dans l'air froid, qui est plus dense. On prend l'air de la pièce à $T_p$ et
+celui du couloir à $T_c&lt;T_p$. L'écart de pression s'annule à une hauteur
+$z_n$, le <strong>plan neutre</strong>, et vaut ailleurs</p>
+<p>$$
+\Delta p(z)=\Delta\rho\,g\,(z-z_n),\qquad \frac{\Delta\rho}{\rho}\simeq\frac{T_p-T_c}{\bar T}
+$$</p>
+<p>Sous le plan neutre, l'air froid du couloir pousse vers la pièce. Au-dessus,
+l'air chaud de la pièce pousse vers le couloir. La pièce est fermée par
+ailleurs, donc les deux débits sont égaux et le plan neutre est à mi-hauteur,
+$z_n=H_p/2$.</p>
+<h3>1.2 Débit d'échange</h3>
+<p>On applique Bernoulli à chaque hauteur, avec un coefficient de décharge
+$C_d\approx0{,}6$ : $u(z)=C_d\sqrt{2\,\Delta p/\rho}$. On intègre ensuite sur la
+moitié de la porte, de largeur $W$ :</p>
+<p>$$
+\boxed{Q=\frac{C_d}{3}\,W\,\sqrt{g'\,H_p^3}},\qquad g'=g\,\frac{|T_p-T_c|}{\bar T}
+$$</p>
+<p>C'est la formule classique de Brown &amp; Solvason (1962), utilisée en ventilation
+naturelle. La vitesse maximale, en haut et en bas de la porte, vaut
+$C_d\sqrt{g'H_p}$.</p>
+<table>
+<thead>
+<tr>
+<th>$T_p-T_c$</th>
+<th>Q, porte de 0,8 × 2 m</th>
+<th>Vitesse max dans la porte</th>
+<th>Renouvellement d'une pièce de 25 m³</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2 K (couloir un peu plus frais)</td>
+<td>0,12 m³/s, soit 420 m³/h</td>
+<td>0,22 m/s</td>
+<td>≈ 3,5 min</td>
+</tr>
+<tr>
+<td>5 K</td>
+<td>0,19 m³/s, soit 670 m³/h</td>
+<td>0,35 m/s</td>
+<td>≈ 2 min</td>
+</tr>
+<tr>
+<td>15 K (porte d'entrée en hiver)</td>
+<td>0,32 m³/s, soit 1 160 m³/h</td>
+<td>0,6 m/s</td>
+<td>≈ 1,3 min</td>
+</tr>
+</tbody>
+</table>
+<p>Même un petit écart de température renouvelle la pièce en quelques minutes.
+C'est ce qui rend l'ouverture d'une porte si efficace, et le courant d'air froid
+si sensible.</p>
+<h3>1.3 Courant de gravité au sol</h3>
+<p>L'air froid qui entre forme une langue qui avance au ras du sol, appelée
+<strong>courant de gravité</strong>. Sa vitesse de front vaut
+$U_f\approx0{,}5\sqrt{g'H_p}$ (Benjamin, 1968 ; lâcher de barrage en canal), soit
+$0{,}7\sqrt{g'h}$ pour une épaisseur $h\approx H_p/2$. Pour 5 K, on
+trouve environ 0,3 m/s : il traverse les 5 m de la pièce en une vingtaine de
+secondes, plutôt 17 s en vitesse constante, un peu plus en réalité car le front
+ralentit. En parallèle, une couche chaude se vide sous le plafond. Les meubles
+barrent ce courant : le meuble de 1 m le fait déborder, celui de 2 m le bloque.</p>
+<h3>1.4 Ce que devient la pièce, porte ouverte</h3>
+<p>Si on laisse la porte ouverte, le régime établi est un équilibre :</p>
+<ul>
+<li>le radiateur chauffe ;</li>
+<li>les parois froides et le couloir refroidissent ;</li>
+<li>l'échange par la porte apporte un flux $\rho c_p\,Q\,(T_c-T_p)$, qui domine
+  vite.</li>
+</ul>
+<p>La pièce tend vers une température proche de celle du couloir, un peu au-dessus
+à cause du radiateur, avec une forte stratification.</p>
+<p>Dans la page, la tuile « Échange par la porte » donne le débit entrant calculé.
+Elle le compare à la formule, évaluée avec l'écart <strong>actuel</strong> entre la
+température moyenne de la pièce et celle du couloir. Peu après l'ouverture,
+l'air proche de la porte s'est déjà refroidi : le débit calculé passe alors
+nettement sous la formule, qui suppose deux réservoirs restés à leurs
+températures de départ.</p>
+<hr />
+<h2>2. Le couloir dans le solveur</h2>
+<h3>2.1 Premier essai : une condition « ouverte », abandonnée</h3>
+<p>La première idée était de rendre perméables les nœuds du mur qui forment la
+porte. On y imposait $\partial\psi/\partial n=0$ (l'air passe normalement), un
+tourbillon à gradient nul, et une température prise en amont : $T_c$ pour l'air
+qui entre, la température de la pièce pour celui qui sort. La matrice de Poisson
+restait symétrique en divisant la ligne de ces nœuds par 2.</p>
+<p><strong>Cela ne marche pas quantitativement.</strong> Une telle condition ignore la colonne
+d'air froid du couloir, donc la différence de pression hydrostatique qui pilote
+l'échange (§1.1). L'échange n'est entraîné que par la circulation intérieure à la
+pièce :</p>
+<table>
+<thead>
+<tr>
+<th>$\nu_t$ (m²/s)</th>
+<th>ΔT</th>
+<th>$C_d$ équivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$5\times10^{-3}$</td>
+<td>5 K</td>
+<td>0,81</td>
+</tr>
+<tr>
+<td>$2\times10^{-3}$</td>
+<td>5 K</td>
+<td><strong>1,39</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Le débit dépend donc fortement de $\nu_t$. Avec $\nu_t=2\times10^{-3}$, il dépasse
+même la borne de Bernoulli ($C_d=1$), ce qui est impossible.</p>
+<h3>2.2 Couloir explicite, ramené à $T_c$</h3>
+<p>On calcule donc le couloir. La grille couvre la pièce <strong>et 1,5 m de chaque côté</strong>,
+soit 161 × 51 nœuds :</p>
+<ul>
+<li><strong>Murs latéraux</strong> : ce sont des colonnes de nœuds solides en $x=0$ et $x=L$.
+  Quand la porte est ouverte, les nœuds de 5 cm à 1,95 m de la colonne concernée
+  deviennent fluides.</li>
+<li><strong>Couloir inutile</strong> : il est entièrement solide. Les lignes « identité » de la
+  matrice ne coûtent presque rien, donc une porte fermée ne ralentit pas le
+  calcul.</li>
+<li><strong>Couloir derrière une porte ouverte</strong> : il est fluide. Il démarre à $T_c$, et au
+  delà de 50 cm de la porte, sa température est rappelée vers $T_c$ :</li>
+</ul>
+<p>$$
+  \frac{\partial T}{\partial t}+\mathbf u\cdot\nabla T=\kappa_e\nabla^2T-\frac{T-T_c}{\tau_r},\qquad \tau_r=5\text{ s}
+  $$</p>
+<p>C'est le réservoir. Près de la porte, l'air du couloir reste libre de se
+  réchauffer au contact de ce qui sort de la pièce.
+- <strong>Paroi</strong> : $\psi=0$ sur toutes les parois, couloir compris, car elles
+  touchent toutes le sol. Les deux colonnes d'air existent, et la différence de
+  pression hydrostatique est représentée.
+- <strong>Ouverture et fermeture</strong> : chacune est un changement de géométrie, avec une
+  nouvelle factorisation de Cholesky (environ 50 ms). Le calcul repart de l'état
+  courant.</p>
+<h3>2.3 Validation</h3>
+<p>Le cas test est une pièce vide à 20 °C, aux murs isolés et sans radiateur, avec
+un couloir plus froid de ΔT. On mesure le débit entrant maximal par mètre de
+largeur et on le compare à la formule du §1.2 :</p>
+<table>
+<thead>
+<tr>
+<th>$\nu_t$ (m²/s)</th>
+<th>ΔT</th>
+<th>Couloir</th>
+<th>$q$ calculé (m²/s)</th>
+<th>$q$ théorique, $C_d=0{,}6$</th>
+<th>$C_d$ équivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$5\times10^{-3}$</td>
+<td>5 K</td>
+<td>1,5 m</td>
+<td>0,257</td>
+<td>0,231</td>
+<td>0,67</td>
+</tr>
+<tr>
+<td>$2\times10^{-3}$</td>
+<td>5 K</td>
+<td>1,5 m</td>
+<td>0,284</td>
+<td>0,231</td>
+<td>0,74</td>
+</tr>
+<tr>
+<td>$5\times10^{-3}$</td>
+<td>15 K</td>
+<td>1,5 m</td>
+<td>0,484</td>
+<td>0,401</td>
+<td>0,72</td>
+</tr>
+<tr>
+<td>$5\times10^{-3}$</td>
+<td>5 K</td>
+<td>3 m</td>
+<td>0,269</td>
+<td>0,231</td>
+<td>0,70</td>
+</tr>
+</tbody>
+</table>
+<p>Le coefficient de décharge obtenu, <strong>0,67 à 0,74</strong>, est celui des mesures de
+Brown &amp; Solvason (0,6 à 0,7). Surtout, il dépend peu de $\nu_t$, de ΔT et de la
+longueur du couloir : 1,5 m suffisent. L'échange décroît ensuite à mesure que la
+pièce se refroidit. Pour 15 K, la pièce passe de 20 à 10 °C en environ 50 s.</p>
+<hr />
+<h2>3. Transitoire en temps réel</h2>
+<p>Jusqu'ici, on cherchait seulement l'état établi. Le faux transitoire avance
+pourtant les équations en temps, par Euler explicite avec un pas d'environ 0,03 à
+0,05 s. C'est un vrai temps physique, à l'ordre 1, pour le modèle à $\nu_t$
+constant. Les phénomènes de la porte durent de quelques secondes à quelques
+minutes, donc ce pas suffit largement.</p>
+<p>À l'ouverture ou à la fermeture, le calcul repart de l'état courant et défile en
+<strong>temps réel × facteur</strong>, jusqu'à ×30. Il revient au critère habituel (§7.3 de la
+théorie de la convection) pour déclarer le nouveau régime établi, stationnaire
+ou oscillant. Le calcul fait environ 450 pas par seconde, soit environ 15 à 20 s
+de temps physique par seconde : au-delà, le facteur est limité par le calcul.</p>
+<p><strong>Limite du modèle.</strong> $\nu_t=5\times10^{-3}$ m²/s représente la turbulence d'une
+pièce <em>établie</em>. Au passage de la porte, le nombre de Reynolds effectif est
+$u\,H_p/\nu_t\approx100$. L'écoulement calculé y est trop « visqueux », et le
+coefficient de décharge qui en sort peut différer de 0,6. La page affiche donc le
+débit calculé <strong>et</strong> celui de la formule du §1.2, pour comparer.</p>
+<hr />
+<h2>4. Correction 2D</h2>
+<p>Dans la coupe, la porte occupe toute la profondeur de la pièce, soit 2 m, alors
+qu'une vraie porte fait 0,8 m de large. Le débit par mètre de largeur est le bon,
+mais le débit total serait 2,5 fois trop grand, et le renouvellement 2,5 fois trop
+rapide.</p>
+<ul>
+<li>La page affiche les débits <strong>pour une porte de 0,8 m</strong>, c'est-à-dire le débit
+  calculé par mètre multiplié par 0,8.</li>
+<li>Les durées vues à l'écran (front froid, remplissage) restent celles de la
+  coupe 2D. Ce sont des minorants.</li>
+</ul>
+<hr />
+<h2>5. Poussières</h2>
+<p><strong>Le couloir est aussi un réservoir de poussière</strong>, de concentration $C_c$ par
+classe de taille, réglable. Ses particules sont dessinées <strong>en blanc</strong>, toutes
+tailles confondues, pour voir ce qu'apporte l'ouverture.</p>
+<ul>
+<li><strong>Particules simulées.</strong> Le couloir a la même densité de particules simulées
+  que la pièce, modulée par $C_c/C_0$ (au plus × 3). Chaque particule porte un
+  poids : le nombre de particules réelles qu'elle représente. Les dépôts sont donc
+  des sommes pondérées, quelle que soit l'origine de la poussière.</li>
+<li><strong>Domaine.</strong> Il s'étend au couloir derrière la porte. Le mur de la porte devient
+  une cloison mince, percée de 0 à 2 m quand la porte est ouverte. Les dépôts côté
+  couloir sont comptés à part.</li>
+<li><strong>Renouvellement.</strong> Au fond du couloir, à plus de 50 cm de la porte, l'air est
+  renouvelé au même taux que la température (0,2 s⁻¹). Une particule du couloir qui
+  s'y dépose, ou qui y est « renouvelée », est remplacée par une autre tirée au
+  hasard au fond du couloir. Une particule de la pièce qui y parvient est emportée,
+  et comptée comme <strong>partie dans le couloir</strong>.</li>
+<li><strong>Transitoire.</strong> Si on ouvre ou ferme la porte, ou si on éteint le radiateur,
+  <strong>en vue Poussières</strong>, les particules ne sont pas relâchées. Elles suivent
+  l'écoulement <strong>instantané</strong> en temps réel, puis la mesure reprend en temps
+  logarithmique dès que le nouveau régime est établi. Dans la vue Écoulement, un
+  tel évènement relance la mesure.</li>
+<li><strong>Bilan.</strong> Le tableau distingue la part des dépôts venue du couloir (colonne
+  « dont couloir »). Il indique aussi la fraction de la poussière de la pièce partie
+  dans le couloir, et la concentration de poussière du couloir en suspension dans
+  la pièce.</li>
+</ul>
+<p>Exemple, scénario A, couloir à 15 °C, $C_0=C_c=1$ /L par classe : 33 s après
+l'ouverture, 13 % de la poussière fine de la pièce est déjà dans le couloir.
+Au bout de 10 min, la poussière venue du couloir représente environ 17 % de la
+poussière initiale de la pièce. Elle s'est surtout déposée au sol près de la
+porte, et un peu sur le dessus du meuble de 2 m.</p>
+<hr />
+<h2>7. La bouffée du battant (option A)</h2>
+<p>Le battant tourne autour d'un axe vertical : son mouvement est hors du plan de la
+coupe. On le calcule en vue de dessus (<a href="theorie_battant.html">theorie_battant.html</a>,
+page <code>battant.html</code>), et on le <strong>reporte ici sous forme paramétrée</strong>, à
+l'ouverture de la porte.</p>
+<h3>7.1 Échange d'air</h3>
+<p>La vue de dessus donne le volume d'air du couloir passé dans la pièce 20 s après
+l'ouverture, selon la vitesse d'ouverture :</p>
+<table>
+<thead>
+<tr>
+<th>Battant ouvert en</th>
+<th>$V_b$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 s</td>
+<td>0,6 m³</td>
+</tr>
+<tr>
+<td>2 s</td>
+<td>0,45 m³ (interpolé)</td>
+</tr>
+<tr>
+<td>3 s</td>
+<td>0,3 m³</td>
+</tr>
+</tbody>
+</table>
+<p>Dans la coupe, on prend une zone de la pièce devant la porte, de 1,5 m de
+profondeur et de 0 à 2 m de haut, et la zone symétrique dans le couloir. Elles
+<strong>échangent la fraction</strong></p>
+<p>$$
+\varphi=\frac{V_b}{V_{\rm zone}},\qquad V_{\rm zone}=1{,}5\times2\times2=6\ \text{m}^3,
+$$</p>
+<p>soit φ ≈ 0,1 pour une ouverture en 1 s.</p>
+<ul>
+<li><strong>Température</strong> : chaque nœud de la zone et son symétrique échangent la fraction
+  φ de leur écart, $T_a\leftarrow T_a+\varphi(T_b-T_a)$, d'un seul coup à
+  l'ouverture. L'écart de température créé contre la porte met ensuite en route
+  l'échange thermique du §1.</li>
+<li><strong>Poussières</strong> : pendant la durée du mouvement du battant, chaque particule en
+  suspension dans l'une des deux zones passe dans l'autre, à la position
+  symétrique, avec une probabilité totale φ. Le volume d'air est conservé : autant
+  part de chaque côté.</li>
+</ul>
+<p>La pénétration de 1,5 m est celle du tourbillon de démarrage en vue de dessus
+(environ 2 m en 5 s). La fermeture n'ajoute pas de bouffée : elle ramène une
+partie de l'air vers le couloir, effet que la vue de dessus chiffre mais qu'on
+néglige ici.</p>
+<h3>7.2 Remise en suspension</h3>
+<p>Le battant crée une rafale au ras du sol, de l'ordre de 1 m/s. Une poussière
+déposée au sol à moins de 1 m de la porte repart avec la probabilité</p>
+<p>$$
+F(d)=F_{\max}\,\frac{d}{d+d_{50}},\qquad d_{50}=20\ \text{µm}
+$$</p>
+<ul>
+<li><strong>Pourquoi d/(d + d₅₀)</strong> : la force aérodynamique qui arrache un grain croît
+  en $d^2$ et l'adhésion de van der Waals en $d$. Leur rapport croît donc en $d$.
+  Les grains de moins de 1 µm ne repartent quasiment pas, ceux de plus de
+  100 µm presque autant que le permet $F_{\max}$.</li>
+<li><strong>$F_{\max}$ est un paramètre libre</strong> : 1 % (faible), 5 % (moyenne) ou 20 %
+  (forte). La littérature sur la remise en suspension par la marche
+  (Qian &amp; Ferro 2008) donne des fractions par évènement très variables selon le
+  sol (dur, moquette) et la taille des grains.</li>
+<li><strong>Hauteur de départ</strong> : les grains repartent entre 2 et 20 cm de haut, puis
+  suivent l'écoulement de la coupe. Les plus gros retombent presque aussitôt, les
+  plus fins peuvent être emportés par le courant d'air de la porte.</li>
+</ul>
+<h3>7.3 Limites</h3>
+<ul>
+<li><strong>Échange instantané en température</strong> : il est appliqué d'un coup, sans
+  l'impulsion du tourbillon. Seule la flottabilité met ensuite l'air en
+  mouvement dans la coupe.</li>
+<li><strong>Zone et volume fixés</strong> : ils viennent d'une seule géométrie de porte. Ils ne
+  dépendent ni de la température, ni de la forme réelle de la pièce.</li>
+<li><strong>Remise en suspension</strong> : elle n'est que paramétrée.</li>
+</ul>
+<hr />
+<h2>6. Laissé de côté</h2>
+<ul>
+<li><strong>Le battant qui tourne</strong> : il est traité à part, en vue de dessus, puis
+  reporté ici sous forme paramétrée (§7).</li>
+<li><strong>L'échange de chaleur et d'air</strong> entre le couloir et le reste du logement : le
+  couloir est un réservoir.</li>
+<li><strong>La porte entrouverte et le jour sous la porte</strong> : une fente de 1 cm donne déjà
+  un petit débit permanent.</li>
+</ul>
+<hr />
+<h2>Références</h2>
+<ul>
+<li>W. G. Brown &amp; K. R. Solvason (1962), <em>Natural convection through rectangular
+  openings in partitions</em>, Int. J. Heat Mass Transfer 5.</li>
+<li>P. F. Linden (1999), <em>The fluid mechanics of natural ventilation</em>, Annu. Rev.
+  Fluid Mech. 31.</li>
+<li>J. E. Simpson (1997), <em>Gravity currents in the environment and the laboratory</em>,
+  2ᵉ éd., Cambridge University Press.</li>
+<li>Voir aussi les références de <a href="theorie_convection.html">theorie_convection.html</a>.</li>
+</ul>
+  </article>
+  <p class="pied">Page générée depuis la théorie du projet. Les formules sont mises en forme par MathJax.</p>
+</div>
+<script>
+  // Les tableaux larges défilent dans leur propre conteneur
+  for (const t of document.querySelectorAll("#texte table")) {
+    const d = document.createElement("div");
+    d.className = "tableau";
+    t.replaceWith(d);
+    d.appendChild(t);
+  }
+</script>
+</body>
+</html>

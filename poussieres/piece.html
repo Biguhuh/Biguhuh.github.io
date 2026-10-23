@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poussière dans une pièce</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --fond: #0b0d12;
+    --panneau: #141821;
+    --bord: #262c3a;
+    --texte: #e6e8ee;
+    --doux: #8b93a7;
+    --moleculaire: #b39cff;
+    --transition: #6cb2ff;
+    --stokes: #4fd6a5;
+    --intermediaire: #ffc857;
+    --newton: #ff7a6b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--fond);
+    color: var(--texte);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header, .commandes, main, footer { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+  header { padding-top: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
+  h2 { font-size: 16px; margin: 0 0 8px; font-weight: 620; }
+  header p { margin: 0; color: var(--doux); max-width: 85ch; }
+
+  .commandes {
+    display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center;
+    margin-top: 16px; padding-top: 12px; padding-bottom: 12px;
+    border-top: 1px solid var(--bord); border-bottom: 1px solid var(--bord);
+  }
+  .commandes label, .positions label { display: flex; align-items: center; gap: 8px; color: var(--doux); }
+  select, button, input[type=number] {
+    background: var(--panneau); color: var(--texte); border: 1px solid var(--bord);
+    border-radius: 6px; padding: 5px 9px; font: inherit;
+  }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--doux); }
+  .bascule { display: inline-flex; border: 1px solid var(--bord); border-radius: 6px; overflow: hidden; }
+  .bascule button { border: 0; border-radius: 0; }
+  .bascule button[aria-pressed=true] { background: #2a3245; }
+
+  main { margin-top: 14px; }
+  .scene { position: relative; }
+  canvas {
+    display: block; width: 100%; aspect-ratio: 5.44 / 2.94;
+    border: 1px solid var(--bord); border-radius: 8px; background: #07080c;
+    touch-action: none;
+  }
+  .horloge {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px;
+    margin-top: 10px; font-variant-numeric: tabular-nums;
+  }
+  .horloge strong { font-size: 16px; }
+  .horloge .doux { color: var(--doux); }
+  .progres { flex: 1 1 200px; height: 6px; background: var(--panneau); border-radius: 99px; overflow: hidden; }
+  .progres div { height: 100%; width: 0; background: var(--stokes); }
+  .positions { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 10px; }
+  .positions input { width: 5.5em; }
+
+  .legende { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; color: var(--doux); font-size: 12.5px; }
+  .pastille::before {
+    content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    margin-right: 6px; background: var(--c);
+  }
+
+  section.resultats { margin-top: 22px; }
+  .defile { overflow-x: auto; border: 1px solid var(--bord); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 13px; }
+  th, td { padding: 6px 10px; text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { color: var(--doux); font-weight: 550; background: var(--panneau); border-bottom: 1px solid var(--bord); }
+  tbody tr + tr td { border-top: 1px solid #1a1f2a; }
+  tr.principal td { font-weight: 600; }
+  tr.secondaire td { color: var(--doux); }
+  tr.separation td { border-top: 1px solid var(--bord) !important; }
+  .note { color: var(--doux); font-size: 12.5px; margin: 6px 0 0; }
+  .entete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .entete h2 { margin: 0; }
+  .vide { color: var(--doux); padding: 10px; }
+
+  footer { color: var(--doux); font-size: 12.5px; padding-bottom: 28px; margin-top: 22px; }
+  footer p { margin: 4px 0; max-width: 100ch; }
+  footer a { color: var(--transition); }
+</style>
+</head>
+<body>
+<header>
+  <nav class="site-nav" style="font-size:12.5px;color:#8b93a7;padding-top:12px"><a href="index.html" style="color:#ffc857;font-weight:600">Poussières</a> — <a href="index.html">Accueil</a> · <a href="colonnes.html">Colonnes</a> · <a href="piece.html">Pièce</a> · <a href="convection.html">Convection</a> · <a href="battant.html">Battant</a></nav>
+  <h1>Où se dépose la poussière dans une pièce ?</h1>
+  <p>Une pièce de <strong>5 m × 2,5 m</strong> vue en coupe, avec 2 m de profondeur. L'air y est parfaitement immobile.
+     Elle contient deux meubles de 0,5 m de large, hauts de 1 m et de 2 m, dont le dessus fait donc 1 m².
+     Au départ, des poussières de 10 nm à 1 mm sont réparties uniformément, avec autant de particules par décade de taille.
+     <strong>Fais glisser les meubles</strong> pour les déplacer : la mesure repart alors de zéro.</p>
+</header>
+
+<div class="commandes">
+  <label>Mesurer au bout de
+    <select id="duree">
+      <option value="10">10 s</option>
+      <option value="60">1 min</option>
+      <option value="600">10 min</option>
+      <option value="3600">1 h</option>
+      <option value="21600">6 h</option>
+      <option value="86400" selected>1 jour</option>
+      <option value="604800">1 semaine</option>
+      <option value="2592000">1 mois</option>
+      <option value="31557600">1 an</option>
+    </select>
+  </label>
+  <label>Durée à l'écran
+    <select id="ecran">
+      <option value="10">10 s</option>
+      <option value="30" selected>30 s</option>
+      <option value="60">1 min</option>
+      <option value="120">2 min</option>
+    </select>
+  </label>
+  <div class="bascule" role="group" aria-label="Déroulement du temps">
+    <button id="modeLog" aria-pressed="true" title="Chaque décade de temps (1 s, 10 s, 100 s…) dure à peu près autant à l'écran : on voit tomber les gros grains, puis les fins">Temps log</button>
+    <button id="modeLin" aria-pressed="false" title="Le temps défile à vitesse constante">Temps linéaire</button>
+  </div>
+  <label>Matière
+    <select id="matiere">
+      <option value="1000" data-nom="Eau">Eau, ρ = 1000 kg/m³</option>
+      <option value="1500" data-nom="Organique" selected>Organique, ρ = 1500 kg/m³</option>
+      <option value="2650" data-nom="Quartz">Quartz, ρ = 2650 kg/m³</option>
+      <option value="7870" data-nom="Fer">Fer, ρ = 7870 kg/m³</option>
+    </select>
+  </label>
+  <label>Particules
+    <select id="nombre">
+      <option value="3000">3 000</option>
+      <option value="10000" selected>10 000</option>
+      <option value="30000">30 000</option>
+    </select>
+  </label>
+  <label title="Concentration initiale de chaque classe de taille, en particules par litre d'air">C₀ par classe
+    <input id="c0" type="number" min="0" step="any" value="1" style="width:5.5em"> /L</label>
+  <button id="pause">Pause</button>
+  <button id="relever" title="Ajoute l'état actuel au tableau des relevés">Relever maintenant</button>
+  <button id="reinit">Relancer</button>
+</div>
+
+<main>
+  <div class="scene">
+    <canvas id="piece" aria-label="Coupe de la pièce, avec les deux meubles qu'on peut déplacer à la souris"></canvas>
+  </div>
+  <div class="horloge">
+    <strong id="temps">t = 0 s</strong>
+    <span class="doux" id="cible"></span>
+    <div class="progres" aria-hidden="true"><div id="barre"></div></div>
+    <span class="doux" id="rythme"></span>
+  </div>
+  <div class="positions">
+    <label>Meuble 1 m, bord gauche à <input id="x0" type="number" min="0" max="4.5" step="0.05"> m</label>
+    <label>Meuble 2 m, bord gauche à <input id="x1" type="number" min="0" max="4.5" step="0.05"> m</label>
+  </div>
+  <div class="legende" id="legende"></div>
+
+  <section class="resultats">
+    <div class="entete">
+      <h2 id="titreBilan">Dépôt surfacique</h2>
+      <span class="note" id="uniteBilan"></span>
+    </div>
+    <div class="defile"><table id="bilan"></table></div>
+  </section>
+
+  <section class="resultats">
+    <div class="entete">
+      <h2>Relevés</h2>
+      <button id="effacer">Effacer</button>
+    </div>
+    <div class="defile" id="releves"></div>
+    <p class="note">Un relevé est ajouté automatiquement à la fin de chaque mesure. Tu peux en faire d'autres en cours de route avec « Relever maintenant ».
+       Change les meubles de place ou de matière, puis relance pour comparer.</p>
+  </section>
+</main>
+
+<footer>
+  <p><strong>Ce qu'on doit voir.</strong> Dans de l'air immobile, une poussière tombe à sa vitesse limite v.
+     Tant que la colonne d'air au-dessus d'une surface n'est pas vidée, chaque surface horizontale reçoit le même flux, C₀·v par m².
+     Une fois la colonne vidée, chaque m² a reçu ce que contenait l'air au-dessus de lui : 2,5 m d'air pour le sol, 1,5 m pour le meuble de 1 m, 0,5 m pour celui de 2 m.
+     On s'attend donc à un rapport 5 : 3 : 1.
+     Les plus fines (moins de 0,1 µm) tombent à peine : elles diffusent et se collent aussi aux murs, au plafond et aux côtés des meubles.</p>
+  <p><strong>Hypothèses.</strong> L'air est parfaitement immobile, sans convection ni courants d'air. Dans une vraie pièce, ce sont eux qui dominent pour les particules de moins de 10 µm.
+     Toute poussière qui touche une surface y reste : pas de rebond ni de remise en suspension.
+     La coupe est en 2D : il n'y a pas de murs avant et arrière.
+     Les grains partent au repos. La mise en vitesse est intégrée, puis on passe à la vitesse limite plus la diffusion brownienne.</p>
+  <p>Théorie : <a href="theorie_sedimentation.html">theorie_sedimentation.html</a> · Colonnes par taille : <a href="colonnes.html">index.html</a></p>
+</footer>
+
+<script src="physique.js"></script>
+<script>
+(() => {
+  // ---------- Géométrie (m) ----------
+  const L = 5, H = 2.5, PROF = 2;          // pièce
+  const LM = 0.5;                          // largeur d'un meuble
+  const MARGE = 0.22;                      // marge autour de la pièce sur le canvas
+  const meubles = [{ h: 1, x: 1.0 }, { h: 2, x: 3.5 }];
+
+  // ---------- Tailles : 10 nm à 1 mm, log-uniforme ----------
+  const PAR_DECADE = 50, DECADES = 5, D_MIN = 1e-8;
+  const CLASSES = [
+    { nom: "10–100 nm", c: "moleculaire" },
+    { nom: "0,1–1 µm", c: "transition" },
+    { nom: "1–10 µm", c: "stokes" },
+    { nom: "10–100 µm", c: "intermediaire" },
+    { nom: "0,1–1 mm", c: "newton" },
+  ];
+  const styles = getComputedStyle(document.documentElement);
+  for (const k of CLASSES) k.couleur = styles.getPropertyValue("--" + k.c).trim();
+
+  // ---------- Numérique ----------
+  const PAS_DIFF = 5e-3;      // m, saut brownien maximal par sous-pas (pour ne pas « sauter » une paroi)
+  const SOUS_PAS_MAX = 400;
+  const T0 = 0.05;            // s, échelle de départ du temps logarithmique
+
+  // Surfaces de dépôt
+  const AIR = 0, SOL = 1, DESSUS = [2, 3], COTES = 4, MURS = 5, PLAFOND = 6;
+  const SURFACES = [
+    { s: SOL, nom: "Sol", principal: true },
+    { s: 2, nom: "Dessus du meuble 1 m", principal: true },
+    { s: 3, nom: "Dessus du meuble 2 m", principal: true },
+    { s: COTES, nom: "Côtés des meubles" },
+    { s: MURS, nom: "Murs" },
+    { s: PLAFOND, nom: "Plafond" },
+  ];
+  const aires = () => ({
+    [SOL]: (L - 2 * LM) * PROF,
+    2: LM * PROF,
+    3: LM * PROF,
+    [COTES]: meubles.reduce((a, m) => a + 2 * m.h * PROF, 0),
+    [MURS]: 2 * H * PROF,
+    [PLAFOND]: L * PROF,
+  });
+  const volumeAir = () => (L * H - meubles.reduce((a, m) => a + LM * m.h, 0)) * PROF;
+
+  const etat = {
+    T: 86400, Tanim: 30, mode: "log", rhoP: 1500, nombre: 10000, c0: 1,
+    t: 0, tau: 0, pause: false, fini: false,
+  };
+  let grille = [], particules = [], parClasse = [], releves = [];
+  let glisse = null, survol = -1;
+
+  // ---------- Formatage ----------
+  const EXPOSANTS = { "-": "⁻", 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" };
+  function nombre(x, chiffres = 2) {
+    if (x === 0) return "0";
+    const e = Math.floor(Math.log10(Math.abs(x)));
+    if (e >= -2 && e < 5) {
+      return Number(x.toPrecision(chiffres)).toLocaleString("fr-FR", { maximumFractionDigits: 6 });
+    }
+    const m = Number((x / 10 ** e).toPrecision(chiffres)).toLocaleString("fr-FR");
+    const exp = String(e).split("").map((c) => EXPOSANTS[c]).join("");
+    return (m === "1" ? "" : m + "·") + "10" + exp;
+  }
+  function duree(s) {
+    const unites = [[365.25 * 86400, "an"], [86400, "j"], [3600, "h"], [60, "min"], [1, "s"], [1e-3, "ms"]];
+    for (const [u, nom] of unites) if (s >= u) return nombre(s / u) + " " + nom;
+    return nombre(s * 1e6) + " µs";
+  }
+  function horloge(s) {
+    if (s < 60) return s.toFixed(1).replace(".", ",") + " s";
+    if (s < 3600) return Math.floor(s / 60) + " min " + String(Math.floor(s % 60)).padStart(2, "0") + " s";
+    if (s < 86400) return Math.floor(s / 3600) + " h " + String(Math.floor((s % 3600) / 60)).padStart(2, "0") + " min";
+    return nombre(s / 86400, 3) + " j";
+  }
+  function masse(kg) {
+    if (kg === 0) return "0";
+    const g = kg * 1e3;
+    for (const [u, nom] of [[1, "g"], [1e-3, "mg"], [1e-6, "µg"], [1e-9, "ng"]]) {
+      if (g >= u) return nombre(g / u) + " " + nom;
+    }
+    return nombre(g / 1e-12) + " pg";
+  }
+  const metres = (x) => x.toFixed(2).replace(".", ",");
+
+  // ---------- Hasard ----------
+  let gaussReserve = null;
+  function gauss() {
+    if (gaussReserve !== null) { const g = gaussReserve; gaussReserve = null; return g; }
+    let u = 0;
+    while (u === 0) u = Math.random();
+    const r = Math.sqrt(-2 * Math.log(u)), a = 2 * Math.PI * Math.random();
+    gaussReserve = r * Math.sin(a);
+    return r * Math.cos(a);
+  }
+
+  // ---------- Préparation ----------
+  function caracteriser() {
+    grille = [];
+    for (let i = 0; i < PAR_DECADE * DECADES; i++) {
+      const d = D_MIN * 10 ** ((i + 0.5) / PAR_DECADE);
+      const c = Physique.caracteriser(d, etat.rhoP);
+      c.dtDiff = (PAS_DIFF * PAS_DIFF) / (2 * c.D);
+      grille.push(c);
+    }
+  }
+
+  const dansMeuble = (x, y) => meubles.some((m) => x > m.x && x < m.x + LM && y < m.h);
+
+  function semer() {
+    particules = [];
+    parClasse = CLASSES.map(() => []);
+    for (let n = 0; n < etat.nombre; n++) {
+      const g = Math.floor(Math.random() * grille.length);
+      let x, y;
+      do { x = Math.random() * L; y = Math.random() * H; } while (dansMeuble(x, y));
+      const p = { x, y, v: 0, g, k: Math.floor(g / PAR_DECADE), s: AIR };
+      particules.push(p);
+      parClasse[p.k].push(p);
+    }
+    etat.t = 0; etat.tau = 0; etat.fini = false;
+    majBoutons();
+    majBilan();
+  }
+
+  // ---------- Temps ----------
+  function tempsSim(tau) {
+    const f = Math.min(1, tau / etat.Tanim);
+    return etat.mode === "log" ? T0 * ((1 + etat.T / T0) ** f - 1) : etat.T * f;
+  }
+  function tauDe(t) {
+    const f = etat.mode === "log" ? Math.log1p(t / T0) / Math.log1p(etat.T / T0) : t / etat.T;
+    return Math.min(1, f) * etat.Tanim;
+  }
+
+  // ---------- Collisions : premier obstacle sur le segment (x0,y0) → (x1,y1) ----------
+  function impact(x0, y0, x1, y1) {
+    const dx = x1 - x0, dy = y1 - y0;
+    let tMin = Infinity, surf = AIR;
+    const garder = (t, s) => { if (t >= 0 && t < tMin) { tMin = t; surf = s; } };
+    if (y1 < 0) garder(-y0 / dy, SOL);
+    if (y1 > H) garder((H - y0) / dy, PLAFOND);
+    if (x1 < 0) garder(-x0 / dx, MURS);
+    if (x1 > L) garder((L - x0) / dx, MURS);
+    for (let i = 0; i < meubles.length; i++) {
+      // Méthode des dalles : on entre dans [a, b] × [0, h] par le dessus ou par un côté
+      const a = meubles[i].x, b = a + LM, h = meubles[i].h;
+      let tE = -Infinity, tS = Infinity, face = AIR;
+      if (dx === 0) { if (x0 <= a || x0 >= b) continue; }
+      else {
+        const t1 = (a - x0) / dx, t2 = (b - x0) / dx;
+        tE = Math.min(t1, t2); tS = Math.max(t1, t2); face = COTES;
+      }
+      if (dy === 0) { if (y0 >= h) continue; }
+      else {
+        const t1 = -y0 / dy, t2 = (h - y0) / dy;
+        const lo = Math.min(t1, t2), hi = Math.max(t1, t2);
+        if (lo > tE) { tE = lo; face = DESSUS[i]; }
+        tS = Math.min(tS, hi);
+      }
+      if (tE <= tS && tE <= 1) garder(tE, face);
+    }
+    if (tMin > 1) return null;
+    return { s: surf, x: x0 + tMin * dx, y: y0 + tMin * dy };
+  }
+
+  function deplacer(p, x1, y1) {
+    const choc = impact(p.x, p.y, x1, y1);
+    if (choc) { p.x = choc.x; p.y = choc.y; p.s = choc.s; return true; }
+    p.x = x1; p.y = y1;
+    return false;
+  }
+
+  function avancer(p, dt) {
+    const c = grille[p.g];
+    if (c.tauEff * 20 > dt) {
+      // Mise en vitesse encore visible : Heun (RK2) sur dv/dt = g' − F(v)/m, v compté vers le bas
+      const n = Math.min(200, Math.ceil(dt / (0.1 * c.tauEff)));
+      const h = dt / n;
+      let dz = 0;
+      for (let i = 0; i < n; i++) {
+        const a1 = Physique.acceleration(c, p.v);
+        const a2 = Physique.acceleration(c, p.v + a1 * h);
+        const v = p.v + 0.5 * (a1 + a2) * h;
+        dz += 0.5 * (p.v + v) * h;
+        p.v = v;
+      }
+      const sigma = Math.sqrt(2 * c.D * dt);
+      deplacer(p, p.x + sigma * gauss(), p.y - dz + sigma * gauss());
+      return;
+    }
+    // Vitesse limite + brownien, en sous-pas assez courts pour que le saut aléatoire reste < PAS_DIFF
+    p.v = c.vt;
+    const n = Math.min(SOUS_PAS_MAX, Math.max(1, Math.ceil(dt / c.dtDiff)));
+    const h = dt / n, sigma = Math.sqrt(2 * c.D * h), dz = c.vt * h;
+    for (let i = 0; i < n; i++) {
+      if (deplacer(p, p.x + sigma * gauss(), p.y - dz + sigma * gauss())) return;
+    }
+  }
+
+  // ---------- Bilan ----------
+  function compter() {
+    const nb = Array.from({ length: 7 }, () => new Array(DECADES).fill(0));
+    const ms = Array.from({ length: 7 }, () => new Array(DECADES).fill(0));
+    for (const p of particules) {
+      nb[p.s][p.k]++;
+      ms[p.s][p.k] += grille[p.g].m;
+    }
+    // Chaque particule simulée de la classe k représente W_k particules réelles
+    const V = volumeAir();
+    const W = parClasse.map((liste) => (liste.length ? (etat.c0 * 1000 * V) / liste.length : 0));
+    const A = aires();
+    const surf = {};
+    for (const { s } of SURFACES) {
+      const n = nb[s].map((x, k) => (x * W[k]) / A[s]);
+      const m = ms[s].reduce((a, x, k) => a + x * W[k], 0) / A[s];
+      surf[s] = { n, total: n.reduce((a, b) => a + b, 0), m };
+    }
+    const enAir = nb[AIR].map((x, k) => (parClasse[k].length ? x / parClasse[k].length : 0));
+    const masseTotale = particules.reduce((a, p) => a + grille[p.g].m * W[p.k], 0);
+    const masseAir = ms[AIR].reduce((a, x, k) => a + x * W[k], 0);
+    return { surf, enAir, nbAir: nb[AIR].reduce((a, b) => a + b, 0), A, fracMasseAir: masseTotale ? masseAir / masseTotale : 0 };
+  }
+
+  function majBilan() {
+    const b = compter();
+    document.getElementById("titreBilan").textContent = "Dépôt surfacique à t = " + horloge(etat.t);
+    document.getElementById("uniteBilan").textContent =
+      "particules par m² pour C₀ = " + nombre(etat.c0) + " particule/L par classe";
+    let html = "<thead><tr><th>Surface</th><th>Aire</th>";
+    for (const k of CLASSES) html += `<th><span class="pastille" style="--c:${k.couleur}">${k.nom}</span></th>`;
+    html += "<th>Total /m²</th><th>Masse /m²</th><th>÷ sol</th></tr></thead><tbody>";
+    const sol = b.surf[SOL].total;
+    SURFACES.forEach(({ s, nom, principal }, i) => {
+      const r = b.surf[s];
+      const cls = (principal ? "principal" : "secondaire") + (i === 3 ? " separation" : "");
+      html += `<tr class="${cls}"><td>${nom}</td><td>${nombre(b.A[s])} m²</td>`;
+      for (const x of r.n) html += `<td>${nombre(x)}</td>`;
+      html += `<td>${nombre(r.total)}</td><td>${masse(r.m)}</td><td>${sol ? nombre(r.total / sol) : "—"}</td></tr>`;
+    });
+    html += `<tr class="secondaire separation"><td>Encore en l'air</td><td>${nombre(volumeAir())} m³</td>`;
+    for (const f of b.enAir) html += `<td>${nombre(100 * f)} %</td>`;
+    html += `<td>${nombre((100 * b.nbAir) / Math.max(1, particules.length))} %</td><td>${nombre(100 * b.fracMasseAir)} % de la masse</td><td></td></tr></tbody>`;
+    document.getElementById("bilan").innerHTML = html;
+    return b;
+  }
+
+  function relever() {
+    const b = compter();
+    const sel = document.getElementById("matiere");
+    releves.push({
+      t: etat.t,
+      matiere: sel.options[sel.selectedIndex].dataset.nom,
+      positions: meubles.map((m) => metres(m.x)).join(" / "),
+      surf: [SOL, 2, 3].map((s) => b.surf[s]),
+    });
+    majReleves();
+  }
+
+  function majReleves() {
+    const el = document.getElementById("releves");
+    if (!releves.length) { el.innerHTML = '<div class="vide">Aucun relevé pour l\'instant.</div>'; return; }
+    let html = `<table><thead><tr><th>#</th><th>t</th><th>Matière</th><th>Meubles 1 m / 2 m (x, m)</th>
+      <th>Sol /m²</th><th>Meuble 1 m /m²</th><th>Meuble 2 m /m²</th><th>Rapport sol : 1 m : 2 m</th></tr></thead><tbody>`;
+    releves.forEach((r, i) => {
+      const [s, m1, m2] = r.surf;
+      const ref = m2.total || m1.total || s.total || 1;
+      html += `<tr><td>${i + 1}</td><td>${horloge(r.t)}</td><td>${r.matiere}</td><td>${r.positions}</td>`;
+      for (const x of r.surf) html += `<td>${nombre(x.total)} · ${masse(x.m)}</td>`;
+      html += `<td>${[s, m1, m2].map((x) => nombre(x.total / ref)).join(" : ")}</td></tr>`;
+    });
+    el.innerHTML = html + "</tbody></table>";
+  }
+
+  // ---------- Rendu ----------
+  const canvas = document.getElementById("piece");
+  const ctx = canvas.getContext("2d");
+  let echelle = 1, dpr = 1;
+
+  function dimensionner() {
+    const r = canvas.getBoundingClientRect();
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    echelle = canvas.width / (L + 2 * MARGE);
+  }
+  const ex = (x) => (x + MARGE) * echelle;
+  const ey = (y) => (H + MARGE - y) * echelle;
+
+  function dessiner() {
+    const W = canvas.width, Hc = canvas.height;
+    ctx.fillStyle = "#07080c";
+    ctx.fillRect(0, 0, W, Hc);
+
+    // Pièce
+    ctx.fillStyle = "#0d1017";
+    ctx.fillRect(ex(0), ey(H), L * echelle, H * echelle);
+    const grad = ctx.createLinearGradient(ex(0), ey(H), ex(L), ey(0));
+    grad.addColorStop(0, "rgba(255, 236, 190, 0.04)");
+    grad.addColorStop(1, "rgba(255, 236, 190, 0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(ex(0), ey(H), L * echelle, H * echelle);
+
+    // Graduations
+    ctx.fillStyle = "rgba(139, 147, 167, 0.8)";
+    ctx.font = `${11 * dpr}px system-ui, sans-serif`;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (let y = 0; y <= H + 1e-9; y += 0.5) {
+      ctx.fillText(metres(y).replace(/,?0+$/, "") || "0", ex(0) - 6 * dpr, ey(y));
+      ctx.fillRect(ex(0) - 3 * dpr, ey(y), 3 * dpr, dpr);
+    }
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (let x = 0; x <= L; x += 1) {
+      ctx.fillText(x + (x === L ? " m" : ""), ex(x), ey(0) + 6 * dpr);
+      ctx.fillRect(ex(x), ey(0), dpr, 3 * dpr);
+    }
+
+    // Particules en l'air
+    const actif = !glisse;
+    if (actif) {
+      ctx.globalAlpha = 0.8;
+      parClasse.forEach((liste, k) => {
+        ctx.fillStyle = CLASSES[k].couleur;
+        const t = (0.9 + 0.45 * k) * dpr;
+        for (const p of liste) if (p.s === AIR) ctx.fillRect(ex(p.x) - t / 2, ey(p.y) - t / 2, t, t);
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    // Meubles
+    meubles.forEach((m, i) => {
+      const x = ex(m.x), y = ey(m.h), w = LM * echelle, h = m.h * echelle;
+      ctx.fillStyle = "#1a2030";
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = glisse?.i === i || survol === i ? "#e6e8ee" : "#4a5470";
+      ctx.lineWidth = 1.5 * dpr;
+      ctx.strokeRect(x, y, w, h);
+      ctx.fillStyle = "#e6e8ee";
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.font = `600 ${12 * dpr}px system-ui, sans-serif`;
+      ctx.fillText(m.h + " m", x + w / 2, y + 8 * dpr);
+      ctx.fillStyle = "#8b93a7";
+      ctx.font = `${11 * dpr}px system-ui, sans-serif`;
+      ctx.fillText("⇔", x + w / 2, y + 26 * dpr);
+    });
+
+    // Murs, plafond, sol
+    ctx.strokeStyle = "#3a4256";
+    ctx.lineWidth = 2 * dpr;
+    ctx.strokeRect(ex(0), ey(H), L * echelle, H * echelle);
+
+    // Dépôts
+    if (actif) {
+      ctx.globalAlpha = 0.9;
+      parClasse.forEach((liste, k) => {
+        ctx.fillStyle = CLASSES[k].couleur;
+        const t = (1.2 + 0.45 * k) * dpr;
+        for (const p of liste) if (p.s !== AIR) ctx.fillRect(ex(p.x) - t / 2, ey(p.y) - t / 2, t, t);
+      });
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.fillStyle = "#e6e8ee";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.font = `${13 * dpr}px system-ui, sans-serif`;
+      ctx.fillText("Relâche pour relancer la mesure", ex(L / 2), ey(H * 0.85));
+    }
+  }
+
+  // ---------- Déplacement des meubles ----------
+  function versMonde(e) {
+    const r = canvas.getBoundingClientRect();
+    const k = (L + 2 * MARGE) / r.width;
+    return [(e.clientX - r.left) * k - MARGE, H + MARGE - (e.clientY - r.top) * k];
+  }
+  function meubleSous(x, y) {
+    const tol = 0.04;
+    return meubles.findIndex((m) => x >= m.x - tol && x <= m.x + LM + tol && y >= -tol && y <= m.h + tol);
+  }
+  function placer(i, x) {
+    x = Math.min(Math.max(x, 0), L - LM);
+    const o = meubles[1 - i];
+    if (x < o.x + LM && x + LM > o.x) {
+      const options = [o.x - LM, o.x + LM].filter((v) => v >= 0 && v <= L - LM);
+      x = options.reduce((a, b) => (Math.abs(b - x) < Math.abs(a - x) ? b : a));
+    }
+    meubles[i].x = Math.round(x * 100) / 100;
+    majPositions();
+  }
+  function majPositions() {
+    meubles.forEach((m, i) => { document.getElementById("x" + i).value = m.x.toFixed(2); });
+  }
+
+  canvas.addEventListener("pointerdown", (e) => {
+    const [x, y] = versMonde(e);
+    const i = meubleSous(x, y);
+    if (i < 0) return;
+    glisse = { i, dx: x - meubles[i].x };
+    canvas.setPointerCapture(e.pointerId);
+    canvas.style.cursor = "grabbing";
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    const [x, y] = versMonde(e);
+    if (glisse) { placer(glisse.i, x - glisse.dx); return; }
+    survol = meubleSous(x, y);
+    canvas.style.cursor = survol >= 0 ? "grab" : "default";
+  });
+  const lacher = () => {
+    if (!glisse) return;
+    glisse = null;
+    canvas.style.cursor = "grab";
+    semer();
+  };
+  canvas.addEventListener("pointerup", lacher);
+  canvas.addEventListener("pointercancel", lacher);
+  canvas.addEventListener("pointerleave", () => { if (!glisse) survol = -1; });
+  [0, 1].forEach((i) => {
+    document.getElementById("x" + i).addEventListener("change", (e) => {
+      placer(i, parseFloat(String(e.target.value).replace(",", ".")) || 0);
+      semer();
+    });
+  });
+
+  // ---------- Légende ----------
+  function majLegende() {
+    document.getElementById("legende").innerHTML = CLASSES.map((k, i) => {
+      const c = grille[i * PAR_DECADE + PAR_DECADE / 2];
+      return `<span class="pastille" style="--c:${k.couleur}" title="Diamètre ${nombre(c.d * 1e6)} µm, vitesse limite ${nombre(c.vt)} m/s">${k.nom} : 2,5 m de chute en ${duree(H / c.vt)}</span>`;
+    }).join("");
+  }
+
+  // ---------- Boucle ----------
+  let precedent = performance.now(), dernierBilan = 0, rythme = 0;
+  function boucle(now) {
+    const dtE = Math.min(0.05, (now - precedent) / 1000);
+    precedent = now;
+    if (!etat.pause && !etat.fini && !glisse) {
+      etat.tau = Math.min(etat.Tanim, etat.tau + dtE);
+      const tN = tempsSim(etat.tau);
+      const dt = tN - etat.t;
+      if (dt > 0) for (const p of particules) if (p.s === AIR) avancer(p, dt);
+      rythme = dtE > 0 ? dt / dtE : 0;
+      etat.t = tN;
+      if (etat.tau >= etat.Tanim) {
+        etat.fini = true;
+        majBilan();
+        relever();
+        majBoutons();
+      }
+    }
+    dessiner();
+    if (now - dernierBilan > 250) {
+      dernierBilan = now;
+      if (!etat.fini) majBilan();
+      document.getElementById("temps").textContent = "t = " + horloge(etat.t);
+      document.getElementById("cible").textContent = "/ " + duree(etat.T);
+      document.getElementById("barre").style.width = (100 * etat.tau) / etat.Tanim + "%";
+      document.getElementById("rythme").textContent =
+        etat.fini ? "Mesure terminée" : etat.pause ? "En pause" : rythme ? "1 s à l'écran ≈ " + duree(rythme) : "";
+    }
+    requestAnimationFrame(boucle);
+  }
+
+  // ---------- Commandes ----------
+  const $ = (id) => document.getElementById(id);
+  function majBoutons() {
+    $("pause").textContent = etat.fini ? "Terminé" : etat.pause ? "Reprendre" : "Pause";
+    $("pause").disabled = etat.fini;
+  }
+  function recaler() {
+    etat.tau = tauDe(etat.t);
+    etat.fini = etat.t >= etat.T;
+    majBoutons();
+  }
+  function choisirMode(mode) {
+    etat.mode = mode;
+    $("modeLog").setAttribute("aria-pressed", mode === "log");
+    $("modeLin").setAttribute("aria-pressed", mode === "lin");
+    recaler();
+  }
+  $("modeLog").onclick = () => choisirMode("log");
+  $("modeLin").onclick = () => choisirMode("lin");
+  $("duree").onchange = (e) => { etat.T = +e.target.value; recaler(); };
+  $("ecran").onchange = (e) => { etat.Tanim = +e.target.value; recaler(); };
+  $("matiere").onchange = (e) => { etat.rhoP = +e.target.value; caracteriser(); majLegende(); semer(); };
+  $("nombre").onchange = (e) => { etat.nombre = +e.target.value; semer(); };
+  $("c0").onchange = (e) => { etat.c0 = Math.max(0, +e.target.value || 0); majBilan(); };
+  $("pause").onclick = () => { etat.pause = !etat.pause; majBoutons(); };
+  $("relever").onclick = relever;
+  $("reinit").onclick = () => { etat.pause = false; semer(); };
+  $("effacer").onclick = () => { releves = []; majReleves(); };
+  window.addEventListener("resize", dimensionner);
+
+  dimensionner();
+  majPositions();
+  caracteriser();
+  majLegende();
+  semer();
+  majReleves();
+  requestAnimationFrame(boucle);
+})();
+</script>
+</body>
+</html>

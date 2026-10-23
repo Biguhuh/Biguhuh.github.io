@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Battant de porte</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --fond: #0b0d12;
+    --panneau: #141821;
+    --bord: #262c3a;
+    --texte: #e6e8ee;
+    --doux: #8b93a7;
+    --accent: #4fd6a5;
+    --lien: #6cb2ff;
+    --piece: #ffc857;
+    --couloir: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--fond);
+    color: var(--texte);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header, .commandes, main, footer { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+  header { padding-top: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
+  header p { margin: 0; color: var(--doux); max-width: 88ch; }
+  .commandes {
+    display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center;
+    margin-top: 16px; padding-top: 12px; padding-bottom: 12px;
+    border-top: 1px solid var(--bord); border-bottom: 1px solid var(--bord);
+  }
+  .commandes label { display: flex; align-items: center; gap: 8px; color: var(--doux); }
+  select, button {
+    background: var(--panneau); color: var(--texte); border: 1px solid var(--bord);
+    border-radius: 6px; padding: 5px 9px; font: inherit;
+  }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--doux); }
+  main { margin-top: 14px; }
+  canvas#plan {
+    display: block; width: 100%; aspect-ratio: 7.04 / 4.5;
+    border: 1px solid var(--bord); border-radius: 8px; background: #07080c;
+  }
+  .sous-scene { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px 24px; margin-top: 10px; }
+  .statut { font-variant-numeric: tabular-nums; }
+  .statut strong { font-weight: 600; }
+  .statut .doux, .doux { color: var(--doux); }
+  .echelle { min-width: 240px; flex: 0 1 320px; }
+  .echelle .titre { font-size: 12px; color: var(--doux); margin-bottom: 4px; }
+  .echelle canvas { display: block; width: 100%; height: 12px; border-radius: 3px; }
+  .graduations { position: relative; height: 16px; font-size: 11.5px; color: var(--doux); font-variant-numeric: tabular-nums; }
+  .graduations span { position: absolute; transform: translateX(-50%); top: 2px; white-space: nowrap; }
+  .legende { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px; color: var(--doux); font-size: 12.5px; }
+  .pastille::before {
+    content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    margin-right: 6px; background: var(--c);
+  }
+  .tuiles { display: grid; gap: 10px; margin-top: 16px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .tuile { background: var(--panneau); border: 1px solid var(--bord); border-radius: 8px; padding: 10px 12px; }
+  .tuile .etiquette { color: var(--doux); font-size: 12.5px; }
+  .tuile .valeur { font-size: 20px; font-weight: 620; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .tuile .detail { color: var(--doux); font-size: 12px; margin-top: 2px; }
+  section.resultats { margin-top: 20px; }
+  section.resultats h2 { font-size: 16px; margin: 0; font-weight: 620; }
+  .entete { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .defile { overflow-x: auto; border: 1px solid var(--bord); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 13px; }
+  th, td { padding: 6px 10px; text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { color: var(--doux); font-weight: 550; background: var(--panneau); border-bottom: 1px solid var(--bord); }
+  tbody tr + tr td { border-top: 1px solid #1a1f2a; }
+  .vide { color: var(--doux); padding: 10px; }
+  .note { color: var(--doux); font-size: 12.5px; margin: 6px 0 0; }
+  footer { color: var(--doux); font-size: 12.5px; padding-bottom: 28px; margin-top: 22px; }
+  footer p { margin: 4px 0; max-width: 100ch; }
+  footer a { color: var(--lien); }
+</style>
+</head>
+<body>
+<header>
+  <nav class="site-nav" style="font-size:12.5px;color:#8b93a7;padding-top:12px"><a href="index.html" style="color:#ffc857;font-weight:600">Poussières</a> — <a href="index.html">Accueil</a> · <a href="colonnes.html">Colonnes</a> · <a href="piece.html">Pièce</a> · <a href="convection.html">Convection</a> · <a href="battant.html">Battant</a></nav>
+  <h1>Le battant de la porte, vu de dessus</h1>
+  <p>Plan horizontal à mi-hauteur de porte : la pièce (5 m × 2 m) à gauche, le couloir à droite, et une porte de 0,8 m qui s'ouvre vers la pièce.
+     L'air y est isotherme : on ne regarde que l'effet mécanique du battant. La couleur donne la vitesse de l'air.
+     La <span style="color:var(--piece)">poussière de la pièce</span> et la <strong>poussière du couloir</strong> (en blanc) suivent l'air.</p>
+</header>
+
+<div class="commandes">
+  <label>Ouverture en
+    <select id="duree">
+      <option value="0.5">0,5 s</option>
+      <option value="1" selected>1 s</option>
+      <option value="2">2 s</option>
+      <option value="3">3 s</option>
+    </select>
+  </label>
+  <button id="ouvrir">Ouvrir</button>
+  <button id="fermer">Fermer</button>
+  <button id="cycle" title="Ouvre, attend 3 s (le temps de passer), puis referme">Ouvrir, passer, fermer</button>
+  <label>Affichage
+    <select id="vitesse">
+      <option value="0.25">ralenti × 0,25</option>
+      <option value="0.5" selected>ralenti × 0,5</option>
+      <option value="1">temps réel</option>
+    </select>
+  </label>
+  <label title="Viscosité turbulente effective (théorie §3.1)">ν<sub>t</sub>
+    <select id="nut">
+      <option value="0.0005">5·10⁻⁴ m²/s</option>
+      <option value="0.001" selected>10⁻³ m²/s</option>
+      <option value="0.002">2·10⁻³ m²/s</option>
+      <option value="0.005">5·10⁻³ m²/s</option>
+    </select>
+  </label>
+  <button id="relever" title="Ajoute l'état actuel au tableau des relevés">Relever</button>
+  <button id="reinit" title="Air au repos, poussières remises en place, compteurs à zéro (la porte reste dans sa position)">Réinitialiser</button>
+</div>
+
+<main>
+  <canvas id="plan" aria-label="Vue de dessus de la pièce et du couloir : vitesse de l'air, battant de porte et poussières"></canvas>
+  <div class="sous-scene">
+    <div>
+      <div class="statut" id="statut" aria-live="polite"></div>
+      <div class="legende">
+        <span class="pastille" style="--c:var(--piece)">poussière de la pièce</span>
+        <span class="pastille" style="--c:var(--couloir)">poussière du couloir</span>
+      </div>
+    </div>
+    <div class="echelle">
+      <div class="titre">Vitesse de l'air</div>
+      <canvas id="barre" aria-hidden="true"></canvas>
+      <div class="graduations" id="graduations"></div>
+    </div>
+  </div>
+  <div class="tuiles">
+    <div class="tuile"><div class="etiquette">Bord du battant</div><div class="valeur" id="vBord">—</div><div class="detail" id="vAngle"></div></div>
+    <div class="tuile"><div class="etiquette">Vitesse max de l'air</div><div class="valeur" id="vMax">—</div><div class="detail">dans la pièce et le couloir</div></div>
+    <div class="tuile"><div class="etiquette">Échange brut par l'embrasure</div><div class="valeur" id="vFlux">—</div><div class="detail">volume entré dans la pièce (autant en est sorti)</div></div>
+    <div class="tuile"><div class="etiquette">Air du couloir dans la pièce</div><div class="valeur" id="vC">—</div><div class="detail" id="vCd">d'après les traceurs</div></div>
+    <div class="tuile"><div class="etiquette">Air de la pièce dans le couloir</div><div class="valeur" id="vP">—</div><div class="detail" id="vPd">d'après les traceurs</div></div>
+    <div class="tuile"><div class="etiquette">Volume balayé par le battant</div><div class="valeur">1,0 m³</div><div class="detail">¼ de disque de 0,8 m × 2 m de haut</div></div>
+  </div>
+
+  <section class="resultats">
+    <div class="entete">
+      <h2>Relevés</h2>
+      <button id="effacer">Effacer</button>
+    </div>
+    <div class="defile" id="releves"></div>
+    <p class="note">Volumes depuis la dernière réinitialisation, ramenés à une porte de 2 m de haut. L'échange brut compte tout ce qui passe l'embrasure vers la pièce, allers-retours compris.
+       Les traceurs mesurent l'air réellement transféré d'un côté à l'autre.</p>
+  </section>
+</main>
+
+<footer>
+  <p><strong>Modèle.</strong> On résout Navier-Stokes 2D incompressible, en air isotherme, sur une grille décalée de 4 cm (164 × 100 cellules).
+     L'advection est semi-lagrangienne de MacCormack et la projection utilise une factorisation de Cholesky.
+     Le battant est un solide mobile par pénalisation de Brinkman, sur grille fixe, et la turbulence est une viscosité effective ν<sub>t</sub>.
+     Contrôles : divergence résiduelle ≈ 10⁻¹², débit net nul à travers la porte, et volume transféré quasi identique sur une grille de 3 cm.</p>
+  <p><strong>Limites.</strong> L'écoulement est supposé identique sur toute la hauteur de la porte : on ignore le sol, le plafond et le jour sous la porte.
+     Il n'y a ni flottabilité ni sédimentation : les poussières sont des traceurs. Avec un couloir à une autre température, l'échange thermique
+     (<a href="convection.html">convection.html</a>) s'ajoute après quelques secondes et domine vite.
+     Les vitesses de pointe dépendent de la vitesse d'ouverture : environ 1 m/s pour une ouverture lente de 3 s, plusieurs m/s pour un battant lancé en 1 s.</p>
+  <p>Théorie : <a href="theorie_battant.html">theorie_battant.html</a></p>
+</footer>
+
+<script src="battant.js"></script>
+<script>
+(() => {
+  const GEO = { dx: 0.04, L: 5, W: 2, LC: 1.5, yC0: -1, yC1: 3, xMur: 5, epMur: 0.04, yPorte0: 0.1, yPorte1: 0.9, lPorte: 0.8, epBattant: 0.06, hauteur: 2 };
+  const NU_AIR = 1.51e-5;
+  const VUE = { x0: -0.25, x1: 6.79, y0: -1.25, y1: 3.25 };
+  const V_REF = 1;   // m/s, haut de l'échelle de couleur
+  const $ = (id) => document.getElementById(id);
+  const fr = (x, d = 2) => x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  // ---------- Couleur de vitesse : séquentielle bleue, du fond au bleu clair ----------
+  const RAMPE = [[13, 16, 23], [24, 79, 149], [57, 135, 229], [169, 205, 250]];
+  function couleurV(v) {
+    const f = Math.sqrt(Math.min(1, Math.max(0, v / V_REF))) * (RAMPE.length - 1);
+    const i = Math.min(RAMPE.length - 2, Math.floor(f)), t = f - i;
+    return RAMPE[i].map((c, k) => Math.round(c + (RAMPE[i + 1][k] - c) * t));
+  }
+
+  // ---------- Moteur ----------
+  let instant = null, envoyer;
+  function demarrer() {
+    const recevoir = (m) => { instant = m; };
+    const repli = () => { const p = Battant.pilote(recevoir, 12); envoyer = (m) => p(m); };
+    try {
+      const w = new Worker("battant-worker.js");
+      let ok = false;
+      w.onmessage = (e) => { ok = true; recevoir(e.data); };
+      w.onerror = (e) => { e.preventDefault(); if (!ok) { repli(); init(); } };
+      envoyer = (m) => w.postMessage(m);
+    } catch {
+      repli();
+    }
+  }
+  const init = () => envoyer({ type: "init", geo: GEO, nu: NU_AIR + +$("nut").value, nTraceurs: 3000 });
+
+  // ---------- Rendu ----------
+  const canvas = $("plan"), ctx = canvas.getContext("2d");
+  const carte = document.createElement("canvas"), carteCtx = carte.getContext("2d");
+  let image = null, echelle = 1, dpr = 1;
+  function dimensionner() {
+    const r = canvas.getBoundingClientRect();
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(r.width * dpr);
+    canvas.height = Math.round(r.height * dpr);
+    echelle = canvas.width / (VUE.x1 - VUE.x0);
+    majEchelle();
+  }
+  const ex = (x) => (x - VUE.x0) * echelle;
+  const ey = (y) => (VUE.y1 - y) * echelle;
+
+  function dessiner() {
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = "#07080c";
+    ctx.fillRect(0, 0, W, H);
+    if (!instant) return;
+    const m = instant, { nx, ny, dx, X0, Y0 } = m;
+    // Murs et extérieur, puis vitesse de l'air dans les cellules fluides
+    ctx.fillStyle = "#1a2030";
+    ctx.fillRect(ex(X0), ey(Y0 + ny * dx), nx * dx * echelle, ny * dx * echelle);
+    if (!image || carte.width !== nx) { carte.width = nx; carte.height = ny; image = carteCtx.createImageData(nx, ny); }
+    const d = image.data;
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+      const v = m.vitesse[i + j * nx], o = (i + (ny - 1 - j) * nx) * 4;
+      if (v < 0) { d[o + 3] = 0; continue; }
+      const c = couleurV(v);
+      d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
+    }
+    carteCtx.putImageData(image, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(carte, ex(X0), ey(Y0 + ny * dx), nx * dx * echelle, ny * dx * echelle);
+
+    // Aire balayée par le battant
+    const B = m.battant;
+    ctx.strokeStyle = "rgba(240,239,236,0.35)";
+    ctx.lineWidth = 1 * dpr;
+    ctx.setLineDash([4 * dpr, 4 * dpr]);
+    ctx.beginPath();
+    for (let k = 0; k <= 30; k++) {
+      const ph = (k / 30) * (Math.PI / 2), x = B.xh - GEO.lPorte * Math.sin(ph), y = B.yh + GEO.lPorte * Math.cos(ph);
+      if (k === 0) ctx.moveTo(ex(x), ey(y)); else ctx.lineTo(ex(x), ey(y));
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Poussières : pièce en jaune, couloir en blanc
+    const t = 1.6 * dpr;
+    for (const [o, coul] of [[0, "#ffc857"], [1, "#ffffff"]]) {
+      ctx.fillStyle = coul;
+      ctx.globalAlpha = 0.85;
+      for (let k = 0; k < m.tx.length; k++) if (m.to[k] === o) ctx.fillRect(ex(m.tx[k]) - t / 2, ey(m.ty[k]) - t / 2, t, t);
+    }
+    ctx.globalAlpha = 1;
+
+    // Battant
+    ctx.strokeStyle = "#a07a52";
+    ctx.lineCap = "round";
+    ctx.lineWidth = Math.max(3 * dpr, 0.05 * echelle);
+    ctx.beginPath(); ctx.moveTo(ex(B.xh), ey(B.yh)); ctx.lineTo(ex(B.xb), ey(B.yb)); ctx.stroke();
+    ctx.lineCap = "butt";
+    ctx.fillStyle = "#e6e8ee";
+    ctx.beginPath(); ctx.arc(ex(B.xh), ey(B.yh), 3 * dpr, 0, 2 * Math.PI); ctx.fill();
+
+    // Étiquettes et échelle
+    ctx.fillStyle = "#8b93a7";
+    ctx.font = `600 ${12 * dpr}px system-ui, sans-serif`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("PIÈCE", ex(2.5), ey(1.0));
+    ctx.save();
+    ctx.translate(ex(GEO.xMur + GEO.epMur + GEO.LC / 2), ey(2.4));
+    ctx.fillText("COULOIR", 0, 0);
+    ctx.restore();
+    ctx.font = `${11 * dpr}px system-ui, sans-serif`;
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#8b93a7";
+    ctx.fillRect(ex(0), ey(-0.6), echelle, 2 * dpr);
+    ctx.fillText("1 m", ex(0), ey(-0.75));
+  }
+
+  function majEchelle() {
+    const barre = $("barre"), r = barre.getBoundingClientRect();
+    barre.width = Math.max(1, Math.round(r.width * dpr));
+    barre.height = Math.max(1, Math.round(r.height * dpr));
+    const c = barre.getContext("2d");
+    for (let x = 0; x < barre.width; x++) {
+      const col = couleurV((V_REF * x) / (barre.width - 1));
+      c.fillStyle = `rgb(${col})`;
+      c.fillRect(x, 0, 1, barre.height);
+    }
+    $("graduations").innerHTML = [0, 0.1, 0.25, 0.5, 1].map((v) =>
+      `<span style="left:${100 * Math.sqrt(v / V_REF)}%">${fr(v, v < 0.25 && v > 0 ? 1 : v ? 2 : 0)}${v === 1 ? " m/s" : ""}</span>`).join("");
+  }
+
+  // ---------- Mesures ----------
+  const vol = (m) => ({
+    c: (m.cDansPiece / m.nCouloir) * m.aCouloir * GEO.hauteur,
+    p: (m.pDansCouloir / m.nPiece) * m.aPiece * GEO.hauteur,
+  });
+  const vitTxt = (v) => (v < 0.1 ? fr(v * 100, 1) + " cm/s" : fr(v, 2) + " m/s");
+  function majMesures() {
+    const m = instant;
+    if (!m) return;
+    const angle = (m.theta * 180) / Math.PI;
+    $("vBord").textContent = vitTxt(Math.abs(m.omega) * GEO.lPorte);
+    $("vAngle").textContent = `angle ${fr(angle, 0)}° · ${m.enMouvement ? "en mouvement" : angle < 1 ? "fermée" : angle > 89 ? "ouverte" : "arrêtée"}`;
+    $("vMax").textContent = vitTxt(m.umax);
+    $("vFlux").textContent = fr(m.vEntrant) + " m³";
+    const v = vol(m);
+    $("vC").textContent = fr(v.c) + " m³";
+    $("vCd").textContent = `${fr((100 * m.cDansPiece) / m.nCouloir, 1)} % des traceurs du couloir sont dans la pièce`;
+    $("vP").textContent = fr(v.p) + " m³";
+    $("vPd").textContent = `${fr((100 * m.pDansCouloir) / m.nPiece, 1)} % des traceurs de la pièce sont dans le couloir`;
+    $("statut").innerHTML = `<strong>t = ${fr(m.temps, 1)} s</strong> <span class="doux">· ${$("vitesse").selectedOptions[0].textContent}`
+      + (m.retard ? " · le calcul ne suit pas, l'animation ralentit" : "") + "</span>";
+  }
+
+  // ---------- Relevés ----------
+  let releves = [];
+  function relever() {
+    const m = instant;
+    if (!m) return;
+    const v = vol(m);
+    releves.push({ t: m.temps, ouverture: $("duree").value, nut: $("nut").selectedOptions[0].textContent, flux: m.vEntrant, c: v.c, p: v.p });
+    majReleves();
+  }
+  function majReleves() {
+    const el = $("releves");
+    if (!releves.length) { el.innerHTML = '<div class="vide">Aucun relevé pour l\'instant.</div>'; return; }
+    el.innerHTML = `<table><thead><tr><th>#</th><th>t</th><th>Ouverture en</th><th>ν<sub>t</sub></th><th>Échange brut</th><th>Air du couloir dans la pièce</th><th>Air de la pièce dans le couloir</th></tr></thead><tbody>`
+      + releves.map((r, i) => `<tr><td>${i + 1}</td><td>${fr(r.t, 1)} s</td><td>${fr(+r.ouverture, 1)} s</td><td>${r.nut}</td><td>${fr(r.flux)} m³</td><td>${fr(r.c)} m³</td><td>${fr(r.p)} m³</td></tr>`).join("")
+      + "</tbody></table>";
+  }
+
+  // ---------- Commandes ----------
+  const evenement = (action) => envoyer({ type: "evenement", action, T: +$("duree").value, attente: 3 });
+  $("ouvrir").onclick = () => evenement("ouvrir");
+  $("fermer").onclick = () => evenement("fermer");
+  $("cycle").onclick = () => evenement("cycle");
+  $("vitesse").onchange = (e) => envoyer({ type: "vitesse", valeur: +e.target.value });
+  $("nut").onchange = (e) => envoyer({ type: "nu", valeur: NU_AIR + +e.target.value });
+  $("reinit").onclick = () => envoyer({ type: "reinit" });
+  $("relever").onclick = relever;
+  $("effacer").onclick = () => { releves = []; majReleves(); };
+  window.addEventListener("resize", dimensionner);
+
+  let dernier = 0;
+  function boucle(t) {
+    dessiner();
+    if (t - dernier > 150) { dernier = t; majMesures(); }
+    requestAnimationFrame(boucle);
+  }
+
+  dimensionner();
+  demarrer();
+  init();
+  envoyer({ type: "vitesse", valeur: +$("vitesse").value });
+  majReleves();
+  requestAnimationFrame(boucle);
+})();
+</script>
+</body>
+</html>

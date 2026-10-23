@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Théorie · Sédimentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Colonne de lecture unique, sur le même fond nuit que les animations */
+  :root {
+    --fond: #0b0d12; --surface: #141821; --trait: #262c3a; --texte: #e6e8ee; --doux: #8b93a7;
+    --poussiere: #ffc857; --lien: #6cb2ff;
+    --titre: "Instrument Serif", Georgia, serif;
+    --corps: "Source Sans 3", system-ui, sans-serif;
+    --donnees: "JetBrains Mono", ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--fond); }
+  body {
+    margin: 0; background: var(--fond); color: var(--texte);
+    font: 17px/1.62 var(--corps);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .page { max-width: 46rem; margin: 0 auto; padding-block: 8px 64px; }
+  .site-nav a { color: var(--lien); text-decoration: none; }
+  h1, h2 { font-family: var(--titre); font-weight: 400; text-wrap: balance; line-height: 1.15; }
+  h1 { font-size: clamp(2.1rem, 5vw, 2.9rem); margin: 28px 0 8px; }
+  h2 { font-size: 1.75rem; margin: 48px 0 10px; padding-top: 14px; border-top: 1px solid var(--trait); }
+  h3 { font-size: 1.08rem; margin: 30px 0 6px; font-weight: 600; }
+  p, li { color: var(--texte); }
+  a { color: var(--lien); }
+  strong { color: #fff; font-weight: 600; }
+  code { font-family: var(--donnees); font-size: 0.86em; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--surface); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+  hr { border: 0; height: 0; margin: 8px 0; }
+  blockquote { margin: 18px 0; padding: 4px 16px; border-left: 3px solid var(--poussiere); background: var(--surface); border-radius: 0 6px 6px 0; }
+  blockquote p { margin: 8px 0; }
+  .tableau { overflow-x: auto; margin: 16px 0; }
+  table { border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; min-width: 100%; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: top; }
+  th { color: var(--doux); font-weight: 600; background: var(--surface); }
+  mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 4px 0; }
+  .pied { margin-top: 48px; color: var(--doux); font-size: 0.85rem; }
+</style>
+<script>
+  window.MathJax = { tex: { inlineMath: [["$", "$"]], displayMath: [["$$", "$$"]] }, svg: { fontCache: "global" } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg-full.js" defer></script>
+</head>
+<body>
+<div class="page">
+  <nav class="site-nav" style="font-size:12.5px;color:#8b93a7;padding-top:12px"><a href="index.html" style="color:#ffc857;font-weight:600">Poussières</a> — <a href="index.html">Accueil</a> · <a href="colonnes.html">Colonnes</a> · <a href="piece.html">Pièce</a> · <a href="convection.html">Convection</a> · <a href="battant.html">Battant</a></nav>
+  <article id="texte">
+<h1>Sédimentation des poussières dans l'air au repos</h1>
+<p>Comment une poussière sphérique tombe dans un air immobile, de la particule
+nanométrique (où l'air n'est plus un milieu continu) jusqu'au grain millimétrique
+(où l'écoulement autour du grain devient inertiel). On part des équations de
+Navier-Stokes pour en déduire la vitesse limite de chute dans chaque régime.</p>
+<p>Les valeurs numériques sont calculées par <code>src/vitesse_chute.py</code> :</p>
+<pre><code class="language-bash">python3 src/vitesse_chute.py 1000   # masse volumique de la particule en kg/m3
+</code></pre>
+<hr />
+<h2>0. Hypothèses et données</h2>
+<p><strong>Hypothèses</strong></p>
+<ul>
+<li>Particule sphérique, rigide et seule : on néglige les interactions entre
+  particules (suspension diluée), les parois, les charges électriques et la
+  thermophorèse.</li>
+<li>Air au repos loin de la particule : il n'y a ni vent ni convection
+  (« sans advection »). Seul l'écoulement créé par la chute de la particule existe.</li>
+<li>L'air est isotherme et incompressible. C'est justifié car la vitesse de chute
+  reste petite devant la vitesse du son (nombre de Mach $\ll 1$).</li>
+</ul>
+<p><strong>Air à 20 °C et 1 atm</strong></p>
+<table>
+<thead>
+<tr>
+<th>Grandeur</th>
+<th>Symbole</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Viscosité dynamique</td>
+<td>$\mu$</td>
+<td>$1{,}81\times10^{-5}$ Pa·s</td>
+</tr>
+<tr>
+<td>Masse volumique</td>
+<td>$\rho_a$</td>
+<td>$1{,}204$ kg/m³</td>
+</tr>
+<tr>
+<td>Libre parcours moyen des molécules</td>
+<td>$\lambda$</td>
+<td>$66{,}5$ nm</td>
+</tr>
+<tr>
+<td>Vitesse thermique moyenne des molécules</td>
+<td>$\bar c=\sqrt{8k_BT/\pi m}$</td>
+<td>$463$ m/s</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Particule</strong> : diamètre $d=2a$ et masse volumique $\rho_p$. On note
+$\Delta\rho=\rho_p-\rho_a$. On prend $\rho_p = 1000$ kg/m³ comme référence, ce qui
+est la convention du « diamètre aérodynamique ». Pour une poussière minérale
+(quartz), on prend $\rho_p=2650$ kg/m³.</p>
+<hr />
+<h2>1. Les deux nombres qui décident de tout</h2>
+<p>Deux nombres sans dimension suffisent à classer les régimes.</p>
+<p><strong>Nombre de Knudsen</strong> : il dit si l'air peut être vu comme un milieu continu à
+l'échelle de la particule.</p>
+<p>$$
+\mathrm{Kn}=\frac{2\lambda}{d}
+$$</p>
+<ul>
+<li>Si $\mathrm{Kn}\ll1$, la particule est énorme devant le libre parcours moyen.
+  L'air est un fluide continu et Navier-Stokes s'applique.</li>
+<li>Si $\mathrm{Kn}\gg1$, la particule est plus petite que la distance entre deux
+  chocs moléculaires. Elle « voit » des molécules individuelles, Navier-Stokes ne
+  s'applique plus et il faut passer à la théorie cinétique (équation de Boltzmann).</li>
+</ul>
+<p><strong>Nombre de Reynolds particulaire</strong> : il compare l'inertie et la viscosité dans
+l'écoulement autour du grain.</p>
+<p>$$
+\mathrm{Re}=\frac{\rho_a\,v\,d}{\mu}
+$$</p>
+<ul>
+<li>Si $\mathrm{Re}\ll1$, la viscosité domine : c'est le régime de Stokes, linéaire
+  et soluble exactement.</li>
+<li>Si $\mathrm{Re}\gtrsim1$, l'inertie compte : un sillage apparaît, puis des
+  tourbillons.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Régime</th>
+<th>Domaine</th>
+<th>Diamètre (ρp = 1000 kg/m³)</th>
+<th>Loi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Moléculaire (Epstein)</td>
+<td>$\mathrm{Kn}&gt;10$</td>
+<td>$d \lesssim 0{,}015$ µm</td>
+<td>$v\propto d$</td>
+</tr>
+<tr>
+<td>Transition (Stokes + Cunningham)</td>
+<td>$0{,}1&lt;\mathrm{Kn}&lt;10$</td>
+<td>0,015 – 1 µm</td>
+<td>entre $d$ et $d^2$</td>
+</tr>
+<tr>
+<td>Stokes</td>
+<td>$\mathrm{Kn}&lt;0{,}1$, $\mathrm{Re}&lt;0{,}1$</td>
+<td>1 – 40 µm</td>
+<td>$v\propto d^2$</td>
+</tr>
+<tr>
+<td>Intermédiaire</td>
+<td>$0{,}1&lt;\mathrm{Re}&lt;10^3$</td>
+<td>40 µm – 2 mm</td>
+<td>environ $v\propto d$</td>
+</tr>
+<tr>
+<td>Newton</td>
+<td>$10^3&lt;\mathrm{Re}&lt;2\times10^5$</td>
+<td>$\gtrsim$ 2 mm</td>
+<td>$v\propto\sqrt d$</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Une correction importante.</strong> On ne peut pas dire que « les poussières qui
+tombent sont en régime de Stokes ». Ce n'est vrai que dans une fenêtre
+d'environ <strong>1 à 40 µm</strong>, qui couvre heureusement l'essentiel des poussières
+domestiques. En dessous, Stokes <strong>sous-estime</strong> la vitesse : d'un facteur 3 à
+0,1 µm et de 23 à 0,01 µm. Au-dessus, Stokes la <strong>surestime</strong> : de 20 % à
+100 µm et d'un facteur 8 à 1 mm.</p>
+</blockquote>
+<hr />
+<h2>2. Les équations de départ</h2>
+<p>Pour l'air incompressible, de vitesse $\mathbf u$ et de pression $p$, les
+équations de Navier-Stokes s'écrivent :</p>
+<p>$$
+\rho_a\left(\frac{\partial\mathbf u}{\partial t}+(\mathbf u\cdot\nabla)\mathbf u\right)
+=-\nabla p+\mu\nabla^2\mathbf u+\rho_a\mathbf g,
+\qquad \nabla\cdot\mathbf u=0
+$$</p>
+<p>Pour la particule, le principe fondamental de la dynamique donne :</p>
+<p>$$
+m_p\frac{d\mathbf v}{dt}=m_p\mathbf g+\oint_S \boldsymbol\sigma\cdot\mathbf n\,dS,
+\qquad \boldsymbol\sigma=-p\,\mathbf I+\mu\left(\nabla\mathbf u+\nabla\mathbf u^{T}\right)
+$$</p>
+<p><strong>Séparation de la pression hydrostatique.</strong> On écrit
+$p=p_0+\rho_a\mathbf g\cdot\mathbf x+p'$. Le terme $\rho_a\mathbf g$ disparaît
+alors de Navier-Stokes. Sur la sphère, la partie hydrostatique donne exactement
+la <strong>poussée d'Archimède</strong> $-\tfrac{\pi d^3}{6}\rho_a\mathbf g$. Il reste donc :</p>
+<ul>
+<li>un poids apparent $\tfrac{\pi d^3}{6}\Delta\rho\,g$ ;</li>
+<li>une <strong>traînée</strong> $\mathbf F$, due au seul écoulement perturbé $(\mathbf u,p')$.</li>
+</ul>
+<p><strong>Vitesse limite.</strong> Quand $d\mathbf v/dt=0$, le poids apparent équilibre la
+traînée. Tout le problème se ramène à calculer la traînée $F(v)$ :</p>
+<p>$$
+\boxed{\;\frac{\pi d^3}{6}\,\Delta\rho\,g=F(v_s)\;}
+$$</p>
+<p><strong>Adimensionnement.</strong> On se place dans le repère de la particule : l'air arrive
+uniformément à la vitesse $U=v_s$. On pose
+$\mathbf x=a\,\mathbf x^*$, $\mathbf u=U\mathbf u^*$, $p'=\frac{\mu U}{a}p^*$ et
+$t=T\,t^*$. On obtient :</p>
+<p>$$
+\mathrm{Re}_a\,\frac{a}{UT}\frac{\partial\mathbf u^*}{\partial t^*}
++\mathrm{Re}_a\,(\mathbf u^*\cdot\nabla^*)\mathbf u^*
+=-\nabla^*p^*+\nabla^{*2}\mathbf u^*,
+\qquad \mathrm{Re}_a=\frac{\rho_a U a}{\mu}
+$$</p>
+<p><strong>Pourquoi l'écoulement est quasi-stationnaire.</strong> La vitesse de la particule
+varie sur son temps de relaxation $\tau=\rho_p d^2/18\mu$ (§4.4). L'écoulement
+s'ajuste, lui, en un temps de diffusion visqueuse $a^2/\nu$. Le rapport des deux
+vaut</p>
+<p>$$
+\frac{a^2/\nu}{\tau}=\frac{9}{2}\frac{\rho_a}{\rho_p}\approx5\times10^{-3}.
+$$</p>
+<p>L'air suit donc instantanément la particule. Pour la même raison
+($\rho_a/\rho_p\sim10^{-3}$), on néglige la masse ajoutée
+$\tfrac12\rho_a V_p\,\dot v$ et la force d'histoire de Basset.</p>
+<hr />
+<h2>3. Régime de Stokes (1 µm ≲ d ≲ 40 µm) : la solution exacte</h2>
+<h3>3.1 Équations de Stokes</h3>
+<p>Si $\mathrm{Re}\ll1$, on supprime le terme d'inertie. Il reste un système
+<strong>linéaire</strong> :</p>
+<p>$$
+\nabla p'=\mu\nabla^2\mathbf u,\qquad\nabla\cdot\mathbf u=0
+$$</p>
+<p>Les conditions aux limites sont :</p>
+<ul>
+<li>adhérence sur la sphère : $\mathbf u=0$ en $r=a$ ;</li>
+<li>écoulement uniforme à l'infini : $\mathbf u\to U\mathbf e_z$ quand $r\to\infty$.</li>
+</ul>
+<h3>3.2 Fonction de courant</h3>
+<p>Le problème est axisymétrique. On l'écrit en coordonnées sphériques $(r,\theta)$
+avec la fonction de courant de Stokes $\psi$, ce qui assure automatiquement
+$\nabla\cdot\mathbf u=0$ :</p>
+<p>$$
+u_r=\frac{1}{r^2\sin\theta}\frac{\partial\psi}{\partial\theta},\qquad
+u_\theta=-\frac{1}{r\sin\theta}\frac{\partial\psi}{\partial r}
+$$</p>
+<p>On prend le rotationnel de l'équation de Stokes, ce qui élimine la pression :
+$\nabla^2\boldsymbol\omega=0$. Cela s'écrit</p>
+<p>$$
+E^4\psi=0,\qquad
+E^2=\frac{\partial^2}{\partial r^2}+\frac{\sin\theta}{r^2}\frac{\partial}{\partial\theta}\left(\frac{1}{\sin\theta}\frac{\partial}{\partial\theta}\right)
+$$</p>
+<p>À l'infini, l'écoulement uniforme vaut $\psi_\infty=\tfrac12Ur^2\sin^2\theta$. On
+cherche donc une solution de la forme $\psi=f(r)\sin^2\theta$. On a alors
+$E^2\psi=\left(f''-2f/r^2\right)\sin^2\theta$, et donc :</p>
+<p>$$
+\left(\frac{d^2}{dr^2}-\frac{2}{r^2}\right)^2 f=0
+$$</p>
+<p>On essaie $f=r^n$. L'opérateur donne $(n-2)(n+1)r^{n-2}$, puis
+$(n-2)(n+1)(n-4)(n-1)r^{n-4}=0$. Les solutions sont $n\in\{4,2,1,-1\}$ :</p>
+<p>$$
+f(r)=A r^4+B r^2+C r+\frac{D}{r}
+$$</p>
+<h3>3.3 Conditions aux limites</h3>
+<ul>
+<li>À l'infini, $\psi\to\tfrac12Ur^2\sin^2\theta$, d'où $A=0$ et $B=U/2$.</li>
+<li>En $r=a$, $u_r=0$ donne $f(a)=0$ et $u_\theta=0$ donne $f'(a)=0$ :</li>
+</ul>
+<p>$$
+\frac{Ua^2}{2}+Ca+\frac{D}{a}=0,\qquad Ua+C-\frac{D}{a^2}=0
+\;\;\Longrightarrow\;\; C=-\frac{3Ua}{4},\quad D=\frac{Ua^3}{4}
+$$</p>
+<p>On obtient la <strong>solution de Stokes (1851)</strong> :</p>
+<p>$$
+\psi=\frac{U}{2}r^2\sin^2\theta\left(1-\frac{3a}{2r}+\frac{a^3}{2r^3}\right)
+$$</p>
+<p>$$
+u_r=U\cos\theta\left(1-\frac{3a}{2r}+\frac{a^3}{2r^3}\right),\qquad
+u_\theta=-U\sin\theta\left(1-\frac{3a}{4r}-\frac{a^3}{4r^3}\right)
+$$</p>
+<p>Chaque terme a un sens physique :</p>
+<ul>
+<li>le terme en $a/r$ est le <strong>stokeslet</strong>, c'est-à-dire la réponse à une force
+  ponctuelle. C'est lui qui porte la traînée ;</li>
+<li>le terme en $a^3/r^3$ est un <strong>dipôle potentiel</strong>, qui ne crée aucune pression.</li>
+</ul>
+<h3>3.4 Pression et contraintes sur la sphère</h3>
+<p>On injecte $\mathbf u$ dans $\nabla p'=\mu\nabla^2\mathbf u$. Seul le stokeslet
+contribue :</p>
+<p>$$
+p'=-\frac{3}{2}\,\mu U a\,\frac{\cos\theta}{r^2}
+$$</p>
+<p>Sur la surface $r=a$ :</p>
+<ul>
+<li><strong>Contrainte normale visqueuse</strong> : $\sigma_{rr}^{\rm visq}=2\mu\,\partial_ru_r=0$
+  en $r=a$.</li>
+<li><strong>Contrainte tangentielle</strong> :
+  $\sigma_{r\theta}=\mu\left[r\,\partial_r(u_\theta/r)+\tfrac1r\partial_\theta u_r\right]_{r=a}
+  =-\dfrac{3\mu U}{2a}\sin\theta$.</li>
+</ul>
+<p>On projette ces contraintes sur $\mathbf e_z$, sachant que
+$\mathbf e_r\cdot\mathbf e_z=\cos\theta$, $\mathbf e_\theta\cdot\mathbf e_z=-\sin\theta$
+et $dS=2\pi a^2\sin\theta\,d\theta$.</p>
+<p><strong>Traînée de pression</strong> :</p>
+<p>$$
+F_p=-\oint p'\cos\theta\,dS=\frac{3\mu U}{2a}\,2\pi a^2\!\int_0^\pi\!\cos^2\theta\sin\theta\,d\theta=2\pi\mu aU
+$$</p>
+<p><strong>Traînée de frottement</strong> :</p>
+<p>$$
+F_\tau=\oint\sigma_{r\theta}(-\sin\theta)\,dS=\frac{3\mu U}{2a}\,2\pi a^2\!\int_0^\pi\!\sin^3\theta\,d\theta=4\pi\mu aU
+$$</p>
+<p>Le frottement compte donc pour deux tiers de la traînée et la pression pour un
+tiers :</p>
+<p>$$
+\boxed{F_{\rm Stokes}=6\pi\mu aU=3\pi\mu d\,U}
+\qquad\Longleftrightarrow\qquad C_D=\frac{F}{\tfrac12\rho_aU^2\,\pi a^2}=\frac{24}{\mathrm{Re}}
+$$</p>
+<h3>3.5 Vitesse de chute de Stokes</h3>
+<p>On écrit l'équilibre $3\pi\mu d\,v_s=\tfrac{\pi d^3}{6}\Delta\rho\,g$ :</p>
+<p>$$
+\boxed{v_s=\frac{\Delta\rho\,g\,d^2}{18\,\mu}}
+$$</p>
+<p>Exemple : pour $d=10$ µm et $\rho_p=1000$ kg/m³, on trouve $v_s=3{,}0$ mm/s.
+La particule met environ 5 minutes pour tomber d'un mètre.</p>
+<h3>3.6 Limite haute de validité</h3>
+<p>On injecte $v_s$ dans le nombre de Reynolds :</p>
+<p>$$
+\mathrm{Re}=\frac{\rho_a\Delta\rho\,g\,d^3}{18\mu^2}.
+$$</p>
+<ul>
+<li>$\mathrm{Re}=0{,}1$ pour $d\approx37$ µm, à $\rho_p=1000$ kg/m³.</li>
+<li>$\mathrm{Re}=0{,}1$ pour $d\approx27$ µm, à $\rho_p=2650$ kg/m³.</li>
+</ul>
+<p>Au-delà, la solution de Stokes cesse d'être uniformément valable. Loin de la
+sphère, à $r\sim a/\mathrm{Re}$, l'inertie redevient du même ordre que la
+viscosité. C'est le paradoxe de Whitehead, résolu par Oseen (1910), qui donne la
+première correction :</p>
+<p>$$
+C_D=\frac{24}{\mathrm{Re}}\left(1+\frac{3}{16}\mathrm{Re}\right).
+$$</p>
+<hr />
+<h2>4. Petites particules (d ≲ 1 µm) : quand l'air cesse d'être continu</h2>
+<h3>4.1 Régime de transition : glissement à la paroi</h3>
+<p>Quand $\mathrm{Kn}$ n'est plus négligeable, la condition d'adhérence est fausse.
+Le gaz <strong>glisse</strong> sur la surface sur une épaisseur de l'ordre de $\lambda$
+(condition de Maxwell : $u_{\rm gliss}\simeq\lambda\,\partial u_t/\partial n$).
+En résolvant Stokes avec cette condition (Basset, Cunningham 1910), on trouve
+une traînée réduite :</p>
+<p>$$
+F=\frac{3\pi\mu d\,U}{C_c},\qquad
+v_s=\frac{\Delta\rho\,g\,d^2\,C_c}{18\,\mu}
+$$</p>
+<p>Le facteur $C_c$ est la <strong>correction de Cunningham</strong>. Sa forme complète a été
+ajustée sur les expériences de la goutte de Millikan :</p>
+<p>$$
+C_c=1+\frac{\lambda}{d}\left[2{,}34+1{,}05\,e^{-0{,}39\,d/\lambda}\right]
+$$</p>
+<table>
+<thead>
+<tr>
+<th>d</th>
+<th>1 µm</th>
+<th>0,3 µm</th>
+<th>0,1 µm</th>
+<th>0,03 µm</th>
+<th>0,01 µm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$C_c$</td>
+<td>1,16</td>
+<td>1,56</td>
+<td>2,94</td>
+<td>8,1</td>
+<td>23</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 Régime moléculaire libre (Kn ≫ 1) : la formule d'Epstein</h3>
+<p>Ici, Navier-Stokes ne s'applique plus du tout. La particule est bombardée par
+des molécules qui ont une distribution de vitesses de Maxwell, de vitesse
+moyenne $\bar c$. La particule avance à $U\ll\bar c$, donc les molécules qui
+frappent l'avant transfèrent un peu plus de quantité de mouvement que celles
+qui frappent l'arrière.</p>
+<p>En ordre de grandeur, le flux de molécules vaut $\rho_a\bar c$, la quantité de
+mouvement transférée par molécule est $\propto U$ et la surface est
+$\propto a^2$. Le calcul complet (Epstein 1924) donne :</p>
+<p>$$
+F=\delta\,\frac{4\pi}{3}\,a^2\rho_a\,\bar c\,U,
+\qquad \delta=1+\frac{\pi}{8}\approx1{,}39\ \text{(réflexion diffuse)}
+$$</p>
+<p>La traînée est proportionnelle à la <strong>surface</strong> ($a^2$) et non plus au rayon.
+On l'équilibre avec le poids :</p>
+<p>$$
+\boxed{v_s=\frac{\rho_p\,g\,d}{2\,\delta\,\rho_a\,\bar c}}\qquad(v_s\propto d)
+$$</p>
+<p><strong>Vérification de cohérence.</strong> Quand $\mathrm{Kn}\to\infty$, on a
+$C_c\to3{,}39\,\lambda/d$. La théorie cinétique donne aussi
+$\mu\approx\tfrac12\rho_a\bar c\lambda$. Avec ces deux résultats, Stokes × Cunningham
+redonne Epstein à 10 % près : $6{,}3\times10^{-8}$ m/s contre
+$7{,}0\times10^{-8}$ m/s à 0,01 µm. La formule de Cunningham raccorde donc
+continûment les deux mondes.</p>
+<h3>4.3 L'agitation brownienne domine</h3>
+<p>À ces tailles, les chocs moléculaires font aussi <strong>diffuser</strong> la particule.
+D'après Stokes-Einstein, avec le même facteur de glissement :</p>
+<p>$$
+D=\frac{k_BT\,C_c}{3\pi\mu d},\qquad
+\text{déplacement quadratique moyen sur un axe : } \sqrt{2Dt}
+$$</p>
+<table>
+<thead>
+<tr>
+<th>d</th>
+<th>Chute en 1 s</th>
+<th>Agitation brownienne en 1 s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0,01 µm</td>
+<td>0,07 µm</td>
+<td><strong>331 µm</strong></td>
+</tr>
+<tr>
+<td>0,1 µm</td>
+<td>0,9 µm</td>
+<td><strong>37 µm</strong></td>
+</tr>
+<tr>
+<td>1 µm</td>
+<td><strong>35 µm</strong></td>
+<td>7 µm</td>
+</tr>
+<tr>
+<td>10 µm</td>
+<td><strong>3 mm</strong></td>
+<td>2 µm</td>
+</tr>
+</tbody>
+</table>
+<p>Sur une seconde, le croisement se situe vers 0,5 µm. En dessous, une particule
+« danse » bien plus qu'elle ne tombe. Comme la diffusion croît en $\sqrt t$ et
+la chute en $t$, la sédimentation finit toujours par l'emporter sur des durées
+très longues. Mais pour 0,01 µm, il faut des mois.</p>
+<h3>4.4 Temps de relaxation</h3>
+<p>La particule part du repos. Tant que la traînée est linéaire,
+$m\dot v=m g'-3\pi\mu d\,v/C_c$, d'où :</p>
+<p>$$
+v(t)=v_s\left(1-e^{-t/\tau}\right),\qquad
+\tau=\frac{\rho_p d^2 C_c}{18\mu}
+$$</p>
+<p>Pour $d=10$ µm, $\tau=0{,}3$ ms. Toutes les particules de moins de 30 µm
+atteignent donc leur vitesse limite quasi instantanément, sur moins d'un
+millimètre.</p>
+<hr />
+<h2>5. Grosses particules (d ≳ 40 µm) : Navier-Stokes complet</h2>
+<h3>5.1 Pourquoi il n'y a plus de solution analytique</h3>
+<p>Quand $\mathrm{Re}$ augmente, on ne peut plus négliger
+$(\mathbf u\cdot\nabla)\mathbf u$, et le problème devient non linéaire. Les
+simulations et les expériences montrent la succession suivante :</p>
+<ul>
+<li>$\mathrm{Re}\approx20$ : une bulle de recirculation se forme derrière la sphère.</li>
+<li>$\mathrm{Re}\approx210$ : le sillage perd sa symétrie axiale.</li>
+<li>$\mathrm{Re}\approx270$ : le sillage devient instationnaire et lâche des
+  tourbillons.</li>
+<li>$\mathrm{Re}\approx3\times10^5$ : c'est la crise de traînée. Elle ne nous
+  concerne pas ici.</li>
+</ul>
+<p>On utilise alors un <strong>coefficient de traînée empirique</strong> :</p>
+<p>$$
+F=\tfrac12\rho_a v^2\,C_D(\mathrm{Re})\,\frac{\pi d^2}{4}
+$$</p>
+<p>Deux corrélations courantes :</p>
+<ul>
+<li><strong>Schiller-Naumann</strong>, pour $\mathrm{Re}&lt;800$ :
+  $C_D=\dfrac{24}{\mathrm{Re}}\left(1+0{,}15\,\mathrm{Re}^{0{,}687}\right)$.</li>
+<li><strong>Clift-Gauvin</strong>, jusqu'à $3\times10^5$ :
+  $C_D=\dfrac{24}{\mathrm{Re}}\left(1+0{,}15\,\mathrm{Re}^{0{,}687}\right)+\dfrac{0{,}42}{1+4{,}25\times10^4\,\mathrm{Re}^{-1{,}16}}$.
+  C'est celle qu'utilise le script.</li>
+</ul>
+<h3>5.2 Résolution sans itérer : le nombre d'Archimède</h3>
+<p>L'équilibre poids apparent = traînée s'écrit $v_s^2=\dfrac{4\Delta\rho\,g\,d}{3\rho_aC_D}$.
+L'inconnue $v_s$ apparaît aussi dans $C_D$ à travers $\mathrm{Re}$. On forme
+plutôt un nombre qui ne dépend que de $d$, le <strong>nombre d'Archimède</strong> :</p>
+<p>$$
+\mathrm{Ar}=\frac{\rho_a\Delta\rho\,g\,d^3}{\mu^2}=\frac34\,C_D(\mathrm{Re})\,\mathrm{Re}^2
+$$</p>
+<p>On calcule $\mathrm{Ar}$, on résout cette équation scalaire pour trouver
+$\mathrm{Re}$, et on en déduit $v_s=\mu\,\mathrm{Re}/(\rho_ad)$. En régime de
+Stokes, on retrouve $\mathrm{Re}=\mathrm{Ar}/18$.</p>
+<h3>5.3 Régime de Newton (Re &gt; 10³)</h3>
+<p>Le coefficient de traînée devient presque constant, $C_D\approx0{,}44$. La
+traînée est alors dominée par la pression dans le sillage décollé :</p>
+<p>$$
+\boxed{v_s=\sqrt{\frac{4\,\Delta\rho\,g\,d}{3\,\rho_a\,C_D}}\approx1{,}74\sqrt{\frac{\Delta\rho\,g\,d}{\rho_a}}}\qquad(v_s\propto\sqrt d)
+$$</p>
+<p>Pour $d=3$ mm et $\rho_p=1000$ kg/m³, on trouve 8,6 m/s. Stokes prédirait
+271 m/s, une valeur absurde.</p>
+<h3>5.4 Le transitoire n'est plus négligeable</h3>
+<p>La traînée devient non linéaire et l'échelle de temps passe de $\tau$ à
+$v_s/g$. Il faut donc intégrer $m\dot v=mg'-F(v)$. Le résultat compte pour une
+animation à l'échelle d'une pièce :</p>
+<table>
+<thead>
+<tr>
+<th>d (ρp = 1000)</th>
+<th>Temps pour atteindre 99 % de $v_s$</th>
+<th>Distance parcourue pendant ce temps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100 µm</td>
+<td>0,1 s</td>
+<td>2 cm</td>
+</tr>
+<tr>
+<td>300 µm</td>
+<td>0,4 s</td>
+<td>38 cm</td>
+</tr>
+<tr>
+<td>1 mm</td>
+<td>1,2 s</td>
+<td>3,5 m</td>
+</tr>
+<tr>
+<td>3 mm</td>
+<td>2,6 s</td>
+<td>17 m</td>
+</tr>
+</tbody>
+</table>
+<p>Un grain millimétrique lâché d'une table <strong>n'atteint jamais</strong> sa vitesse limite
+avant de toucher le sol.</p>
+<hr />
+<h2>6. Synthèse numérique</h2>
+<p>Valeurs données par <code>src/vitesse_chute.py</code> : air à 20 °C, $v_s$ calculée par le
+modèle complet (Cunningham + Clift-Gauvin).</p>
+<table>
+<thead>
+<tr>
+<th>d</th>
+<th>Kn</th>
+<th>Re</th>
+<th>Régime</th>
+<th>$v_s$ (ρp = 1000)</th>
+<th>Chute de 1 m</th>
+<th>$v_s$ (ρp = 2650)</th>
+<th>Stokes pur (ρp = 1000)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0,01 µm</td>
+<td>13</td>
+<td>$5\times10^{-11}$</td>
+<td>moléculaire</td>
+<td>$7{,}0\times10^{-8}$ m/s</td>
+<td>166 j*</td>
+<td>$1{,}9\times10^{-7}$ m/s</td>
+<td>$3{,}0\times10^{-9}$</td>
+</tr>
+<tr>
+<td>0,03 µm</td>
+<td>4,4</td>
+<td>$4\times10^{-10}$</td>
+<td>transition</td>
+<td>$2{,}2\times10^{-7}$ m/s</td>
+<td>53 j*</td>
+<td>$5{,}8\times10^{-7}$ m/s</td>
+<td>$2{,}7\times10^{-8}$</td>
+</tr>
+<tr>
+<td>0,1 µm</td>
+<td>1,3</td>
+<td>$6\times10^{-9}$</td>
+<td>transition</td>
+<td>$8{,}9\times10^{-7}$ m/s</td>
+<td>13 j</td>
+<td>$2{,}4\times10^{-6}$ m/s</td>
+<td>$3{,}0\times10^{-7}$</td>
+</tr>
+<tr>
+<td>0,3 µm</td>
+<td>0,44</td>
+<td>$8\times10^{-8}$</td>
+<td>transition</td>
+<td>$4{,}2\times10^{-6}$ m/s</td>
+<td>2,7 j</td>
+<td>$1{,}1\times10^{-5}$ m/s</td>
+<td>$2{,}7\times10^{-6}$</td>
+</tr>
+<tr>
+<td>1 µm</td>
+<td>0,13</td>
+<td>$2\times10^{-6}$</td>
+<td>Stokes (+ 16 %)</td>
+<td>$3{,}5\times10^{-5}$ m/s</td>
+<td>8 h</td>
+<td>$9{,}2\times10^{-5}$ m/s</td>
+<td>$3{,}0\times10^{-5}$</td>
+</tr>
+<tr>
+<td>3 µm</td>
+<td>0,04</td>
+<td>$6\times10^{-5}$</td>
+<td>Stokes</td>
+<td>$2{,}9\times10^{-4}$ m/s</td>
+<td>59 min</td>
+<td>$7{,}6\times10^{-4}$ m/s</td>
+<td>$2{,}7\times10^{-4}$</td>
+</tr>
+<tr>
+<td>10 µm</td>
+<td>0,01</td>
+<td>0,002</td>
+<td>Stokes</td>
+<td>$3{,}0\times10^{-3}$ m/s</td>
+<td>5,5 min</td>
+<td>$8{,}1\times10^{-3}$ m/s</td>
+<td>$3{,}0\times10^{-3}$</td>
+</tr>
+<tr>
+<td>30 µm</td>
+<td>—</td>
+<td>0,05</td>
+<td>Stokes</td>
+<td>0,027 m/s</td>
+<td>38 s</td>
+<td>0,070 m/s</td>
+<td>0,027</td>
+</tr>
+<tr>
+<td>100 µm</td>
+<td>—</td>
+<td>1,7</td>
+<td>intermédiaire</td>
+<td>0,25 m/s</td>
+<td>4,0 s</td>
+<td>0,58 m/s</td>
+<td>0,30</td>
+</tr>
+<tr>
+<td>300 µm</td>
+<td>—</td>
+<td>23</td>
+<td>intermédiaire</td>
+<td>1,2 m/s</td>
+<td>0,95 s</td>
+<td>2,3 m/s</td>
+<td>2,7</td>
+</tr>
+<tr>
+<td>1 mm</td>
+<td>—</td>
+<td>256</td>
+<td>intermédiaire</td>
+<td>3,8 m/s</td>
+<td>0,52 s</td>
+<td>7,0 m/s</td>
+<td>30</td>
+</tr>
+<tr>
+<td>3 mm</td>
+<td>—</td>
+<td>1800</td>
+<td>Newton</td>
+<td>8,9 m/s</td>
+<td>0,47 s</td>
+<td>15 m/s</td>
+<td>271</td>
+</tr>
+</tbody>
+</table>
+<p>* Durée théorique, h/v_s. Pour 100 µm et plus, la durée est celle d'une chute
+depuis le repos, transitoire compris, intégrée avec la traînée complète : elle
+dépasse h/v_s de 1 % à 100 µm, de 12 % à 300 µm, du double à 1 mm et du
+quadruple à 3 mm. En pratique, aux plus petites tailles, la diffusion brownienne
+et le moindre courant d'air dominent largement.</p>
+<p><strong>Validation.</strong> Les valeurs à ρp = 1000 kg/m³ correspondent à celles tabulées
+par Hinds (<em>Aerosol Technology</em>, 2ᵉ éd., tableau 3.2), qui sont, de 0,01 µm à
+100 µm : $6{,}75\times10^{-8}$ ; $8{,}62\times10^{-7}$ ; $3{,}48\times10^{-5}$ ;
+$3{,}06\times10^{-3}$ ; $0{,}250$ m/s.</p>
+<p>L'écart du modèle est de −0,1 % à −0,6 % de 1 à 100 µm, mais de +3,1 % à
+0,01 µm et de +2,7 % à 0,1 µm : la correction de Cunningham employée, ajustée
+sur les mesures de Millikan, n'est précise qu'à quelques % dans le régime de
+transition.</p>
+<p><strong>Lois d'échelle à retenir</strong></p>
+<p>$$
+v_s\;\propto\;
+\begin{cases}
+d &amp; \text{Epstein, }d\lesssim0{,}02\text{ µm}\\
+d^2\,C_c(d) &amp; \text{Stokes-Cunningham, }0{,}02\text{ à }40\text{ µm}\\
+\approx d &amp; \text{intermédiaire, }40\text{ µm à }2\text{ mm}\\
+\sqrt d &amp; \text{Newton, }\gtrsim2\text{ mm}
+\end{cases}
+$$</p>
+<hr />
+<h2>7. Ce que ça implique pour l'animation</h2>
+<p>On intègre pour chaque particule, à chaque pas de temps :</p>
+<p>$$
+d\mathbf v=\left(\mathbf g'-\frac{\mathbf F(\mathbf v)}{m_p}\right)dt,\qquad
+d\mathbf x=\mathbf v\,dt+\sqrt{2D\,dt}\;\boldsymbol\xi,\quad\boldsymbol\xi\sim\mathcal N(0,\mathbf I)
+$$</p>
+<ul>
+<li><strong>Pour $d\lesssim30$ µm</strong>, $\tau$ est inférieur à la milliseconde. On peut
+  directement imposer $\mathbf v=v_s\mathbf e_z$ sans intégrer la vitesse, et
+  ajouter le terme brownien.</li>
+<li><strong>Pour $d\gtrsim100$ µm</strong>, il faut intégrer la vitesse avec la traînée non
+  linéaire. Le terme brownien devient négligeable.</li>
+<li><strong>Les échelles de temps couvrent environ 10 décades</strong>, de 0,5 s à plusieurs
+  mois pour un mètre de chute. Une animation lisible devra donc :</li>
+<li>soit utiliser un temps accéléré par classe de taille ;</li>
+<li>soit afficher une horloge en échelle logarithmique ;</li>
+<li>soit montrer côte à côte des colonnes de hauteur ou de durée adaptées.</li>
+</ul>
+<hr />
+<h2>Références</h2>
+<ul>
+<li>G. G. Stokes (1851), <em>On the effect of the internal friction of fluids on the
+  motion of pendulums</em>, Trans. Camb. Phil. Soc. 9.</li>
+<li>E. Cunningham (1910), Proc. R. Soc. A 83 ; C. N. Davies (1945), Proc. Phys.
+  Soc. 57.</li>
+<li>P. S. Epstein (1924), <em>On the resistance experienced by spheres in their motion
+  through gases</em>, Phys. Rev. 23.</li>
+<li>C. W. Oseen (1910) ; Schiller &amp; Naumann (1933) ; Clift &amp; Gauvin (1970).</li>
+<li>W. C. Hinds, <em>Aerosol Technology</em>, 2ᵉ éd., Wiley, 1999, chapitres 3 et 7.</li>
+<li>R. Clift, J. R. Grace, M. E. Weber, <em>Bubbles, Drops, and Particles</em>, 1978.</li>
+</ul>
+  </article>
+  <p class="pied">Page générée depuis la théorie du projet. Les formules sont mises en forme par MathJax.</p>
+</div>
+<script>
+  // Les tableaux larges défilent dans leur propre conteneur
+  for (const t of document.querySelectorAll("#texte table")) {
+    const d = document.createElement("div");
+    d.className = "tableau";
+    t.replaceWith(d);
+    d.appendChild(t);
+  }
+</script>
+</body>
+</html>

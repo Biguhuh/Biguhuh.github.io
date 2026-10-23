@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poussières</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Mise en page : un bandeau où la poussière tombe, puis une colonne de lecture (46rem) et une grille 2 × 2 des animations */
+  :root {
+    --fond: #0b0d12; --surface: #141821; --trait: #262c3a; --texte: #e6e8ee; --doux: #8b93a7;
+    --poussiere: #ffc857; --lien: #6cb2ff;
+    --c1: #b39cff; --c2: #6cb2ff; --c3: #4fd6a5; --c4: #ffc857; --c5: #ff7a6b;
+    --titre: "Instrument Serif", Georgia, serif;
+    --corps: "Source Sans 3", system-ui, sans-serif;
+    --donnees: "JetBrains Mono", ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--fond); color: var(--texte); font: 17px/1.6 var(--corps); }
+  .bande { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .large { max-width: 64rem; margin: 0 auto; }
+  .colonne { max-width: 46rem; margin: 0 auto; }
+
+  .ouverture { position: relative; overflow: hidden; border-bottom: 1px solid var(--trait); }
+  .ouverture canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .ouverture .large { position: relative; padding-block: 72px 56px; }
+  h1 {
+    font-family: var(--titre); font-weight: 400; margin: 0;
+    font-size: clamp(3.4rem, 11vw, 7.5rem); line-height: 0.95; letter-spacing: -0.01em;
+  }
+  .question { font-family: var(--titre); font-style: italic; font-size: clamp(1.35rem, 3.4vw, 2rem); margin: 14px 0 0; color: var(--texte); max-width: 30ch; text-wrap: balance; }
+  .chapeau { margin: 22px 0 0; color: var(--doux); max-width: 58ch; }
+  .echelle-tailles { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 22px; font: 12.5px/1.4 var(--donnees); color: var(--doux); }
+  .echelle-tailles span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--c); }
+
+  main { padding-block: 8px 72px; }
+  h2 { font-family: var(--titre); font-weight: 400; font-size: 2rem; margin: 56px 0 6px; text-wrap: balance; }
+  .intro-section { color: var(--doux); margin: 0 0 22px; }
+
+  .pages { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .carte {
+    display: flex; flex-direction: column; gap: 8px; min-width: 0;
+    padding: 18px 18px 16px; background: var(--surface); border: 1px solid var(--trait); border-radius: 10px;
+    color: inherit; text-decoration: none; transition: border-color 0.15s;
+  }
+  .carte:hover, .carte:focus-visible { border-color: var(--poussiere); outline: none; }
+  .carte .type { font: 11.5px/1 var(--donnees); letter-spacing: 0.08em; text-transform: uppercase; color: var(--doux); }
+  .carte h3 { font-family: var(--titre); font-weight: 400; font-size: 1.6rem; margin: 0; line-height: 1.1; }
+  .carte p { margin: 0; color: var(--doux); font-size: 0.95rem; }
+  .carte .resultat { color: var(--texte); border-top: 1px solid var(--trait); padding-top: 10px; margin-top: auto; }
+  .carte .ouvrir { font-size: 0.9rem; color: var(--poussiere); font-weight: 600; }
+
+  .lecons { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .lecons li { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 4px 20px; padding: 16px 0; border-top: 1px solid var(--trait); }
+  .lecons .chiffre { font: 1.35rem/1.2 var(--donnees); color: var(--poussiere); font-variant-numeric: tabular-nums; }
+  .lecons strong { display: block; font-weight: 600; margin-bottom: 2px; }
+  .lecons span.texte { color: var(--doux); }
+
+  .theorie { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .theorie a { display: block; padding: 12px 14px; border: 1px solid var(--trait); border-radius: 8px; color: var(--texte); text-decoration: none; }
+  .theorie a:hover, .theorie a:focus-visible { border-color: var(--lien); outline: none; }
+  .theorie a span { display: block; color: var(--doux); font-size: 0.9rem; }
+
+  .limites { color: var(--doux); padding-left: 1.1em; }
+  .limites li { margin: 6px 0; }
+  footer { border-top: 1px solid var(--trait); padding-block: 22px 40px; color: var(--doux); font-size: 0.85rem; }
+  a { color: var(--lien); }
+
+  @media (max-width: 640px) {
+    .pages, .theorie { grid-template-columns: minmax(0, 1fr); }
+    .lecons li { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<header class="ouverture bande">
+  <canvas id="chute" aria-hidden="true"></canvas>
+  <div class="large">
+    <h1>Poussières</h1>
+    <p class="question">Où se dépose la poussière d'une pièce, et pourquoi pas partout pareil&nbsp;?</p>
+    <p class="chapeau">Une suite d'animations calculées en unités réelles, dans le navigateur.
+      On y suit des poussières de 10 nm à 1 mm, d'abord dans l'air immobile, puis dans l'air brassé par un radiateur, et enfin quand on ouvre une porte.</p>
+    <div class="echelle-tailles" aria-label="Classes de taille et couleurs">
+      <span style="--c:var(--c1)">10–100 nm</span><span style="--c:var(--c2)">0,1–1 µm</span><span style="--c:var(--c3)">1–10 µm</span>
+      <span style="--c:var(--c4)">10–100 µm</span><span style="--c:var(--c5)">0,1–1 mm</span>
+    </div>
+  </div>
+</header>
+
+<main class="bande">
+  <div class="large">
+    <h2>Les animations</h2>
+    <p class="intro-section">Chaque page est un petit laboratoire : on déplace les meubles, le radiateur ou la porte, et on mesure.</p>
+    <div class="pages">
+      <a class="carte" href="colonnes.html">
+        <span class="type">Air immobile · par taille</span>
+        <h3>Sept colonnes de chute</h3>
+        <p>Une colonne d'un mètre par taille de grain, de 10 nm à 3 mm, avec la vitesse de chute, le régime d'écoulement et l'agitation brownienne.</p>
+        <p class="resultat">Un grain de 1 mm tombe d'un mètre en 0,5 s, un de 10 µm en 5 min, un de 10 nm en plusieurs mois.</p>
+        <span class="ouvrir">Ouvrir →</span>
+      </a>
+      <a class="carte" href="piece.html">
+        <span class="type">Air immobile · pièce</span>
+        <h3>La pièce et ses deux meubles</h3>
+        <p>Une pièce de 5 m × 2,5 m avec un meuble de 1 m et un de 2 m, que l'on déplace. On mesure le dépôt par m² sur le sol et sur chaque meuble.</p>
+        <p class="resultat">Chaque m² reçoit la poussière de l'air qui le surplombe : sol, meuble de 1 m et meuble de 2 m dans le rapport 5 : 3 : 1.</p>
+        <span class="ouvrir">Ouvrir →</span>
+      </a>
+      <a class="carte" href="convection.html">
+        <span class="type">Air brassé · coupe verticale</span>
+        <h3>Radiateur, fenêtre et porte</h3>
+        <p>L'écoulement créé par un radiateur et une fenêtre froide, une porte vers un couloir à ouvrir en temps réel, et les poussières qu'ils transportent.</p>
+        <p class="resultat">Le brassage égalise le dépôt des grains de quelques µm (≈ 1 : 1 : 1) ; les grains de plus de 0,1 mm l'ignorent.</p>
+        <span class="ouvrir">Ouvrir →</span>
+      </a>
+      <a class="carte" href="battant.html">
+        <span class="type">Air brassé · vue de dessus</span>
+        <h3>Le battant de la porte</h3>
+        <p>Le mouvement du battant, calculé dans le plan horizontal : tourbillon de démarrage, jet à la fermeture, air échangé avec le couloir.</p>
+        <p class="resultat">Un battant fait passer 0,3 à 0,6 m³ d'air, selon qu'on l'ouvre en 3 s ou en 1 s.</p>
+        <span class="ouvrir">Ouvrir →</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="colonne">
+    <h2>Ce qu'on a appris</h2>
+    <ul class="lecons">
+      <li><span class="chiffre">10⁸</span><div><strong>Cinq décades de taille, huit de vitesse</strong>
+        <span class="texte">De 10 nm à 1 mm, la vitesse de chute passe de 7·10⁻⁸ m/s à 4 m/s. La loi de Stokes, en d², ne vaut qu'entre 1 et 40 µm environ : en dessous, l'air n'est plus un milieu continu ; au-dessus, l'inertie de l'air compte.</span></div></li>
+      <li><span class="chiffre">5 : 3 : 1</span><div><strong>En air immobile, la hauteur décide</strong>
+        <span class="texte">Une fois la colonne d'air vidée, le sol reçoit 2,5 m d'air de poussière par m², le dessus d'un meuble de 1 m en reçoit 1,5 m et celui d'un meuble de 2 m seulement 0,5 m.</span></div></li>
+      <li><span class="chiffre">1 : 1 : 1</span><div><strong>Le radiateur égalise</strong>
+        <span class="texte">Dans l'air brassé, les grains de 1 à 10 µm se déposent autant par m² partout ; ceux de plus de 0,1 mm tombent comme en air immobile ; ceux de moins de 1 µm restent en l'air des heures.</span></div></li>
+      <li><span class="chiffre">≈ 2 min</span><div><strong>Une porte ouverte renouvelle vite</strong>
+        <span class="texte">Avec 5 °C d'écart entre la pièce et le couloir, environ 670 m³/h passent une porte de 0,8 × 2 m : l'air d'une pièce de 25 m³ est remplacé en deux minutes. Le coefficient de décharge calculé, 0,7, est celui des mesures.</span></div></li>
+      <li><span class="chiffre">2 à 3 s</span><div><strong>Le battant, violent mais bref</strong>
+        <span class="texte">Le battant crée les vitesses les plus fortes (1 à 5 m/s selon la vitesse d'ouverture) mais ne transfère que 0,3 à 0,6 m³ : autant que 2 à 3 s de porte ouverte avec 5 °C d'écart. Il domine quand on ne fait que passer.</span></div></li>
+    </ul>
+
+    <h2>La théorie</h2>
+    <p class="intro-section">Chaque animation repose sur une théorie écrite d'abord, avec ses hypothèses, ses ordres de grandeur et sa validation.</p>
+    <div class="theorie">
+      <a href="theorie_sedimentation.html">Sédimentation<span>Stokes, Cunningham, Epstein, Newton : la vitesse de chute selon la taille.</span></a>
+      <a href="theorie_convection.html">Convection<span>Boussinesq en ψ-ω, faux transitoire, validation sur la cavité de de Vahl Davis, transport des poussières.</span></a>
+      <a href="theorie_porte.html">Porte<span>Échange par une ouverture, couloir réservoir, coefficient de décharge, bouffée du battant.</span></a>
+      <a href="theorie_battant.html">Battant<span>Vue de dessus, pénalisation de Brinkman, volume transféré et convergence en maillage.</span></a>
+    </div>
+
+    <h2>Les limites</h2>
+    <ul class="limites">
+      <li>Tout est en 2D : une coupe verticale, ou une vue de dessus pour le battant. Une porte y occupe toute la profondeur, d'où des échanges environ 2,5 fois trop rapides dans la coupe.</li>
+      <li>La turbulence est une viscosité effective constante : la forme de l'écoulement et ses vitesses sont fiables, pas les flux de chaleur aux parois.</li>
+      <li>La remise en suspension de la poussière du sol et l'épaisseur de la couche de paroi sont des paramètres choisis, pas mesurés.</li>
+      <li>La thermophorèse, qui grise les murs froids, et la remise en suspension par la marche ne sont pas encore modélisées.</li>
+    </ul>
+  </div>
+</main>
+
+<footer class="bande">
+  <div class="colonne">Calculs faits dans votre navigateur ; certaines pages demandent quelques secondes pour établir l'écoulement. Projet « Poussières », octobre 2026.</div>
+</footer>
+
+<script>
+  // Bandeau : des poussières de cinq tailles tombent, chacune à une vitesse liée à sa taille
+  (() => {
+    const canvas = document.getElementById("chute"), ctx = canvas.getContext("2d");
+    const couleurs = ["#b39cff", "#6cb2ff", "#4fd6a5", "#ffc857", "#ff7a6b"];
+    const vitesses = [0.6, 2, 8, 40, 160];   // px/s, échelle compressée des vitesses réelles
+    const fixe = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let grains = [], w = 0, h = 0, dpr = 1;
+    function dimensionner() {
+      const r = canvas.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      w = canvas.width = Math.round(r.width * dpr);
+      h = canvas.height = Math.round(r.height * dpr);
+      const n = Math.round((r.width * r.height) / 900);
+      grains = Array.from({ length: n }, () => {
+        const k = Math.floor(Math.random() * 5);
+        return { k, x: Math.random() * w, y: Math.random() * h, a: 0.25 + Math.random() * 0.45 };
+      });
+      if (fixe) dessiner(0);
+    }
+    function dessiner(dt) {
+      ctx.clearRect(0, 0, w, h);
+      for (const g of grains) {
+        g.y += vitesses[g.k] * dpr * dt;
+        g.x += (g.k < 2 ? (Math.random() - 0.5) * 30 : 0) * dpr * dt;   // les plus fines s'agitent
+        if (g.y > h) { g.y -= h; g.x = Math.random() * w; }
+        const t = (0.8 + 0.55 * g.k) * dpr;
+        ctx.globalAlpha = g.a;
+        ctx.fillStyle = couleurs[g.k];
+        ctx.fillRect(g.x, g.y, t, t);
+      }
+      ctx.globalAlpha = 1;
+    }
+    let avant = performance.now();
+    function boucle(t) {
+      dessiner(Math.min(0.05, (t - avant) / 1000));
+      avant = t;
+      requestAnimationFrame(boucle);
+    }
+    dimensionner();
+    window.addEventListener("resize", dimensionner);
+    if (!fixe) requestAnimationFrame(boucle);
+  })();
+</script>
+
+</html>
