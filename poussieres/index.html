@@ -69,6 +69,8 @@
   .limites li { margin: 6px 0; }
   footer { border-top: 1px solid var(--trait); padding-block: 22px 40px; color: var(--doux); font-size: 0.85rem; }
   a { color: var(--lien); }
+  /* Textes courants en justifié ; titres, chiffres et boutons restent alignés à gauche. */
+  .chapeau, .intro-section, .carte p, .lecons span.texte, .limites li, footer p { text-align: justify; hyphens: auto; }
 
   @media (max-width: 640px) {
     .pages, .theorie { grid-template-columns: minmax(0, 1fr); }
