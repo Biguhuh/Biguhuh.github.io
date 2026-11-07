@@ -29,3 +29,4 @@ Chaque projet a sa propre licence :
 | [votes_parlementaires](https://github.com/Biguhuh/votes_parlementaires) | MIT (code) |
 | [map_cantines_egalim](https://github.com/Biguhuh/map_cantines_egalim) | MIT (code) |
 | [cancer](https://github.com/Biguhuh/cancer) | CC BY 4.0 (textes et analyses), MIT (code) |
+| [bio-pesticides](https://github.com/Biguhuh/bio-pesticides) | CC BY 4.0 (textes), MIT (code) |
