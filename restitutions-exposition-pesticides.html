@@ -67,6 +67,15 @@
   ul { margin: 0 0 12px; padding-left: 22px; }
   li { margin-bottom: 4px; }
   .signature { margin: 28px 0 0; font-weight: 600; }
+  /* « À retenir » en tête d'une restitution, même encadré que sur les pages Bio et Cancers. */
+  .a-retenir {
+    background: var(--card-bg); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+    padding: 12px 16px; margin: 0 0 24px;
+  }
+  .a-retenir p { font-size: 14.5px; margin: 0 0 6px; }
+  .a-retenir ul { margin: 0; }
+  .a-retenir li { font-size: 14.5px; margin-bottom: 6px; }
+  .a-retenir li:last-child { margin-bottom: 0; }
 
   /* Accessibilité (WCAG 2.1 AA / RGAA) : liens soulignés, pas seulement colorés ; focus visible. */
   a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
@@ -134,6 +143,16 @@
 
   <section id="panel-2026-10-13-mougon" class="tab-panel" role="tabpanel" aria-labelledby="tab-2026-10-13-mougon" data-tab="2026-10-13-mougon" hidden>
     <h2>Restitution du 13 octobre 2026, Mougon</h2>
+
+    <div class="a-retenir">
+      <p><strong>À retenir</strong>, en attente de confirmation par des publications scientifiques</p>
+      <ul>
+        <li>Sur la zone d'étude du programme, 98 pesticides ont été détectés dans l'air, dont 81 à Mougon.</li>
+        <li>Les poussières des habitations de Mougon contiennent en moyenne 70 pesticides, ce qui signale une présence et non un niveau de danger.</li>
+        <li>L'exposition est plus forte dans les zones entourées d'agriculture conventionnelle, mais une partie des molécules vient des produits utilisés dans les maisons.</li>
+        <li>Le nombre de molécules relevé est plus faible dans les communes où l'agriculture biologique est plus développée.</li>
+      </ul>
+    </div>
 
     <p>Le 13 octobre, à Mougon, Mme Sabrina Gaba, chercheuse INRAE au Centre d'Études Biologiques de Chizé (CEBC), a présenté aux habitants d'Aigondigné les premiers résultats de l'étude Santé des Territoires. Nous y étions, au nom du collectif Santé des Territoires Aigondigné.</p>
 
