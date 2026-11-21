@@ -339,7 +339,10 @@
   // Les numéros du dossier deviennent ceux de l'onglet Sources de la page
   var blocN = document.getElementById("num-sources");
   var NUM = blocN ? JSON.parse(blocN.textContent) : {};
+  // Sur la page publique, pas d'étiquettes fait et estimation
+  var PUBLIC = document.body.dataset.public === "1";
   function citer(t) {
+    if (PUBLIC) t = t.replace(/\s*\[(fait|estimation)\]/g, "");
     return t.replace(/\[(fait|estimation|hypothèse)\]/g, '<span class="tag">$1</span>')
       .replace(/\[(\d{1,3})\]/g, function (_, g) {
         var n = NUM[g] || g;
