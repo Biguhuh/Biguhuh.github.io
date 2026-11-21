@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parkinson dans les Deux-Sèvres</title>
+<meta name="description" content="Évolution de la maladie de Parkinson dans les Deux-Sèvres et les départements voisins, de 2013 à 2023, et ce que l'on sait du lien avec les pesticides — Santé des Territoires Aigondigné">
+<style>
+  :root {
+    --bg: #f7f7f5; --card-bg: #ffffff; --text: #1a1a1a; --muted: #5a5a5a;
+    --accent: #2f6f4f; --border: #e3e2dd; --note-bg: #eef4f0;
+    /* Couleurs des courbes : palette Okabe-Ito, distinctes pour toutes les formes de daltonisme. */
+    --s1: #005f99; --s2: #a8430b; --s3: #8b3f74; --s4: #5a5a5a; --s5: #00785a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --card-bg: #1d2025; --text: #f0f0ee; --muted: #a3a6ab;
+      --accent: #6fcf97; --border: #2c2f35; --note-bg: #1c2621;
+      --s1: #56b4e9; --s2: #ff8a5c; --s3: #e58cc0; --s4: #a3a6ab; --s5: #3fc79a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6;
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 64px 20px 80px; }
+  .back { display: inline-block; margin-bottom: 24px; font-size: 14px; color: var(--muted); text-decoration: none; }
+  .back:hover { color: var(--accent); }
+  h1 { font-size: 30px; margin: 0 0 12px; line-height: 1.2; }
+  .lead { color: var(--muted); font-size: 16px; margin: 0 0 20px; }
+  .pub-date { font-size: 13px; color: var(--muted); margin: -8px 0 20px; }
+  h2 { font-size: 22px; margin: 40px 0 14px; line-height: 1.3; }
+  p, li { font-size: 15.5px; text-align: justify; hyphens: auto; }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+  sup.cite { font-size: 11px; line-height: 0; }
+  sup.cite a { text-decoration: none; }
+  .note { background: var(--note-bg); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+          padding: 12px 16px; margin: 16px 0; }
+  .note p, .note li { font-size: 14.5px; }
+  .note p:last-child, .note ul:last-child { margin-bottom: 0; }
+  .note h2 { font-size: 17px; margin: 0 0 8px; }
+  figure { margin: 18px 0 22px; }
+  .chart { width: 100%; height: auto; display: block; }
+  .chart .grille { stroke: var(--border); stroke-width: 1; }
+  .chart .axe { fill: var(--muted); font-size: 12px; }
+  .chart .val { fill: var(--text); font-size: 11.5px; }
+  .chart .barre { fill: var(--s1); }
+  .chart .ligne { fill: none; stroke-width: 2.5; }
+  .chart .s1 { stroke: var(--s1); fill: var(--s1); }
+  .chart .s2 { stroke: var(--s2); fill: var(--s2); }
+  .chart .s3 { stroke: var(--s3); fill: var(--s3); }
+  .chart .s4 { stroke: var(--s4); fill: var(--s4); }
+  .chart .s5 { stroke: var(--s5); fill: var(--s5); }
+  .chart .ligne.s1, .chart .ligne.s2, .chart .ligne.s3, .chart .ligne.s4, .chart .ligne.s5 { fill: none; }
+  .chart .ligne.s5 { stroke-dasharray: 12 4; stroke-width: 2.2; }
+  .chart .ligne.s2 { stroke-dasharray: 7 4; }
+  .chart .ligne.s3 { stroke-dasharray: 2 4; }
+  .chart .ligne.s4 { stroke-dasharray: 10 3 2 3; stroke-width: 1.8; }
+  .chart .lab { font-size: 12px; stroke: none; font-weight: 600; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 14px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  thead th { color: var(--muted); font-size: 13px; font-weight: 600; }
+  td { font-variant-numeric: tabular-nums; }
+  ol.sources { padding-left: 22px; }
+  ol.sources li { font-size: 14px; margin-bottom: 10px; }
+  .type { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+          color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; margin-right: 4px; }
+  .signature { margin: 32px 0 0; font-weight: 600; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--muted); }
+  footer a { color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  @media (max-width: 480px) {
+    /* Le graphique est réduit de moitié sur téléphone : on double la taille des textes. */
+    .chart .axe { font-size: 19px; }
+    .chart .val { font-size: 17px; }
+    .chart .lab { font-size: 17px; }
+    main { padding-top: 40px; }
+    h1 { font-size: 25px; }
+    th, td { padding: 6px 4px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="https://biguhuh.github.io/">← Tous les projets</a>
+
+  <h1>Parkinson dans les Deux-Sèvres</h1>
+  <p class="lead">Le nombre de nouveaux cas de maladie de Parkinson augmente dans les Deux-Sèvres, comme
+    dans toute la France. À ce jour, le lien avec les pesticides est reconnu pour les personnes exposées
+    dans leur travail, en premier lieu les agriculteurs&nbsp;: depuis 2012, la maladie y est une maladie
+    professionnelle <sup class="cite"><a href="#src-1">1</a></sup>. Pour les riverains et le reste de la
+    population, ce lien n'est pas établi. Cette page présente les chiffres officiels, ce qu'ils montrent et
+    ce qu'ils ne permettent pas de conclure.</p>
+  <p class="pub-date">Mis à jour en novembre 2026</p>
+
+  <div class="note">
+    <p><strong>À retenir</strong></p>
+    <ul>
+      <li>Dans les Deux-Sèvres, 192 personnes ont commencé un traitement pour la maladie de Parkinson en
+        2023, contre 147 en 2013, soit 30,6&nbsp;% de plus. En France, la hausse est de 23,5&nbsp;%.</li>
+      <li>À l'échelle de la France, cette hausse s'explique par le vieillissement de la population. Une fois
+        corrigé de l'âge, le taux national reste stable&nbsp;: 3,7 nouveaux cas pour 10&nbsp;000 habitants en
+        2013 comme en 2023.</li>
+      <li>Les Deux-Sèvres suivent la France&nbsp;: leur taux reste proche du taux national, 4,4 contre 4,3 en
+        2023, et rien ne montre que l'écart se creuse.</li>
+      <li>La Vienne voisine fait exception. Son taux était au niveau de la France en 2013-2015. Il le dépasse
+        de 30&nbsp;% en 2021-2023. Le vieillissement n'explique pas cet écart, et sa cause n'est pas
+        connue.</li>
+      <li>Le lien avec les pesticides est fort chez les professionnels exposés. Pour les riverains des zones
+        traitées, l'Inserm le juge faible.</li>
+    </ul>
+  </div>
+
+  <h2>Les nouveaux cas, année par année</h2>
+  <p>On compte comme nouveau cas une personne qui commence un traitement pour la maladie de Parkinson dans
+    l'année <sup class="cite"><a href="#src-2">2</a></sup>. Dans les Deux-Sèvres, ce nombre passe de 147 en
+    2013 à 192 en 2023.</p>
+  <figure>
+<svg viewBox="0 0 550 300" class="chart" role="img" aria-labelledby="g1-titre g1-desc">
+<title id="g1-titre">Nouveaux cas de maladie de Parkinson dans les Deux-Sèvres, 2013 à 2023</title>
+<desc id="g1-desc">Histogramme. De 147 en 2013 à 192 en 2023, avec des variations d'une année à l'autre : 134 en 2016, 188 en 2021, 153 en 2022. Les valeurs sont dans le tableau plus bas.</desc>
+<line x1="48" x2="540" y1="266.0" y2="266.0" class="grille"/>
+<text x="42" y="270.0" class="axe" text-anchor="end">0</text>
+<line x1="48" x2="540" y1="209.6" y2="209.6" class="grille"/>
+<text x="42" y="213.6" class="axe" text-anchor="end">50</text>
+<line x1="48" x2="540" y1="153.3" y2="153.3" class="grille"/>
+<text x="42" y="157.3" class="axe" text-anchor="end">100</text>
+<line x1="48" x2="540" y1="96.9" y2="96.9" class="grille"/>
+<text x="42" y="100.9" class="axe" text-anchor="end">150</text>
+<line x1="48" x2="540" y1="40.5" y2="40.5" class="grille"/>
+<text x="42" y="44.5" class="axe" text-anchor="end">200</text>
+<rect x="54.7" y="100.3" width="31.3" height="165.7" class="barre"/>
+<text x="70.4" y="95.3" class="val" text-anchor="middle">147</text>
+<text x="70.4" y="288" class="axe" text-anchor="middle">2013</text>
+<rect x="99.4" y="69.9" width="31.3" height="196.1" class="barre"/>
+<text x="115.1" y="64.9" class="val" text-anchor="middle">174</text>
+<text x="115.1" y="288" class="axe" text-anchor="middle">2014</text>
+<rect x="144.2" y="93.5" width="31.3" height="172.5" class="barre"/>
+<text x="159.8" y="88.5" class="val" text-anchor="middle">153</text>
+<text x="159.8" y="288" class="axe" text-anchor="middle">2015</text>
+<rect x="188.9" y="114.9" width="31.3" height="151.1" class="barre"/>
+<text x="204.5" y="109.9" class="val" text-anchor="middle">134</text>
+<text x="204.5" y="288" class="axe" text-anchor="middle">2016</text>
+<rect x="233.6" y="80.0" width="31.3" height="186.0" class="barre"/>
+<text x="249.3" y="75.0" class="val" text-anchor="middle">165</text>
+<text x="249.3" y="288" class="axe" text-anchor="middle">2017</text>
+<rect x="278.3" y="71.0" width="31.3" height="195.0" class="barre"/>
+<text x="294.0" y="66.0" class="val" text-anchor="middle">173</text>
+<text x="294.0" y="288" class="axe" text-anchor="middle">2018</text>
+<rect x="323.1" y="78.9" width="31.3" height="187.1" class="barre"/>
+<text x="338.7" y="73.9" class="val" text-anchor="middle">166</text>
+<text x="338.7" y="288" class="axe" text-anchor="middle">2019</text>
+<rect x="367.8" y="72.1" width="31.3" height="193.9" class="barre"/>
+<text x="383.5" y="67.1" class="val" text-anchor="middle">172</text>
+<text x="383.5" y="288" class="axe" text-anchor="middle">2020</text>
+<rect x="412.5" y="54.1" width="31.3" height="211.9" class="barre"/>
+<text x="428.2" y="49.1" class="val" text-anchor="middle">188</text>
+<text x="428.2" y="288" class="axe" text-anchor="middle">2021</text>
+<rect x="457.3" y="93.5" width="31.3" height="172.5" class="barre"/>
+<text x="472.9" y="88.5" class="val" text-anchor="middle">153</text>
+<text x="472.9" y="288" class="axe" text-anchor="middle">2022</text>
+<rect x="502.0" y="49.6" width="31.3" height="216.4" class="barre"/>
+<text x="517.6" y="44.6" class="val" text-anchor="middle">192</text>
+<text x="517.6" y="288" class="axe" text-anchor="middle">2023</text>
+</svg>
+    <figcaption>Nouveaux cas de maladie de Parkinson dans les Deux-Sèvres, en nombre de personnes. Source&nbsp;:
+      Santé publique France, repris par l'<a href="https://parkinson.data-stat.org/departements/deux-sevres">Observatoire
+      Parkinson France</a>.</figcaption>
+  </figure>
+  <p>Le nombre varie beaucoup d'une année à l'autre&nbsp;: 188 en 2021, 153 en 2022, 192 en 2023. La hausse
+    de 30,6&nbsp;% compare deux années seulement. Il faut regarder la courbe entière.</p>
+
+  <h2>Le rôle du vieillissement</h2>
+  <p>La maladie de Parkinson touche surtout les personnes âgées. Quand la population vieillit, le nombre de
+    nouveaux cas augmente, même si le risque à chaque âge ne change pas. Pour savoir si ce risque change,
+    on utilise un taux corrigé de l'âge et du sexe, appelé taux standardisé.</p>
+  <p>Tous les taux de cette page sont fournis par Santé publique France <sup class="cite"><a href="#src-2">2</a></sup>.
+    Nous ne les calculons pas nous-mêmes.</p>
+  <p>Pour la France entière, Santé publique France publie un taux corrigé sur la population de 2014, qui reste
+    la même d'une année à l'autre. Ce taux est stable&nbsp;: 3,7 nouveaux cas pour 10&nbsp;000 habitants en
+    2013, 3,7 en 2023. Le taux brut, lui, passe de 3,6 à 4,3.</p>
+  <figure>
+<svg viewBox="0 0 720 300" class="chart" role="img" aria-labelledby="g2-titre g2-desc">
+<title id="g2-titre">France : nouveaux cas pour 10 000 habitants, taux brut et taux corrigé de l&#x27;âge, 2013 à 2023</title>
+<desc id="g2-desc">Deux courbes. Le taux brut monte de 3,6 en 2013 à 4,3 en 2023. Le taux corrigé de l&#x27;âge et du sexe, calculé sur la population de 2014, reste à 3,7 en 2013 comme en 2023, avec un creux à 3,4 en 2020. Les valeurs sont dans le tableau plus bas.</desc>
+<line x1="48" x2="520" y1="266.0" y2="266.0" class="grille"/>
+<text x="42" y="270.0" class="axe" text-anchor="end">3</text>
+<line x1="48" x2="520" y1="142.0" y2="142.0" class="grille"/>
+<text x="42" y="146.0" class="axe" text-anchor="end">4</text>
+<line x1="48" x2="520" y1="18.0" y2="18.0" class="grille"/>
+<text x="42" y="22.0" class="axe" text-anchor="end">5</text>
+<text x="48.0" y="288" class="axe" text-anchor="middle">2013</text>
+<text x="142.4" y="288" class="axe" text-anchor="middle">2015</text>
+<text x="236.8" y="288" class="axe" text-anchor="middle">2017</text>
+<text x="331.2" y="288" class="axe" text-anchor="middle">2019</text>
+<text x="425.6" y="288" class="axe" text-anchor="middle">2021</text>
+<text x="520.0" y="288" class="axe" text-anchor="middle">2023</text>
+<polyline points="48.0,191.6 95.2,142.0 142.4,154.4 189.6,154.4 236.8,154.4 284.0,154.4 331.2,142.0 378.4,166.8 425.6,129.6 472.8,117.2 520.0,104.8" class="s2 ligne"/>
+<rect x="44.0" y="187.6" width="8" height="8" class="s2 pt"/>
+<rect x="91.2" y="138.0" width="8" height="8" class="s2 pt"/>
+<rect x="138.4" y="150.4" width="8" height="8" class="s2 pt"/>
+<rect x="185.6" y="150.4" width="8" height="8" class="s2 pt"/>
+<rect x="232.8" y="150.4" width="8" height="8" class="s2 pt"/>
+<rect x="280.0" y="150.4" width="8" height="8" class="s2 pt"/>
+<rect x="327.2" y="138.0" width="8" height="8" class="s2 pt"/>
+<rect x="374.4" y="162.8" width="8" height="8" class="s2 pt"/>
+<rect x="421.6" y="125.6" width="8" height="8" class="s2 pt"/>
+<rect x="468.8" y="113.2" width="8" height="8" class="s2 pt"/>
+<rect x="516.0" y="100.8" width="8" height="8" class="s2 pt"/>
+<polyline points="48.0,179.2 95.2,142.0 142.4,166.8 189.6,179.2 236.8,179.2 284.0,179.2 331.2,191.6 378.4,216.4 425.6,179.2 472.8,179.2 520.0,179.2" class="s1 ligne"/>
+<circle cx="48.0" cy="179.2" r="4" class="s1 pt"/>
+<circle cx="95.2" cy="142.0" r="4" class="s1 pt"/>
+<circle cx="142.4" cy="166.8" r="4" class="s1 pt"/>
+<circle cx="189.6" cy="179.2" r="4" class="s1 pt"/>
+<circle cx="236.8" cy="179.2" r="4" class="s1 pt"/>
+<circle cx="284.0" cy="179.2" r="4" class="s1 pt"/>
+<circle cx="331.2" cy="191.6" r="4" class="s1 pt"/>
+<circle cx="378.4" cy="216.4" r="4" class="s1 pt"/>
+<circle cx="425.6" cy="179.2" r="4" class="s1 pt"/>
+<circle cx="472.8" cy="179.2" r="4" class="s1 pt"/>
+<circle cx="520.0" cy="179.2" r="4" class="s1 pt"/>
+<text x="528" y="108.8" class="s2 lab">Taux brut 4,3</text>
+<text x="528" y="183.2" class="s1 lab">Corrigé de l&#x27;âge 3,7</text>
+</svg>
+    <figcaption>France, nouveaux cas pour 10&nbsp;000 habitants. Le taux corrigé de l'âge et du sexe est
+      calculé sur la population de 2014. Selon Santé publique France, le creux de 2020 peut s'expliquer par
+      un moindre recours aux soins pendant l'épidémie de Covid-19. Source&nbsp;: Santé publique France,
+      <a href="https://odisse.santepubliquefrance.fr/explore/dataset/parkinson-incidence-et-prevalence_fra/">Odissé</a>.</figcaption>
+  </figure>
+  <p>À l'échelle de la France, la hausse du nombre de nouveaux cas s'explique donc par le vieillissement de
+    la population. À âge égal, le risque ne montre pas de hausse sur la période. C'est aussi la conclusion de Santé publique France
+    dans son étude de 2023 sur les années 2016 à 2020 <sup class="cite"><a href="#src-3">3</a></sup>.</p>
+  <p>Ce constat ne rend pas la maladie moins préoccupante. Les malades sont plus nombreux chaque année, et il faut les
+    soigner et les accompagner.</p>
+
+  <h2>Les Deux-Sèvres comparées à la France</h2>
+  <p>Par département, Santé publique France corrige les taux sur la population française de chaque année.
+    Ces taux permettent de comparer un département à la France une année donnée. Ils ne corrigent pas le
+    vieillissement d'une année à l'autre&nbsp;: ils montent avec le taux national. Pour savoir si un
+    département s'écarte de la tendance due à l'âge, il faut donc le comparer au taux national de la même
+    année.</p>
+  <figure>
+<svg viewBox="0 0 720 300" class="chart" role="img" aria-labelledby="g3-titre g3-desc">
+<title id="g3-titre">Nouveaux cas pour 10 000 habitants par département, comparés à la France la même année, 2013 à 2023</title>
+<desc id="g3-desc">Courbes. Deux-Sèvres de 3,2 à 4,4. Charente-Maritime de 3,6 à 3,8. Vienne de 3,2 à 6,1. Mayenne de 2,5 à 4,9. France, même année, de 3,6 à 4,3. Les valeurs sont dans le tableau plus bas.</desc>
+<line x1="48" x2="520" y1="266.0" y2="266.0" class="grille"/>
+<text x="42" y="270.0" class="axe" text-anchor="end">2</text>
+<line x1="48" x2="520" y1="210.9" y2="210.9" class="grille"/>
+<text x="42" y="214.9" class="axe" text-anchor="end">3</text>
+<line x1="48" x2="520" y1="155.8" y2="155.8" class="grille"/>
+<text x="42" y="159.8" class="axe" text-anchor="end">4</text>
+<line x1="48" x2="520" y1="100.7" y2="100.7" class="grille"/>
+<text x="42" y="104.7" class="axe" text-anchor="end">5</text>
+<line x1="48" x2="520" y1="45.6" y2="45.6" class="grille"/>
+<text x="42" y="49.6" class="axe" text-anchor="end">6</text>
+<text x="48.0" y="288" class="axe" text-anchor="middle">2013</text>
+<text x="142.4" y="288" class="axe" text-anchor="middle">2015</text>
+<text x="236.8" y="288" class="axe" text-anchor="middle">2017</text>
+<text x="331.2" y="288" class="axe" text-anchor="middle">2019</text>
+<text x="425.6" y="288" class="axe" text-anchor="middle">2021</text>
+<text x="520.0" y="288" class="axe" text-anchor="middle">2023</text>
+<polyline points="48.0,199.9 95.2,161.3 142.4,183.3 189.6,210.9 236.8,172.3 284.0,155.8 331.2,166.8 378.4,161.3 425.6,139.2 472.8,183.3 520.0,133.7" class="s1 ligne"/>
+<circle cx="48.0" cy="199.9" r="4" class="s1 pt"/>
+<circle cx="95.2" cy="161.3" r="4" class="s1 pt"/>
+<circle cx="142.4" cy="183.3" r="4" class="s1 pt"/>
+<circle cx="189.6" cy="210.9" r="4" class="s1 pt"/>
+<circle cx="236.8" cy="172.3" r="4" class="s1 pt"/>
+<circle cx="284.0" cy="155.8" r="4" class="s1 pt"/>
+<circle cx="331.2" cy="166.8" r="4" class="s1 pt"/>
+<circle cx="378.4" cy="161.3" r="4" class="s1 pt"/>
+<circle cx="425.6" cy="139.2" r="4" class="s1 pt"/>
+<circle cx="472.8" cy="183.3" r="4" class="s1 pt"/>
+<circle cx="520.0" cy="133.7" r="4" class="s1 pt"/>
+<polyline points="48.0,177.8 95.2,166.8 142.4,150.3 189.6,155.8 236.8,172.3 284.0,161.3 331.2,166.8 378.4,155.8 425.6,161.3 472.8,155.8 520.0,166.8" class="s5 ligne"/>
+<path d="M48.0,172.3 L53.5,177.8 L48.0,183.3 L42.5,177.8 Z" class="s5 pt"/>
+<path d="M95.2,161.3 L100.7,166.8 L95.2,172.3 L89.7,166.8 Z" class="s5 pt"/>
+<path d="M142.4,144.8 L147.9,150.3 L142.4,155.8 L136.9,150.3 Z" class="s5 pt"/>
+<path d="M189.6,150.3 L195.1,155.8 L189.6,161.3 L184.1,155.8 Z" class="s5 pt"/>
+<path d="M236.8,166.8 L242.3,172.3 L236.8,177.8 L231.3,172.3 Z" class="s5 pt"/>
+<path d="M284.0,155.8 L289.5,161.3 L284.0,166.8 L278.5,161.3 Z" class="s5 pt"/>
+<path d="M331.2,161.3 L336.7,166.8 L331.2,172.3 L325.7,166.8 Z" class="s5 pt"/>
+<path d="M378.4,150.3 L383.9,155.8 L378.4,161.3 L372.9,155.8 Z" class="s5 pt"/>
+<path d="M425.6,155.8 L431.1,161.3 L425.6,166.8 L420.1,161.3 Z" class="s5 pt"/>
+<path d="M472.8,150.3 L478.3,155.8 L472.8,161.3 L467.3,155.8 Z" class="s5 pt"/>
+<path d="M520.0,161.3 L525.5,166.8 L520.0,172.3 L514.5,166.8 Z" class="s5 pt"/>
+<polyline points="48.0,199.9 95.2,161.3 142.4,144.8 189.6,139.2 236.8,117.2 284.0,78.6 331.2,95.2 378.4,100.7 425.6,117.2 472.8,67.6 520.0,40.0" class="s2 ligne"/>
+<rect x="44.0" y="195.9" width="8" height="8" class="s2 pt"/>
+<rect x="91.2" y="157.3" width="8" height="8" class="s2 pt"/>
+<rect x="138.4" y="140.8" width="8" height="8" class="s2 pt"/>
+<rect x="185.6" y="135.2" width="8" height="8" class="s2 pt"/>
+<rect x="232.8" y="113.2" width="8" height="8" class="s2 pt"/>
+<rect x="280.0" y="74.6" width="8" height="8" class="s2 pt"/>
+<rect x="327.2" y="91.2" width="8" height="8" class="s2 pt"/>
+<rect x="374.4" y="96.7" width="8" height="8" class="s2 pt"/>
+<rect x="421.6" y="113.2" width="8" height="8" class="s2 pt"/>
+<rect x="468.8" y="63.6" width="8" height="8" class="s2 pt"/>
+<rect x="516.0" y="36.0" width="8" height="8" class="s2 pt"/>
+<polyline points="48.0,238.4 95.2,150.3 142.4,216.4 189.6,183.3 236.8,155.8 284.0,155.8 331.2,172.3 378.4,166.8 425.6,122.7 472.8,177.8 520.0,106.2" class="s3 ligne"/>
+<path d="M48.0,233.4 L53.0,242.4 L43.0,242.4 Z" class="s3 pt"/>
+<path d="M95.2,145.3 L100.2,154.3 L90.2,154.3 Z" class="s3 pt"/>
+<path d="M142.4,211.4 L147.4,220.4 L137.4,220.4 Z" class="s3 pt"/>
+<path d="M189.6,178.3 L194.6,187.3 L184.6,187.3 Z" class="s3 pt"/>
+<path d="M236.8,150.8 L241.8,159.8 L231.8,159.8 Z" class="s3 pt"/>
+<path d="M284.0,150.8 L289.0,159.8 L279.0,159.8 Z" class="s3 pt"/>
+<path d="M331.2,167.3 L336.2,176.3 L326.2,176.3 Z" class="s3 pt"/>
+<path d="M378.4,161.8 L383.4,170.8 L373.4,170.8 Z" class="s3 pt"/>
+<path d="M425.6,117.7 L430.6,126.7 L420.6,126.7 Z" class="s3 pt"/>
+<path d="M472.8,172.8 L477.8,181.8 L467.8,181.8 Z" class="s3 pt"/>
+<path d="M520.0,101.2 L525.0,110.2 L515.0,110.2 Z" class="s3 pt"/>
+<polyline points="48.0,177.8 95.2,155.8 142.4,161.3 189.6,161.3 236.8,161.3 284.0,161.3 331.2,155.8 378.4,166.8 425.6,150.3 472.8,144.8 520.0,139.2" class="s4 ligne"/>
+
+
+
+
+
+
+
+
+
+
+
+<text x="528" y="44.0" class="s2 lab">Vienne 6,1</text>
+<text x="528" y="110.2" class="s3 lab">Mayenne 4,9</text>
+<text x="528" y="137.7" class="s1 lab">Deux-Sèvres 4,4</text>
+<text x="528" y="162.7" class="s4 lab">France 4,3</text>
+<text x="528" y="187.7" class="s5 lab">Charente-Maritime 3,8</text>
+</svg>
+    <figcaption>Nouveaux cas pour 10&nbsp;000 habitants, corrigés de l'âge et du sexe sur la population
+      française de chaque année. La courbe «&nbsp;France&nbsp;» donne le repère national de la même année.
+      Source&nbsp;: Santé publique France, repris par
+      l'<a href="https://parkinson.data-stat.org/departements/deux-sevres">Observatoire Parkinson France</a>.</figcaption>
+  </figure>
+  <p>Dans les Deux-Sèvres, le taux passe de 3,2 en 2013 à 4,4 en 2023. Le taux national de la même année
+    passe de 3,6 à 4,3. Sur les onze années, les Deux-Sèvres restent proches de la France, en moyenne
+    6&nbsp;% en dessous. L'écart varie d'une année à l'autre, mais rien ne montre qu'il se
+    creuse&nbsp;: sa tendance ne se distingue pas des variations dues au hasard. La p-value est de 0,27, au-dessus du seuil de
+    0,05 en dessous duquel une tendance est habituellement considérée comme significative. Pour en savoir
+    plus sur la p-value, voir l'<a href="https://biguhuh.github.io/cancer/#methodologie">étude cancers</a>.</p>
+  <p>La hausse observée dans les Deux-Sèvres suit donc celle de la France. Avec les données actuelles, elle
+    s'explique comme elle par le vieillissement. Ces données ne permettent pas de conclure à une hausse
+    propre au département.</p>
+  <p>La Charente-Maritime reste elle aussi proche de la France, à 3,8 en 2023 contre 4,3. Le nombre de
+    nouveaux cas y passe de 305 en 2013 à 348 en 2023, une hausse qui vient de la population elle-même,
+    plus nombreuse et plus âgée.</p>
+  <p>La Vienne voisine fait exception. En 2013-2015, son taux était au niveau du taux national. Depuis,
+    l'écart se creuse presque chaque année. En 2021-2023, il dépasse le taux national de 30&nbsp;%.
+    En 2023, il atteint 6,1 contre 4,3 pour la France, le plus élevé des départements de métropole. Cet
+    écart grandissant dépasse nettement ce que le hasard seul pourrait produire&nbsp;: la p-value est
+    de 0,001. Comme le taux de la Vienne est comparé à la France la même année, le vieillissement n'explique
+    pas cet écart. Sa cause reste à identifier.</p>
+  <p>La Mayenne, plus au nord, varie beaucoup d'une année à l'autre, entre 2,5 et 4,9.</p>
+
+  <h2>Comparaison avec les voisins et la France</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th scope="col">Territoire</th><th scope="col">Nouveaux cas 2013</th><th scope="col">Nouveaux cas 2023</th>
+          <th scope="col">Évolution, nombres bruts</th><th scope="col">Taux corrigé pour 10&nbsp;000, 2013 → 2023</th></tr>
+      </thead>
+      <tbody>
+          <tr><th scope="row">Deux-Sèvres</th><td>147</td><td>192</td><td>+30,6&nbsp;%</td><td>3,2 → 4,4</td></tr>
+          <tr><th scope="row">Charente-Maritime</th><td>305</td><td>348</td><td>+14,1&nbsp;%</td><td>3,6 → 3,8</td></tr>
+          <tr><th scope="row">Vienne</th><td>154</td><td>285</td><td>+85,1&nbsp;%</td><td>3,2 → 6,1</td></tr>
+          <tr><th scope="row">Mayenne</th><td>88</td><td>161</td><td>+83,0&nbsp;%</td><td>2,5 → 4,9</td></tr>
+          <tr><th scope="row">Nouvelle-Aquitaine</th><td>2 479</td><td>3 272</td><td>+32,0&nbsp;%</td><td>3,5 → 4,6</td></tr>
+          <tr><th scope="row">France</th><td>23 837</td><td>29 431</td><td>+23,5&nbsp;%</td><td>brut&nbsp;: 3,6 → 4,3<br>corrigé de l'âge&nbsp;: 3,7 → 3,7</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Les évolutions en nombres bruts reflètent en grande partie l'âge et la taille de la population. Pour
+    comparer un territoire à la France, la dernière colonne est la plus pertinente. Pour la France, seul le
+    taux corrigé sur la population de 2014 permet de suivre l'évolution à âge égal.</p>
+
+  <div class="note">
+    <h2>Ce que les chiffres ne disent pas</h2>
+    <ul>
+      <li>Les malades sont repérés par leurs remboursements de médicaments. Un changement dans les pratiques
+        de diagnostic ou de traitement peut entraîner un décompte différent du nombre de nouveaux malades.</li>
+      <li>Une hausse calculée entre deux années seulement peut exagérer ou masquer l'évolution réelle, car le
+        nombre de nouveaux cas varie beaucoup d'une année à l'autre.</li>
+      <li>Les taux sont publiés arrondis au dixième. Dans un département comme les Deux-Sèvres, un écart de
+        0,1 d'une année à l'autre ne veut rien dire à lui seul.</li>
+      <li>Selon l'étude de 2023 de Santé publique France, les écarts entre départements «&nbsp;n'ont pas d'explication
+        évidente&nbsp;». La Vienne figure parmi les départements où la maladie est la plus fréquente
+        <sup class="cite"><a href="#src-3">3</a></sup>.</li>
+      <li>Ces chiffres ne disent rien, à eux seuls, des causes de la maladie.</li>
+    </ul>
+  </div>
+
+  <div class="note">
+    <h2>Le lien avec les pesticides</h2>
+    <p>L'expertise collective de l'Inserm de 2021 classe le lien entre pesticides et maladie de Parkinson
+      selon la population <sup class="cite"><a href="#src-4">4</a></sup>&nbsp;:</p>
+    <ul>
+      <li>chez les professionnels exposés, la présomption est forte, pour les pesticides en général, les
+        herbicides et les insecticides, en particulier les insecticides organochlorés&nbsp;;</li>
+      <li>dans la population générale et chez les riverains des zones traitées, la présomption est faible.</li>
+    </ul>
+    <p>Des études françaises menées sur toute la population vont dans le même sens. Les agriculteurs ont
+      13&nbsp;% de nouveaux cas en plus que les autres assurés <sup class="cite"><a href="#src-5">5</a></sup>.
+      Dans la population générale, la maladie est plus fréquente en zone rurale, et de 8,5&nbsp;% dans les
+      cantons où la vigne est la plus présente <sup class="cite"><a href="#src-6">6</a></sup>. Chez les
+      agriculteurs, elle augmente avec les dépenses de pesticides dans les vignes sans appellation d'origine,
+      jusqu'à 16&nbsp;% de cas en plus <sup class="cite"><a href="#src-7">7</a></sup>.</p>
+    <p>Ces études comparent des territoires ou des groupes, pas des personnes. Elles ne permettent pas, à
+      elles seules, d'expliquer l'écart qui se creuse dans la Vienne. Cet écart justifie d'aller regarder de
+      plus près.</p>
+  </div>
+
+  <h2>Les chiffres en détail</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th scope="col">Année</th><th scope="col">Personnes traitées, Deux-Sèvres</th><th scope="col">Nouveaux cas, Deux-Sèvres</th>
+          <th scope="col">Taux, Deux-Sèvres</th><th scope="col">Charente-Maritime</th><th scope="col">Vienne</th><th scope="col">Mayenne</th>
+          <th scope="col">France, même année</th><th scope="col">France, corrigé sur 2014</th></tr>
+      </thead>
+      <tbody>
+          <tr><th scope="row">2013</th><td>1 054</td><td>147</td><td>3,2</td><td>3,6</td><td>3,2</td><td>2,5</td><td>3,6</td><td>3,7</td></tr>
+          <tr><th scope="row">2014</th><td>1 080</td><td>174</td><td>3,9</td><td>3,8</td><td>3,9</td><td>4,1</td><td>4,0</td><td>4,0</td></tr>
+          <tr><th scope="row">2015</th><td>1 128</td><td>153</td><td>3,5</td><td>4,1</td><td>4,2</td><td>2,9</td><td>3,9</td><td>3,8</td></tr>
+          <tr><th scope="row">2016</th><td>1 098</td><td>134</td><td>3,0</td><td>4,0</td><td>4,3</td><td>3,5</td><td>3,9</td><td>3,7</td></tr>
+          <tr><th scope="row">2017</th><td>1 122</td><td>165</td><td>3,7</td><td>3,7</td><td>4,7</td><td>4,0</td><td>3,9</td><td>3,7</td></tr>
+          <tr><th scope="row">2018</th><td>1 144</td><td>173</td><td>4,0</td><td>3,9</td><td>5,4</td><td>4,0</td><td>3,9</td><td>3,7</td></tr>
+          <tr><th scope="row">2019</th><td>1 162</td><td>166</td><td>3,8</td><td>3,8</td><td>5,1</td><td>3,7</td><td>4,0</td><td>3,6</td></tr>
+          <tr><th scope="row">2020</th><td>1 191</td><td>172</td><td>3,9</td><td>4,0</td><td>5,0</td><td>3,8</td><td>3,8</td><td>3,4</td></tr>
+          <tr><th scope="row">2021</th><td>1 180</td><td>188</td><td>4,3</td><td>3,9</td><td>4,7</td><td>4,6</td><td>4,1</td><td>3,7</td></tr>
+          <tr><th scope="row">2022</th><td>1 180</td><td>153</td><td>3,5</td><td>4,0</td><td>5,6</td><td>3,6</td><td>4,2</td><td>3,7</td></tr>
+          <tr><th scope="row">2023</th><td>1 255</td><td>192</td><td>4,4</td><td>3,8</td><td>6,1</td><td>4,9</td><td>4,3</td><td>3,7</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Nouveaux cas pour 10&nbsp;000 habitants. Les taux des départements sont corrigés de l'âge et du sexe
+    sur la population française de chaque année. La colonne «&nbsp;France, même année&nbsp;» est le taux
+    national brut, qui sert de repère pour ces taux. La dernière colonne est corrigée sur la population de
+    2014. Tous ces taux sont fournis par Santé publique France, sur la plateforme
+    <a href="https://odisse.santepubliquefrance.fr/">Odissé</a>, données relevées le 21 novembre 2026, mise à
+    jour du 9 avril 2026, sous Licence Ouverte 2.0. Notre seul calcul est la comparaison de chaque département
+    au taux national de la même année, et le test de sa tendance.</p>
+
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li id="src-1"><span class="type">Texte officiel</span> Tableau n°&nbsp;58 des maladies professionnelles du régime
+      agricole, «&nbsp;Maladie de Parkinson provoquée par les pesticides&nbsp;», créé par le décret du 4 mai 2012, dernière
+      mise à jour par le décret du 17 décembre 2025. Fiche de l'INRS.
+      <a href="https://www.inrs.fr/publications/bdd/mp/tableau.html?refINRS=RA+58">inrs.fr</a></li>
+    <li id="src-2"><span class="type">Données officielles</span> Santé publique France, jeux de données «&nbsp;Parkinson&nbsp;:
+      incidence et prévalence&nbsp;» pour la France, les régions et les départements, 2013-2023, produits à partir du
+      Système national des données de santé, publiés sur la plateforme Odissé sous Licence Ouverte 2.0, mise à jour du
+      9 avril 2026. Données départementales reprises par l'Observatoire Parkinson France, initiative citoyenne bénévole
+      menée avec l'appui de l'association France Parkinson.
+      <a href="https://odisse.santepubliquefrance.fr/explore/dataset/parkinson-incidence-et-prevalence_dep/">odisse.santepubliquefrance.fr</a>,
+      <a href="https://parkinson.data-stat.org/departements/deux-sevres">parkinson.data-stat.org</a></li>
+    <li id="src-3"><span class="type">Institution</span> Santé publique France, «&nbsp;Maladie de Parkinson&nbsp;: quelle
+      évolution entre 2016 et 2020&nbsp;?&nbsp;», 11 avril 2023.
+      <a href="https://www.santepubliquefrance.fr/les-actualites/maladie-de-parkinson-quelle-evolution-entre-2016-et-2020">santepubliquefrance.fr</a></li>
+    <li id="src-4"><span class="type">Institution</span> Inserm, 2021. Expertise collective <em>Pesticides et effets sur la
+      santé, nouvelles données</em>, synthèse, tableau sur la maladie de Parkinson.
+      <a href="https://www.inserm.fr/expertise-collective/pesticides-et-sante-nouvelles-donnees-2021/">inserm.fr</a></li>
+    <li id="src-5"><span class="type">Étude</span> Kab S., Moisan F., Elbaz A., 2017. Farming and incidence of motor neuron
+      disease: French nationwide study. <em>European Journal of Neurology</em> 24:1191-1195. L'étude compare aussi
+      l'incidence de la maladie de Parkinson chez les agriculteurs et chez les autres assurés.
+      <a href="https://doi.org/10.1111/ene.13353">doi:10.1111/ene.13353</a></li>
+    <li id="src-6"><span class="type">Étude</span> Kab S., Spinosi J., Chaperon L. et al., 2017. Agricultural activities and
+      the incidence of Parkinson's disease in the general French population. <em>European Journal of Epidemiology</em>
+      32:203-216. <a href="https://doi.org/10.1007/s10654-017-0229-z">doi:10.1007/s10654-017-0229-z</a></li>
+    <li id="src-7"><span class="type">Étude</span> Perrin L., Spinosi J., Chaperon L. et al., 2021. Pesticides expenditures by
+      farming type and incidence of Parkinson disease in farmers: a French nationwide study.
+      <em>Environmental Research</em> 197:111161.
+      <a href="https://doi.org/10.1016/j.envres.2021.111161">doi:10.1016/j.envres.2021.111161</a></li>
+  </ol>
+
+  <p class="signature">Santé des Territoires Aigondigné</p>
+
+  <footer>
+    <a href="https://github.com/Biguhuh">github.com/Biguhuh</a>
+  </footer>
+</main>
+</body>
+</html>

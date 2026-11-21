@@ -67,6 +67,8 @@
   ul { margin: 0 0 12px; padding-left: 22px; }
   li { margin-bottom: 4px; }
   .signature { margin: 28px 0 0; font-weight: 600; }
+  /* Note de bas d'onglet, appelée par un astérisque. */
+  p.note-bas { font-size: 14px; margin-top: 28px; padding-top: 10px; border-top: 1px solid var(--accent); }
   /* « À retenir » en tête d'une restitution, même encadré que sur les pages Bio et Cancers. */
   .a-retenir {
     background: var(--card-bg); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
@@ -109,6 +111,7 @@
     <div class="tabs-inner" role="tablist">
       <button role="tab" id="tab-accueil" aria-selected="true" aria-controls="panel-accueil" tabindex="0" data-tab="accueil">Accueil</button>
       <button role="tab" id="tab-2026-10-13-mougon" aria-selected="false" aria-controls="panel-2026-10-13-mougon" tabindex="-1" data-tab="2026-10-13-mougon">13 octobre 2026, Mougon</button>
+      <button role="tab" id="tab-passereaux" aria-selected="false" aria-controls="panel-passereaux" tabindex="-1" data-tab="passereaux">Étude sur les passereaux</button>
       <button role="tab" id="tab-collectif" aria-selected="false" aria-controls="panel-collectif" tabindex="-1" data-tab="collectif">Le collectif</button>
     </div>
   </nav>
@@ -126,6 +129,14 @@
 
     <ul>
       <li><a href="#2026-10-13-mougon">13 octobre 2026, Mougon</a>&nbsp;: premiers résultats sur les pesticides mesurés dans l'air et dans les poussières des habitations.</li>
+    </ul>
+
+    <h2>Les publications</h2>
+
+    <p>Les résultats du programme paraissent aussi dans des revues scientifiques, après relecture par d'autres chercheurs. Nous en résumons l'essentiel.</p>
+
+    <ul>
+      <li><a href="#passereaux">Étude sur les passereaux</a>, octobre 2026&nbsp;: les pesticides dans le sang des oiseaux des haies et des jardins, selon la distance aux champs et la part de bio.</li>
     </ul>
 
     <h2>Liens utiles</h2>
@@ -229,6 +240,8 @@
       <li>les prélèvements humains&nbsp;: urines, selles et cheveux.</li>
     </ul>
 
+    <p>Une première étude sur les oiseaux de la zone atelier a été publiée en octobre 2026. Elle porte sur des captures faites en 2023 dans deux autres villages. Elle est résumée dans l'onglet <a href="#passereaux">«&nbsp;Étude sur les passereaux&nbsp;»</a>.</p>
+
     <p>Le suivi de ces travaux va s'étirer sur le long terme. Les habitants y sont pleinement associés.</p>
 
     <h3>Et nous, que faisons-nous&nbsp;?</h3>
@@ -247,6 +260,97 @@
     <p>Mais l'action individuelle ne suffira pas. Comme pour la lutte contre le dérèglement climatique, <strong>l'action collective</strong> est tout aussi indispensable.</p>
 
     <p>Pour aller plus loin sur le lien entre pesticides, santé et alimentation&nbsp;: <a href="https://biguhuh.github.io/cancer/">https://biguhuh.github.io/cancer/</a></p>
+
+    <p class="signature">Collectif Santé des Territoires Aigondigné</p>
+  </section>
+
+  <section id="panel-passereaux" class="tab-panel" role="tabpanel" aria-labelledby="tab-passereaux" data-tab="passereaux" hidden>
+    <h2>Étude sur les passereaux, octobre 2026</h2>
+
+    <div class="a-retenir">
+      <p><strong>À retenir</strong>, résultats publiés dans une revue scientifique après relecture par d'autres chercheurs</p>
+      <ul>
+        <li>Pendant la reproduction, un passereau vit sur un petit territoire autour de son nid. Son sang reflète les pesticides présents près de lui. Les auteurs y voient une bonne sentinelle de la contamination locale.</li>
+        <li>Sur les 111 pesticides recherchés, 37 ont été trouvés. Chaque oiseau en porte en moyenne 5. Près de deux tiers de ces molécules ne servent qu'en agriculture.</li>
+        <li>17 de ces molécules étaient déjà interdites au moment des captures. La plus fréquente est l'acétamipride<sup><a href="#note-acetamipride" aria-label="Note sur l'acétamipride">*</a></sup>, interdite en France depuis 2018.</li>
+        <li>Les oiseaux des jardins ne sont pas moins contaminés que ceux des haies agricoles.</li>
+        <li>Plus le jardin est loin du champ conventionnel le plus proche, moins il y a de pesticides dans le sang&nbsp;: la concentration baisse de 70&nbsp;% entre 0 et 378&nbsp;m. Ce sont des associations, mesurées chez des oiseaux et non chez des habitants.</li>
+      </ul>
+    </div>
+
+    <p>En octobre 2026, l'équipe du CEBC a publié dans la revue <em>Environment International</em> une étude sur les pesticides dans le sang des passereaux de la Zone Atelier Plaine &amp; Val de Sèvre. Audrey Bailly en est la première autrice. Sabrina Gaba et Vincent Bretagnolle font partie des auteurs.</p>
+
+    <p>Cet article est issu des travaux de thèse d'Audrey Bailly, au Centre d'études biologiques de Chizé, sous la direction de Karine Monceau et Jérôme Moreau. La thèse s'intitule «&nbsp;Influence de l'agriculture biologique sur la contamination aux pesticides et les effets sublétaux chez les passereaux des agroécosystèmes&nbsp;». Son <a href="https://www.univ-larochelle.fr/wp-content/uploads/20261003_Annonce-these-de-Madame-Audrey-BAILLY.pdf">avis de soutenance</a> est publié par La Rochelle Université.</p>
+
+    <h3>Le lien avec la restitution de Mougon&nbsp;:</h3>
+
+    <p>À Mougon, en 2025, les équipes du CEBC ont aussi prélevé le sang des oiseaux des jardins. Ces résultats-là ne sont pas encore publiés. L'étude publiée porte sur des oiseaux capturés en 2023, dans des haies de la plaine et dans les jardins de deux autres villages de la zone atelier. Elle montre ce que les chercheurs peuvent apprendre du sang des oiseaux.</p>
+
+    <h3>Pourquoi étudier les oiseaux&nbsp;:</h3>
+
+    <p>Mesurer les pesticides chez les habitants est long et difficile. Les passereaux vivent près des humains, dans les jardins et les haies. Pendant la saison de reproduction, ils restent sur un petit territoire, de 20 à 150&nbsp;m de rayon environ. Leur sang reflète donc les pesticides présents autour d'eux. Les chercheurs y voient des sentinelles de l'environnement que nous partageons avec eux.</p>
+
+    <h3>Ce qui a été mesuré&nbsp;:</h3>
+
+    <ul>
+      <li>31 sites, d'avril à juillet 2023&nbsp;: 12 haies en bordure de champs et 19 jardins dans deux villages&nbsp;;</li>
+      <li>autour des haies, la part de bio dans un rayon de 250&nbsp;m va de 0 à 100&nbsp;%&nbsp;;</li>
+      <li>les jardins sont situés de 0 à 378&nbsp;m du champ conventionnel le plus proche&nbsp;;</li>
+      <li>217 oiseaux adultes de 11 espèces, dont le merle, le rouge-gorge, la mésange charbonnière et la fauvette à tête noire&nbsp;;</li>
+      <li>une goutte de sang par oiseau, dans laquelle 111 pesticides ont été recherchés par un laboratoire du CNRS à Strasbourg.</li>
+    </ul>
+
+    <h3>Ce qui a été trouvé&nbsp;:</h3>
+
+    <p>Chez les cinq espèces présentes à la fois dans les haies et dans les jardins, 37 molécules ont été détectées&nbsp;: 14 fongicides, 15 herbicides et 8 insecticides. Chaque oiseau en porte environ cinq en moyenne.</p>
+
+    <p>Parmi ces 37 molécules, 17 étaient déjà interdites en France au moment des captures. La plus fréquente est l'acétamipride<sup><a href="#note-acetamipride" aria-label="Note sur l'acétamipride">*</a></sup>, un insecticide néonicotinoïde interdit en France depuis 2018. On la trouve chez 39&nbsp;% des oiseaux des jardins et chez 30&nbsp;% de ceux des haies. Pour une molécule interdite, les auteurs avancent trois explications possibles&nbsp;: un usage local qui continue, y compris illégal, une persistance dans l'environnement, ou une exposition ailleurs, pour les oiseaux migrateurs. Les données ne permettent pas de trancher.</p>
+
+    <p>Près des deux tiers des molécules trouvées ne sont autorisées qu'en agriculture.</p>
+
+    <h3>Jardins et haies, même niveau&nbsp;:</h3>
+
+    <p>Les chercheurs s'attendaient à des oiseaux moins contaminés dans les jardins, où l'on utilise beaucoup moins de pesticides. Ce n'est pas le cas&nbsp;: le nombre de molécules, leur concentration et leur toxicité sont du même ordre dans les jardins et dans les haies.</p>
+
+    <p>Pour les auteurs, les pesticides se dispersent au-delà des champs traités, par le vent au moment des épandages et par le ruissellement de l'eau. Ils jugent que les distances sans traitement fixées depuis 2020, de 5, 10 ou 20&nbsp;m selon les cultures et les produits, pourraient être insuffisantes.</p>
+
+    <h3>La distance aux champs compte&nbsp;:</h3>
+
+    <p>Dans les jardins, la contamination des oiseaux baisse quand on s'éloigne du champ conventionnel le plus proche. Entre 0 et 378&nbsp;m, selon les modèles de l'étude&nbsp;:</p>
+
+    <ul>
+      <li>le nombre de molécules baisse de 30&nbsp;%&nbsp;;</li>
+      <li>la concentration totale baisse de 70&nbsp;%&nbsp;;</li>
+      <li>l'indice de toxicité baisse de 85&nbsp;%, avec une marge d'incertitude large, de 41 à 96&nbsp;%.</li>
+    </ul>
+
+    <p>Les auteurs n'excluent pas que des habitants utilisent des pesticides dans leur jardin. Mais pour eux, la principale source de contamination reste les pesticides épandus sur les cultures conventionnelles.</p>
+
+    <h3>Le bio autour des haies&nbsp;:</h3>
+
+    <p>Dans les haies, plus la part de bio est grande dans un rayon de 250&nbsp;m, plus la concentration de pesticides dans le sang des oiseaux est faible. Entre 0 et 100&nbsp;% de bio, la baisse estimée est de 61&nbsp;%, avec une marge d'incertitude de 32,5 à 77,8&nbsp;%.</p>
+
+    <p>Sur le nombre de molécules et l'indice de toxicité, aucun effet n'est mis en évidence. Selon les auteurs, les pesticides se dispersent largement, et une partie peut venir de traitements antérieurs au passage en bio.</p>
+
+    <h3>Les limites de l'étude&nbsp;:</h3>
+
+    <ul>
+      <li>Ce sont des associations, pas la preuve d'une cause.</li>
+      <li>Les captures portent sur une seule saison, 2023, et sur peu d'oiseaux pour certaines espèces.</li>
+      <li>Les effets varient selon les espèces. Le rouge-gorge, qui vit sur un petit territoire, fait partie des espèces les plus pertinentes pour suivre les pesticides présents autour d'elles.</li>
+      <li>L'indice de toxicité sert à comparer les oiseaux entre eux. Il ne mesure pas un risque pour leur santé.</li>
+      <li>L'étude porte sur des oiseaux. Elle ne dit rien directement de l'exposition des habitants.</li>
+    </ul>
+
+    <p>Les auteurs demandent que ces résultats soient confirmés avec plus d'oiseaux et plus d'espèces. Selon eux, des mesures dans l'environnement et chez les habitants sont en cours d'analyse.</p>
+
+    <h3>Pour aller plus loin&nbsp;:</h3>
+
+    <p>Référence de l'article, en accès libre&nbsp;: Bailly A., Monceau K., Millet M., Debenest E., Gaba S., Bretagnolle V., Moreau J., 2026. Passerine birds as bio-indicators of pesticide levels in farmlands and gardens: mitigation by organic farming and distance from treated fields. <em>Environment International</em> 217:110574. <a href="https://doi.org/10.1016/j.envint.2026.110574">doi:10.1016/j.envint.2026.110574</a></p>
+
+    <p>Cette étude est aussi présentée sur la page <a href="https://biguhuh.github.io/bio-pesticides/#passereaux">Bio et pesticides</a>, avec les autres travaux du CEBC sur la plaine au sud de Niort.</p>
+
+    <p class="note-bas" id="note-acetamipride">* L'acétamipride est interdite en France depuis 2018. La loi Duplomb de 2025 prévoyait de permettre son retour par dérogation. Le Conseil constitutionnel a censuré cette disposition le 7 août 2025, par sa <a href="https://www.conseil-constitutionnel.fr/decision/2025/2025891DC.htm">décision n°&nbsp;2025-891 DC</a>. La <a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054707007">loi d'urgence agricole du 18 août 2026</a> ouvre une autre voie. Elle permet à l'Anses d'accorder des dérogations pour la seule culture des noisettes. Chaque dérogation dure un an, renouvelable deux fois. Le Conseil constitutionnel a jugé cette disposition conforme à la Constitution, avec des réserves, par sa <a href="https://www.conseil-constitutionnel.fr/decision/2026/2026914DC.htm">décision n°&nbsp;2026-914 DC</a>. Les oiseaux de l'étude ont été capturés en 2023, quand l'acétamipride était interdite.</p>
 
     <p class="signature">Collectif Santé des Territoires Aigondigné</p>
   </section>
