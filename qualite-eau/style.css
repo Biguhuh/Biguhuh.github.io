@@ -1,27 +1,60 @@
+/* Base : feuille de style du site cancer, biguhuh.github.io/cancer/style.css, charte commune du site. */
+/* Palette commune avec l'accueil et la page Bio et pesticides de biguhuh.github.io. */
 :root {
-  --bg: #fbfaf7;
-  --bg-alt: #f1efe8;
+  --bg: #f7f7f5;
+  --bg-alt: #efeeea;
   --paper: #ffffff;
-  --ink: #23241f;
-  --ink-soft: #55564d;
-  --accent: #1e5b3a;
-  --accent-soft: #e4efe7;
+  --ink: #1a1a1a;
+  --ink-soft: #5a5a5a;
+  --accent: #2f6f4f;
+  --accent-soft: #eef4f0;
   --warn: #a4331f;
   --warn-soft: #fbe9e6;
   --up: #a4331f;
   --up-bg: #fbe9e6;
   --down: #1c5a86;
   --down-bg: #e6f0f7;
-  --none: #6b6b62;
-  --none-bg: #ececE5;
-  --line: #ddd9cd;
+  --none: #5a5a5a;
+  --none-bg: #ecece8;
+  --line: #e3e2dd;
   --max-w: 760px;
   --max-w-wide: 1040px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a;
+    --bg-alt: #1a1d22;
+    --paper: #1d2025;
+    --ink: #f0f0ee;
+    --ink-soft: #a3a6ab;
+    --accent: #6fcf97;
+    --accent-soft: #1c2621;
+    --warn: #f08a76;
+    --warn-soft: #3a211c;
+    --up: #f08a76;
+    --up-bg: #3a211c;
+    --down: #7fb8e0;
+    --down-bg: #17283a;
+    --none: #a3a6ab;
+    --none-bg: #2a2d33;
+    --line: #2c2f35;
+  }
 }
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; color-scheme: light dark; }
+
+/* Accessibilité (WCAG 2.1 AA / RGAA) : les liens ont la couleur d'accent (contraste ≥ 5,5:1 sur
+   tous les fonds, en clair comme en sombre) et restent soulignés, pour ne pas reposer sur la seule
+   couleur, illisible pour certains daltoniens. Le focus clavier est toujours visible. */
+a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 
 body {
   margin: 0;
@@ -39,43 +72,31 @@ body {
 
 /* ---------- Header ---------- */
 
+/* En-tête sur le modèle de la page Bio et pesticides : lien retour, titre, sous-titre, date. */
 .site-header {
-  background: var(--accent);
-  color: #fff;
-  padding: 28px 0;
-}
-.header-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 16px;
-  flex-wrap: wrap;
+  color: var(--ink);
+  padding: 48px 0 8px;
 }
 /* Lien retour vers le sommaire du site biguhuh.github.io */
 .home-link {
   display: inline-block;
-  margin-bottom: 10px;
-  font-size: 0.85rem;
-  color: #dcece2;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--ink-soft);
   text-decoration: none;
 }
-.home-link:hover { color: #fff; text-decoration: underline; }
-.site-header h1 { margin: 0 0 6px; font-size: 1.5rem; }
+.home-link:hover { color: var(--accent); }
+.site-header h1 { margin: 0 0 12px; font-size: 30px; line-height: 1.2; }
 .site-header .subtitle {
-  margin: 0;
-  color: #dcece2;
-  max-width: 680px;
-  font-size: 0.95rem;
+  margin: 0 0 8px;
+  color: var(--ink-soft);
+  max-width: var(--max-w);
+  font-size: 16px;
 }
 .pub-date {
   margin: 0;
-  flex-shrink: 0;
-  font-size: 0.82rem;
-  color: #dcece2;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-  padding: 4px 12px;
-  white-space: nowrap;
+  font-size: 13px;
+  color: var(--ink-soft);
 }
 
 /* ---------- Onglet Synthèse (conclusion) ---------- */
@@ -125,6 +146,22 @@ body {
 }
 .method-block h3 { margin: 0 0 10px; color: var(--accent); font-size: 1.02rem; }
 .method-block p { margin: 0 0 12px; max-width: none; }
+.method-block .text-list { margin: 0; }
+/* « À retenir » en tête de l'Accueil : même encadré que la méthode, espacé du texte qui suit. */
+.method-block.a-retenir { margin: 0 0 24px; }
+.method-block .text-list li:last-child { margin-bottom: 0; }
+
+/* Onglet Enfants : remarque courte et complément en petit, en bas de page. */
+.note-line { color: var(--ink-soft); font-size: 0.95rem; margin-top: 18px; }
+.bonus {
+  max-width: var(--max-w);
+  margin-top: 36px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+.tab-panel .bonus h3 { font-size: 0.98rem; color: var(--ink-soft); margin-top: 0; }
 
 /* ---------- Onglet Registre : sommaire interne et parties ---------- */
 
@@ -329,13 +366,21 @@ figcaption { font-size: 0.85rem; color: var(--ink-soft); margin-top: 8px; }
 }
 .site-footer p { max-width: none; font-size: 0.82rem; color: var(--ink-soft); margin: 0; }
 
+.biblio-list .type {
+  display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--ink-soft); border: 1px solid var(--line);
+  border-radius: 4px; padding: 0 5px; margin-right: 4px; vertical-align: 1px;
+}
+
+@media (max-width: 640px) {
+  .site-header { padding: 32px 0 4px; }
+  .site-header h1 { font-size: 25px; }
+  main { padding: 28px 0 48px; }
+  .tabs [role="tab"] { padding: 12px 13px 10px; font-size: 0.88rem; }
+}
+
 /* ---------- Eau du robinet : couleurs et étiquettes propres à ce site ---------- */
 
-:root {
-  --accent: #1d5a7a;
-  --accent-soft: #e3eef4;
-}
-.site-header .subtitle, .pub-date { color: #d9e9f2; }
 
 /* Étiquettes [fait], [estimation], [hypothèse], [position] */
 .tag {
@@ -469,3 +514,26 @@ svg.petit { width: 100%; height: auto; display: block; }
   .ribbon span { top: 44px; right: -62px; width: 240px; font-size: 10px; padding: 8px 0; }
   .site-header .header-text { padding-right: 70px; }
 }
+
+/* Mode sombre : couleurs de la carte et des petites cartes de champs */
+@media (prefers-color-scheme: dark) {
+  .carte-commune { fill: #2a2d33; stroke: #14161a; }
+  .carte-commune.mellois { fill: #343840; }
+  .carte-commune.sans-reseau { fill: #1f2226; }
+  .carte-commune:hover, .carte-commune.actif { fill: #1f3a4d; }
+  .carte-commune.actif { stroke: #7fb8e0; }
+  .carte-point { stroke: #c9ccd1; stroke-width: 1.2; }
+  .carte-point.vide { stroke: #8b8e94; }
+  .carte-legende circle { stroke: #c9ccd1; stroke-width: 1; }
+  .carte-prise { stroke: #f0f0ee; }
+  .champs-fond, .champs-hors { fill: #2a2d33; }
+  .champs-hors-carre { background: #2a2d33; border-color: #5a5d63; }
+  .champs-parcelle { stroke: #14161a; }
+  .champs-bord { stroke: #f0f0ee; }
+  .champs-centre { fill: #f0f0ee; stroke: #14161a; }
+  .g-chgt-rond { fill: #f0f0ee; }
+  .g-chgt-num { fill: #14161a; }
+  svg.graphe { background: var(--paper); }
+}
+/* Focus clavier sur les points de la carte */
+.carte-cible:focus-visible { outline: none; stroke: var(--accent); stroke-width: 3; fill: transparent; }

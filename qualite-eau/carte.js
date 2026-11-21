@@ -16,6 +16,12 @@
   // Classes de nitrates moyens pour la couleur des points, en mg/L
   var CLASSES = [[10, "#86b6ef"], [25, "#5598e7"], [40, "#2a78d6"], [50, "#1c5cab"], [Infinity, "#0d366b"]];
 
+  // Au clavier : Tab va de point en point, Entrée ou Espace affiche le panneau
+  function clavier(e, action) {
+    e.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); action(); }
+    });
+  }
   function el(nom, attrs, parent) {
     var e = document.createElementNS(NS, nom);
     for (var k in attrs) e.setAttribute(k, attrs[k]);
@@ -60,10 +66,12 @@
     var analyse = Object.keys(k.series).length > 0;
     var cercle = el("circle", { cx: k.x, cy: k.y, r: analyse ? 5 : 3.2,
       class: "carte-point" + (analyse ? "" : " vide"), fill: col || (analyse ? "#9a988f" : "none") }, gP);
-    var cible = el("circle", { cx: k.x, cy: k.y, r: 10, class: "carte-cible" }, gP);
+    var cible = el("circle", { cx: k.x, cy: k.y, r: 10, class: "carte-cible", tabindex: 0, role: "button",
+      "aria-label": "Captage de " + k.commune + (analyse ? "" : ", sans analyse de l'ARS") }, gP);
     function entrer() { montrerCaptage(k, cercle); }
     cible.addEventListener("mouseenter", entrer);
     cible.addEventListener("click", function () { montrerCaptage(k, cercle, true); });
+    clavier(cible, function () { montrerCaptage(k, cercle, true); });
   });
 
   // Prises d'eau de surface : carrés ; bord tireté si la position est approchée
@@ -73,9 +81,11 @@
     var c = 6.5;
     var carre = el("rect", { x: k.x - c, y: k.y - c, width: 2 * c, height: 2 * c, rx: 1.5,
       class: "carte-prise" + (k.exacte ? "" : " approx"), fill: col || (analyse ? "#9a988f" : "#ffffff") }, gP);
-    var cible = el("circle", { cx: k.x, cy: k.y, r: 12, class: "carte-cible" }, gP);
+    var cible = el("circle", { cx: k.x, cy: k.y, r: 12, class: "carte-cible", tabindex: 0, role: "button",
+      "aria-label": "Prise d'eau de surface " + k.nom + ", " + k.commune }, gP);
     cible.addEventListener("mouseenter", function () { montrerPrise(k, carre); });
     cible.addEventListener("click", function () { montrerPrise(k, carre, true); });
+    clavier(cible, function () { montrerPrise(k, carre, true); });
   });
 
   // ---------- Panneau ----------
@@ -326,8 +336,14 @@
     return '<div class="petit-bloc"><p class="petit-titre">' + esc(s.nom) + ", " + unite + "</p>" + o.join("") + pq + "</div>";
   }
   // [27] devient un appel vers l'onglet Sources, [fait] une étiquette
+  // Les numéros du dossier deviennent ceux de l'onglet Sources de la page
+  var blocN = document.getElementById("num-sources");
+  var NUM = blocN ? JSON.parse(blocN.textContent) : {};
   function citer(t) {
     return t.replace(/\[(fait|estimation|hypothèse)\]/g, '<span class="tag">$1</span>')
-      .replace(/\[(\d{1,3})\]/g, '<sup class="cite">[<a href="#src-$1">$1</a>]</sup>');
+      .replace(/\[(\d{1,3})\]/g, function (_, g) {
+        var n = NUM[g] || g;
+        return '<sup class="cite">[<a href="#src-' + n + '">' + n + "</a>]</sup>";
+      });
   }
 })();
